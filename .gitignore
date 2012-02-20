@@ -1,0 +1,19 @@
+# Ignore objects and archives
+*.[oa]
+
+# Ignore precompiled headers
+*.gch
+
+# Specific files to ignore
+Matrix2-UnitTest
+RigidException-UnitTest
+Vector3-UnitTest
+Vector2-UnitTest
+OdeRungeKutta4-UnitTest
+OdeRungeKutta4-Plot1
+moc_SampleDemo.cpp
+OdeRungKutta4-UnitTest
+OdeRungeKutta4-Plot1
+
+# Ignore w/e .metadata is
+.metadata/
