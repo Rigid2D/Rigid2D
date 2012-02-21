@@ -10,25 +10,31 @@
 class SampleDemo : public QGLWidget
 {
   Q_OBJECT
-  
+
   public: 
     SampleDemo(QWidget *parent = NULL);
     ~SampleDemo();
     int getFps();
+    void pause();
 
   signals:
     void fpsChanged(int value);
 
   public slots:
     void paintGL();
+    void togglePause();
 
   protected:
     QTimer *animationTimer;
     QTime *fpsTimer;
     int frameCount;
     int fps;
-		Rigid2D::RigidBodySystem *rigidBodySystem;
+    bool paused;
+    float test_rot; // remove later
+    Rigid2D::RigidBodySystem *rigidBodySystem;
     Rigid2D::RigidBody *body;
+    Rigid2D::Force *mouseForce;
+    Rigid2D::Real userData_mouseForce[2]; // mouse coordinates for the mouse force object (x, y)
 
   protected:
     void initializeGL();
