@@ -55,15 +55,20 @@ namespace Rigid2D {
   void RigidBody::getState(Real *dst) const
   {
     assert(dst != NULL);
+    
+    DEBUG( std::cout << "Inside getstate, posx " << position_.x << std::endl; )
 
     dst[0] = position_.x;
     dst[1] = position_.y;
-    dst[2] = mass_ * velocity_.x;
-    dst[3] = mass_ * velocity_.y;
+    dst[2] = momentum_.x; //mass_ * velocity_.x;
+    dst[3] = momentum_.y; //mass_ * velocity_.y;
   }
 
 	void RigidBody::setState(Real *source){
 		assert(source != NULL);
+
+    DEBUG( std::cout << "Inside setstate, new posx " 
+        << source[2] << std::endl; )
 
 		position_.x = source[0];
 		position_.y = source[1];
@@ -75,8 +80,11 @@ namespace Rigid2D {
   {
     assert(dst != NULL);
 
-    dst[0] = velocity_.x;
-    dst[1] = velocity_.y;
+    DEBUG( std::cout << "Inside getstatederv, foacc_x " << forceAccumulator_[0] 
+        << std::endl; )
+
+    dst[0] = momentum_.x / mass_; //velocity_.x;
+    dst[1] = momentum_.y / mass_; //velocity_.y;
     dst[2] = forceAccumulator_.x;
     dst[3] = forceAccumulator_.y;
   }

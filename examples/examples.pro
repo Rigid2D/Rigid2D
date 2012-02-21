@@ -25,5 +25,5 @@ SOURCES = examples.cpp \
 	../include/Common/MathUtils.cpp \
 	../include/Common/feq.cpp
 
-QMAKE_CXXFLAGS += -std=c++0x
+QMAKE_CXXFLAGS += -std=c++0x -ggdb
 QMAKE_CLEAN += examples *.o

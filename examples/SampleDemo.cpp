@@ -28,7 +28,7 @@ SampleDemo::SampleDemo(QWidget *parent)
 	// Init sample rigid body;
   Real vertex_array[8] = {-5, 5, 5, 5,
                           5, -5, -5, -5};
-  body = new RigidBody(Vector2(0, 0), 10.0, vertex_array, 4, Vector2(0, 0));
+  body = new RigidBody(Vector2(5, 0), 10.0, vertex_array, 4, Vector2(0, 0));
   mouseForce->addRigidBody(body);
 
 	// Add body and force to rigidBodySystem
@@ -36,6 +36,8 @@ SampleDemo::SampleDemo(QWidget *parent)
   rigidBodySystem->addForce(mouseForce);
 
   userData_mouseForce[0] = 15;
+  userData_mouseForce[2] = 1;
+  userData_mouseForce[3] = 2;
 
 	// remove later
 	//test_rot = 0.0;
@@ -88,8 +90,8 @@ void SampleDemo::paintGL()
 
   glTranslatef(0, 0, -90);
   glTranslatef(body->getPosition()[0], body->getPosition()[1], 0);
-    std::cout << "RB position_x " << body->getPosition()[0] << std::endl;
-	glRotatef(test_rot, 0, 0, 1);
+    //std::cout << "RB position_x " << body->getPosition()[0] << std::endl;
+	//glRotatef(test_rot, 0, 0, 1);
 	//if (!paused)
 		//test_rot += 0.1;
   glColor3f (1, 1, 1);
@@ -98,6 +100,7 @@ void SampleDemo::paintGL()
 
   // Update ALL THE THINGS
   rigidBodySystem->update();
+  //std::cout << "RB position_x " << body->getPosition()[0] << std::endl;
 }
 
 void SampleDemo::mousePressEvent(QMouseEvent *event) 
