@@ -1,4 +1,5 @@
 #include "SampleDemo.h"
+#include "ForceFunctions.h"
 #include "Common/MathUtils.h"
 #include <QMouseEvent>
 
@@ -21,16 +22,23 @@ SampleDemo::SampleDemo(QWidget *parent)
 	// Init RigidBodySystem
 	rigidBodySystem = new RigidBodySystem();
 
+  // Create a spring force for the mouse
+  mouseForce = new Force(mouseSpringForce, NULL, 0, userData_mouseForce);
+
 	// Init sample rigid body;
   Real vertex_array[8] = {-5, 5, 5, 5,
                           5, -5, -5, -5};
   body = new RigidBody(Vector2(0, 0), 10.0, vertex_array, 4, Vector2(0, 0));
+  mouseForce->addRigidBody(body);
 
-	// Add body to rigidBodySystem
+	// Add body and force to rigidBodySystem
 	rigidBodySystem->addRigidBody(body);
+  rigidBodySystem->addForce(mouseForce);
+
+  userData_mouseForce[0] = 15;
 
 	// remove later
-	test_rot = 0.0;
+	//test_rot = 0.0;
 	paused = false;
 }
 
@@ -79,13 +87,17 @@ void SampleDemo::paintGL()
   glLoadIdentity();
 
   glTranslatef(0, 0, -90);
+  glTranslatef(body->getPosition()[0], body->getPosition()[1], 0);
+    std::cout << "RB position_x " << body->getPosition()[0] << std::endl;
 	glRotatef(test_rot, 0, 0, 1);
-	if (!paused)
-		test_rot += 0.1;
+	//if (!paused)
+		//test_rot += 0.1;
   glColor3f (1, 1, 1);
   glVertexPointer(2, GL_FLOAT, 0, body->getVertexArray());
   glDrawArrays(GL_POLYGON, 0, body->getVertexCount());
 
+  // Update ALL THE THINGS
+  rigidBodySystem->update();
 }
 
 void SampleDemo::mousePressEvent(QMouseEvent *event) 
@@ -107,8 +119,14 @@ void SampleDemo::mousePressEvent(QMouseEvent *event)
 
   gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
-  std::cout << body->pointIsInterior(posX, posY) << std::endl;
-  
+ /* if (event->type() == QEvent::MouseButtonRelease) {
+    std::cout << "sdvszdfz";
+  }
+  if (body->pointIsInterior(posX, posY))
+  {
+    userData_mouseForce[0] = posX;
+    userData_mouseForce[1] = posY;
+  }*/
 }
 
 void SampleDemo::mouseMoveEvent(QMouseEvent *event) 

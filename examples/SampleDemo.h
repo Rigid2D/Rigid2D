@@ -33,6 +33,8 @@ class SampleDemo : public QGLWidget
     float test_rot; // remove later
     Rigid2D::RigidBodySystem *rigidBodySystem;
     Rigid2D::RigidBody *body;
+    Rigid2D::Force *mouseForce;
+    Rigid2D::Real userData_mouseForce[2]; // mouse coordinates for the mouse force object (x, y)
 
   protected:
     void initializeGL();

@@ -3,6 +3,7 @@
 #include "Common/RigidException.h"
 #include <new>
 #include <cstring> // for memcpy()
+#include <iostream>
 
 using namespace std;
 

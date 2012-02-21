@@ -10,10 +10,12 @@ INCLUDEPATH += ../include
 # Input
 QT += opengl
 HEADERS = SampleDemo.h \
-  ../include/Rigid2D.h
+  ../include/Rigid2D.h \
+  ForceFunctions.h \
 
 SOURCES = examples.cpp \
   SampleDemo.cpp \
+  ForceFunctions.cpp \
   ../include/Objects/RigidBody.cpp \
   ../include/Objects/RigidBodySystem.cpp \
 	../include/Common/OdeRungeKutta4.cpp \
