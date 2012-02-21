@@ -37,7 +37,7 @@ SampleDemo::SampleDemo(QWidget *parent)
 
   userData_mouseForce[0] = 15;
   userData_mouseForce[2] = 1;
-  userData_mouseForce[3] = 2;
+  userData_mouseForce[3] = 1;
 
 	// remove later
 	//test_rot = 0.0;

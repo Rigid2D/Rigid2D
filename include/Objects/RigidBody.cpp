@@ -29,7 +29,7 @@ namespace Rigid2D {
 
   Vector2 RigidBody::getVelocity() const
   {
-    return velocity_;
+    return Vector2(momentum_.x/mass_, momentum_.y/mass_);
   }
 
   Vector2 RigidBody::getMomentum() const
