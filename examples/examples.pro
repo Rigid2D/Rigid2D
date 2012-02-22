@@ -12,8 +12,10 @@ QT += opengl
 HEADERS = SampleDemo.h \
   ../include/Rigid2D.h \
   ForceFunctions.h \
+  DemosFramework.h
 
 SOURCES = examples.cpp \
+  DemosFramework.cpp \
   SampleDemo.cpp \
   ForceFunctions.cpp \
   ../include/Objects/RigidBody.cpp \
@@ -23,7 +25,7 @@ SOURCES = examples.cpp \
 	../include/Common/RigidException.cpp \
   ../include/Objects/Force.cpp \
 	../include/Common/MathUtils.cpp \
-	../include/Common/feq.cpp
+	../include/Common/feq.cpp \
 
 QMAKE_CXXFLAGS += -std=c++0x -ggdb
 QMAKE_CLEAN += examples *.o
