@@ -35,12 +35,11 @@ SampleDemo::SampleDemo(QWidget *parent)
 	rigidBodySystem->addRigidBody(body);
   rigidBodySystem->addForce(mouseForce);
 
-  userData_mouseForce[0] = 15;
-  userData_mouseForce[2] = 1;
+  userData_mouseForce[0] = -15;
+  userData_mouseForce[1] = -15;
+  userData_mouseForce[2] = 2;
   userData_mouseForce[3] = 1;
 
-	// remove later
-	//test_rot = 0.0;
 	paused = false;
 }
 
@@ -84,23 +83,19 @@ void SampleDemo::paintGL()
 {
   calculateFps();
 
-  // Do drawing here!!
+  // Do drawing here!
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
 
   glTranslatef(0, 0, -90);
   glTranslatef(body->getPosition()[0], body->getPosition()[1], 0);
-    //std::cout << "RB position_x " << body->getPosition()[0] << std::endl;
-	//glRotatef(test_rot, 0, 0, 1);
-	//if (!paused)
-		//test_rot += 0.1;
   glColor3f (1, 1, 1);
   glVertexPointer(2, GL_FLOAT, 0, body->getVertexArray());
   glDrawArrays(GL_POLYGON, 0, body->getVertexCount());
 
-  // Update ALL THE THINGS
-  rigidBodySystem->update();
-  //std::cout << "RB position_x " << body->getPosition()[0] << std::endl;
+  // Update ALL THE THINGS!! (unless paused)
+	if (!paused)
+    rigidBodySystem->update();
 }
 
 void SampleDemo::mousePressEvent(QMouseEvent *event) 
