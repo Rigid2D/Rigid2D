@@ -1,6 +1,7 @@
 #include "ForceFunctions.h"
 #include <cassert>
 
+#include <iostream>
 /**
  * Using the following damped spring force equation:
  * f = -[ks*norm(l) + kd*(l_dot*l)/norm(l)]*l/norm(l)
@@ -10,7 +11,7 @@
  * l: vector representing distance between center of mass of RigidBody and mouse
  * position
  *
- * l_dot: vector representing differnce between velocity of center of mass of
+ * l_dot: vector representing difference between velocity of center of mass of
  * RigidBody and velocity of mouse.  Assumes mouse is stationary for the
  * purposes of computing force.
  *
