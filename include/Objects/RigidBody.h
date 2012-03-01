@@ -29,6 +29,8 @@ namespace Rigid2D
 
       Real* getVertexArray() const;
 
+      Vector2 getForceAccumulator() const;
+
 			// Copies RigidBody state information, such as position, momentum,
 			// orientation, and force accumulator, to the destination array dst.
       void getState(Real *dst) const;

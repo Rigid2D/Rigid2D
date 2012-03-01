@@ -67,7 +67,7 @@ void SampleDemo::resizeGL(int w, int h)
 
   glViewport( 0, 0, (GLint)w, (GLint)h );
 
-  std::cout << "W " << w << "\n";
+  //std::cout << "W " << w << "\n";
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   //gluPerspective(45.0f,(GLfloat)w / (GLfloat)h, 0.1f, 1000.0f);
@@ -96,9 +96,14 @@ void SampleDemo::paintGL()
   glVertexPointer(2, GL_FLOAT, 0, body->getVertexArray());
   glDrawArrays(GL_POLYGON, 0, body->getVertexCount());
 
+  cout.precision(3);
+
   // Update ALL THE THINGS!! (unless paused)
-	if (!paused)
+	if (!paused) {
+    cout << "RB{" << body->getPosition()[0] << " " << body->getPosition()[1] 
+       << " " << body->getForceAccumulator()[0] << " " << body->getForceAccumulator()[1] << "}\n";
     rigidBodySystem->update();
+  }
 }
 
 void SampleDemo::mousePressEvent(QMouseEvent *event) 
@@ -145,8 +150,8 @@ void SampleDemo::mousePressEvent(QMouseEvent *event)
   gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
   {
-    std::cout << posX << "   " << winY << std::endl;
-    std::cout << pos.x() << "   " << pos.y() << std::endl;
+    //std::cout << posX << "   " << winY << std::endl;
+    //std::cout << pos.x() << "   " << pos.y() << std::endl;
     userData_mouseForce[0] = pos.x() * (100.0/572) - 50;
     userData_mouseForce[1] = -(pos.y() * (100.0/572) - 50);
   }
@@ -173,8 +178,8 @@ void SampleDemo::mouseMoveEvent(QMouseEvent *event)
   gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
   {
-    std::cout << posX << "   " << winY << std::endl;
-    std::cout << pos.x() << "   " << pos.y() << std::endl;
+    //std::cout << posX << "   " << winY << std::endl;
+    //std::cout << pos.x() << "   " << pos.y() << std::endl;
    // userData_mouseForce[0] = pos.x() * (100.0/700);
    // userData_mouseForce[1] = pos.y() * (100.0/700);
   }

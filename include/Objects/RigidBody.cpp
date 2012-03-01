@@ -52,6 +52,11 @@ namespace Rigid2D {
     return vertex_array_;
   }
 
+  Vector2 RigidBody::getForceAccumulator() const
+  {
+    return forceAccumulator_;
+  }
+
   void RigidBody::getState(Real *dst) const
   {
     assert(dst != NULL);
