@@ -4,6 +4,8 @@
 #include <new>
 #include <cstring> // for memcpy()
 
+DEBUG( #include <iostream> )
+
 using namespace std;
 
 namespace Rigid2D {
@@ -15,8 +17,8 @@ namespace Rigid2D {
     systemDimension_ = 0;
 
     // TODO: Set to 2 for now.  Once we handle RigidBody orientation and angular momentum,
-    // change this to 4.
-    statesPerRigidBody_ = 2;
+    // change this to 4.  [OOD?] (OOD - out of date) -MD
+    statesPerRigidBody_ = 4; // RFC: 2 per vector so total of 4? -MD
 
     // Set the starting allocation size for S_.
     allocationSize_ = 10 * statesPerRigidBody_;
@@ -41,9 +43,13 @@ namespace Rigid2D {
   void RigidBodySystem::update() {
     if (systemDimension_ == 0) return;
 
+    DEBUG( std::cout << "Pre ODEsolver step S_[0] " << S_[0] << std::endl; )
+    
     // Update the system time_, and system state array S_
     solver_->processNextStep(time_, S_);
-
+    
+    DEBUG( std::cout << "Post ODEsolver step S_[0] " << S_[0] << std::endl; )
+    
     // Disperse state information within S_ to all RigidBodies
     updateRigidBodies();
   }
@@ -111,13 +117,13 @@ namespace Rigid2D {
     // Check if input S is the same as the system state array S_.  This will be
     // true for the first step of RungeKutta4 Method, allowing us to skip one
     // process cycle.
-    if (S != S_){
+    //if (S != S_){
       // Need to update all RigidBody state information using state array S, then
       // recalculate all force accumulator fields for the RigidBodies.
 
       // Copy elements of S into S_.
       memcpy(S_, S, systemDimension_*sizeof(Real));
-
+      DEBUG( std::cout << "S[0] " << S[0] << std::endl; )
       // Disperse state array S to all RigidBodies.
       updateRigidBodies();
 
@@ -127,7 +133,7 @@ namespace Rigid2D {
       // Loop through each Force object calling their applyForce() function.
       // This will update the RigidBody forceAccumulator fields needed for dSdt.
       applyAllForces();
-    }
+  //  }
 
     // Loop through each RigidBody and build the state derivative array
     // dSdt = (p_1\m_1, F_1,..., p_n\m_n, F_n)
@@ -155,11 +161,11 @@ namespace Rigid2D {
 
   void RigidBodySystem::buildDerivStateArray(Real * dSdt){
     assert(dSdt != NULL);
-
     Real *dSdt_temp = dSdt;
 
     unordered_set<RigidBody*>::iterator it;
     for(it = rigidBodies_.begin(); it != rigidBodies_.end(); ++it) {
+      DEBUG( std::cout << "Inside buildSystemStateArray()\n"; )
       // Store the current RigidBody's position, momentum, orientation, and
       // angular momentum information in the next 4 elements of S_.
       (*it)->getStateDeriv(dSdt_temp);
@@ -208,7 +214,7 @@ namespace Rigid2D {
       delete S_;
 
     try {
-      S_ = new Real [allocationSize_];
+      S_ = new Real[allocationSize_];
     }
     catch (std::bad_alloc error){
       throw InternalErrorException(__LINE__, __FUNCTION__, __FILE__,
@@ -225,6 +231,9 @@ namespace Rigid2D {
 
     // Copy all RigidBody state information into S_.
     buildSystemStateArray();
+
+    DEBUG( std::cout << "After buildSystemStateAr(), posx " << S_[0] 
+        << std::endl; )
 
     // Delete current OdeSolver, and reallocate a new one with dimension
     // equal to SLength_.
