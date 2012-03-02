@@ -55,8 +55,6 @@ namespace Rigid2D {
   void RigidBody::getState(Real *dst) const
   {
     assert(dst != NULL);
-    
-    DEBUG( std::cout << "Inside getstate, posx " << position_.x << std::endl; )
 
     dst[0] = position_.x;
     dst[1] = position_.y;
@@ -67,9 +65,6 @@ namespace Rigid2D {
 	void RigidBody::setState(Real *source){
 		assert(source != NULL);
 
-    DEBUG( std::cout << "Inside setstate, new posx " 
-        << source[2] << std::endl; )
-
 		position_.x = source[0];
 		position_.y = source[1];
 		momentum_.x = source[2];
@@ -79,9 +74,6 @@ namespace Rigid2D {
   void RigidBody::getStateDeriv(Real *dst) const
   {
     assert(dst != NULL);
-
-    DEBUG( std::cout << "Inside getstatederv, foacc_x " << forceAccumulator_[0] 
-        << std::endl; )
 
     dst[0] = momentum_.x / mass_; //velocity_.x;
     dst[1] = momentum_.y / mass_; //velocity_.y;
