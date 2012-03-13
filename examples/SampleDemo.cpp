@@ -38,8 +38,8 @@ SampleDemo::SampleDemo(QWidget *parent)
 
   //userData_mouseForce[0] = -15;
   //userData_mouseForce[1] = -15;
-  userData_mouseForce[2] = 2;
-  userData_mouseForce[3] = 8;
+  userData_mouseForce[2] = 3;
+  userData_mouseForce[3] = 4;
 
 	paused = false;
 }
@@ -100,8 +100,8 @@ void SampleDemo::paintGL()
 
   // Update ALL THE THINGS!! (unless paused)
 	if (!paused) {
-    cout << "RB{" << body->getPosition()[0] << " " << body->getPosition()[1] 
-       << " " << body->getForceAccumulator()[0] << " " << body->getForceAccumulator()[1] << "}\n";
+    //cout << "RB{" << body->getPosition()[0] << " " << body->getPosition()[1] 
+    //   << " " << body->getForceAccumulator()[0] << " " << body->getForceAccumulator()[1] << "}\n";
     rigidBodySystem->update();
   }
 }
@@ -152,6 +152,9 @@ void SampleDemo::mousePressEvent(QMouseEvent *event)
   {
     //std::cout << posX << "   " << winY << std::endl;
     //std::cout << pos.x() << "   " << pos.y() << std::endl;
+    //userdata_mouseforce[0] = pos.x() * (100.0/572) - 50;
+    //userdata_mouseforce[1] = -(pos.y() * (100.0/572) - 50);
+
     userData_mouseForce[0] = pos.x() * (100.0/572) - 50;
     userData_mouseForce[1] = -(pos.y() * (100.0/572) - 50);
   }
