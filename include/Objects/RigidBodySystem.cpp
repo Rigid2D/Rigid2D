@@ -111,7 +111,7 @@ namespace Rigid2D {
     // Check if input S is the same as the system state array S_.  This will be
     // true for the first step of RungeKutta4 Method, allowing us to skip one
     // process cycle.
-    //if (S != S_){
+    if (S != S_){
       // Need to update all RigidBody state information using state array S, then
       // recalculate all force accumulator fields for the RigidBodies.
 
@@ -127,7 +127,7 @@ namespace Rigid2D {
       // Loop through each Force object calling their applyForce() function.
       // This will update the RigidBody forceAccumulator fields needed for dSdt.
       applyAllForces();
-  //  }
+    }
 
     // Loop through each RigidBody and build the state derivative array
     // dSdt = (p_1\m_1, F_1,..., p_n\m_n, F_n)

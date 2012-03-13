@@ -87,7 +87,6 @@ void DemosFramework::restartDemo()
   delete CurrentDemo;
   CurrentDemo = new SampleDemo();
   CurrentDemo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  // retarded fix for positioning of the demo widget --- TODO make it less retarded
   GLLayout->addWidget(CurrentDemo);
   QObject::connect(PauseButton, SIGNAL(clicked()), CurrentDemo, SLOT(togglePause()));
   QObject::connect(CurrentDemo, SIGNAL(fpsChanged(int)), FPSNumLabel, SLOT(setNum(int)));
