@@ -4,8 +4,6 @@
 #include <new>
 #include <cstring> // for memcpy()
 
-DEBUG( #include <iostream> )
-
 using namespace std;
 
 namespace Rigid2D {
@@ -43,13 +41,9 @@ namespace Rigid2D {
   void RigidBodySystem::update() {
     if (systemDimension_ == 0) return;
 
-    DEBUG( std::cout << "Pre ODEsolver step S_[0] " << S_[0] << std::endl; )
-    
     // Update the system time_, and system state array S_
     solver_->processNextStep(time_, S_);
-    
-    DEBUG( std::cout << "Post ODEsolver step S_[0] " << S_[0] << std::endl; )
-    
+
     // Disperse state information within S_ to all RigidBodies
     updateRigidBodies();
   }
@@ -123,7 +117,7 @@ namespace Rigid2D {
 
       // Copy elements of S into S_.
       memcpy(S_, S, systemDimension_*sizeof(Real));
-      DEBUG( std::cout << "S[0] " << S[0] << std::endl; )
+
       // Disperse state array S to all RigidBodies.
       updateRigidBodies();
 
@@ -165,7 +159,6 @@ namespace Rigid2D {
 
     unordered_set<RigidBody*>::iterator it;
     for(it = rigidBodies_.begin(); it != rigidBodies_.end(); ++it) {
-      DEBUG( std::cout << "Inside buildSystemStateArray()\n"; )
       // Store the current RigidBody's position, momentum, orientation, and
       // angular momentum information in the next 4 elements of S_.
       (*it)->getStateDeriv(dSdt_temp);
@@ -231,9 +224,6 @@ namespace Rigid2D {
 
     // Copy all RigidBody state information into S_.
     buildSystemStateArray();
-
-    DEBUG( std::cout << "After buildSystemStateAr(), posx " << S_[0] 
-        << std::endl; )
 
     // Delete current OdeSolver, and reallocate a new one with dimension
     // equal to SLength_.

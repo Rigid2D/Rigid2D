@@ -22,7 +22,6 @@ void RungeKutta4RigidBodySolver::processNextStep (Real tIn, Real* xIn, Real& tOu
   // Step 2
   // kn2_ = f_(tIn + oneHalfStep_, xIn + oneHalfStep*kn1_)
   for(i = 0; i < dimension_; ++i){
-    DEBUG( std::cout << "kn1_" << i << "  " << kn1_[i] << std::endl; )
     tmp_[i] = xIn[i] + oneHalfStep_*kn1_[i];
   }
   rigidBodySystem_->computeStateDeriv(tIn + oneHalfStep_, tmp_, kn2_);
