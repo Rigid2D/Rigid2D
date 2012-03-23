@@ -1,5 +1,4 @@
 #include "RigidBodySystem.h"
-#include "Common/RungeKutta4RigidBodySolver.h"
 #include "Common/RigidException.h"
 #include <new>
 #include <cstring> // for memcpy()
@@ -84,25 +83,6 @@ namespace Rigid2D {
     }
   }
 
-  void RigidBodySystem::addForce(Force *force) {
-    forces_.insert(force);
-  }
-
-  void RigidBodySystem::addForces(Force **forces, unsigned int numForces) {
-    for (unsigned i = 0; i < numForces; ++i) {
-      forces_.insert(forces[i]);
-    }
-  }
-
-  void RigidBodySystem::removeForce(Force *force) {
-    forces_.erase(force);
-  }
-
-  void RigidBodySystem::removeForces(Force **forces, unsigned int numForces) {
-    for (unsigned int i = 0; i < numForces; ++i) {
-      forces_.erase(forces[i]);
-    }
-  }
 
   // Computes the derivative dS/dt, from the given inputs:
   // t - simulation time

@@ -19,6 +19,16 @@
 //#define NULL 0
 //#endif
 
+typedef
+void (*ForceFunctionPtr)(RigidBody * const rigidBody,    // Memory location for a particular
+                                                         // RigidBody that the force is acting
+                                                         // upon.
+
+                         Vector2 * dst,                  // Destination for storing force
+                                                         // components.
+
+                         void * userData);               // User specific data which can be
+                                                         // used in computing forces.
 
 // Place all global library settings and constants in this file.
 namespace Rigid2D{

@@ -85,47 +85,6 @@ namespace Rigid2D
        */
       void removeRigidBodies (RigidBody **rigidBodyArray, unsigned int numBodies);
 
-      /** Tells RigidBodySystem to apply the given force from here on out.
-			 * If the force was already previously given, it does not apply it a
-			 * second time.
-       *
-       * @param force pointer to a Force object.
-       * @see addForces()
-       * @see removeForce()
-       * @see removeForces()
-       */
-      void addForce(Force *force);
-
-      /** Same as addForce() but for multiple forces.
-			 *
-       * @param forces array of Force object pointers.
-			 * @param numForces length of forces.
-       * @see addForce()
-       * @see removeForce()
-       * @see removeForces()
-       */
-			void addForces(Force **forces, unsigned int numForces);
-
-      /** Tells RigidBodySystem to remove the force from the list of forces
-			 * being applied. If the force was not being applied, it does nothing.
-       *
-       * @param force pointer to a Force object.
-       * @see addForces()
-       * @see addForces()
-       * @see removeForces()
-       */
-			void removeForce(Force *force);
-
-      /** Same as removeForce() but for multiple forces.
-			 *
-       * @param forces array of Force object pointers.
-			 * @param numForces length of forces.
-       * @see addForce()
-       * @see addForces()
-       * @see removeForce()
-       */
-			void removeForces (Force **forces, unsigned int numForces);
-
       unsigned int getDimension();
 
       // Computes the derivative dS/dt, from the given inputs:
