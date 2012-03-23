@@ -33,7 +33,7 @@ namespace Rigid2D {
       // @state is the array containing position, momentum, etc.
       // @results a two dimensional array containing the resultant 
       // force.x and force.y.
-      void calculateForce(RigidBody * const rb, Real *state, Real *result);
+      void computeForce(RigidBody * const rb, RBState *state, Real *result);
 
       // Set funct as the new ForceFunctionPtr
       void setForceFunction(ForceFunctionPtr funct);

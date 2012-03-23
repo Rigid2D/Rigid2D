@@ -4,11 +4,10 @@
 
 namespace Rigid2D {
 
-  RigidBody::RigidBody(Vector2 position, Real mass, Real *vertex_array,
-      int vertex_count, Vector2 velocity)
-    : position_(position),
-    velocity_(velocity),
-    momentum_(velocity*mass),
+  RigidBody::RigidBody(Vector2 & position, Vector2 & velocity, Real mass, 
+      int vertex_count, Real *vertex_array)
+    : state_.position(position),
+    state_.momentum(velocity * mass),
     mass_(mass),
     vertex_count_(vertex_count)
   {
@@ -22,23 +21,22 @@ namespace Rigid2D {
     delete vertex_array_;
   }
 
-
   void RigidBody::update()
   {
-
+    ODESolver::nextStep(this);
   }
 
-  void RigidBody::computeForces(Vector2 & result)
+  void RigidBody::computeForces(RBState *state)
   {
+    forceAccumulator_ = Vector(0, 0);
     unordered_set<Force*>::iterator it;
-    Vector2 tempResult;
+    Vector2 forceResult;
     for (it = forces_.begin(); it != forces_.end(); ++it) 
     {
-      (*it)->computeForce(&tempResult);
-      result += tempResult;
+      (*it)->computeForce(this, state, &forceResult);
+      forceAccumulator_ += forceResult;
     }
   }
-
 
   void RigidBody::addForce(Force *force) 
   {
@@ -65,22 +63,70 @@ namespace Rigid2D {
 
   Vector2 RigidBody::getPosition() const
   {
-    return position_;
+    return state_.position;
   }
 
   Vector2 RigidBody::getVelocity() const
   {
-    return Vector2(momentum_.x/mass_, momentum_.y/mass_);
+    return state_.momentum / mass;
   }
 
   Vector2 RigidBody::getMomentum() const
   {
-    return momentum_;
+    return state.momentum_;
   }
 
   Real RigidBody::getMass() const
   {
     return mass_;
+  }
+
+  void RigidBody::getState(RBState *dest) const
+  {
+    return state_;
+  }
+
+  void RigidBody::setState(RBState *state){
+    assert(source != NULL);
+
+    state_ = state;
+  }
+
+  void RigidBody::computeStateDeriv(Real t, Real * dState)
+  {
+    assert(dState != NULL);
+
+    dState[0] = momentum_.x / mass_;
+    dState[1] = momentum_.y / mass_;
+    dState[2] = forceAccumulator_.x;
+    dState[3] = forceAccumulator_.y;
+  }
+
+  void RigidBody::setPosition(const Vector2 & position)
+  {
+    state_.position = position;
+  }
+
+  void RigidBody::setPosition (Real xPos, Real yPos)
+  {
+    state_.position.x = xPos;
+    state_.position.y = yPos;
+  }
+
+  void RigidBody::setVelocity(const Vector2 & velocity)
+  {
+    state_.momentum = velocity * mass_;
+  }
+
+  void RigidBody::setVelocity (Real xVel, Real yVel)
+  {
+    state_.momentum = Vector2(xVel, yVel) * mass_;
+  }
+
+  void RigidBody::setMass(const Real &mass)
+  {
+    state_.momentum /= mass_ / mass;
+    mass_ = mass;
   }
 
   int RigidBody::getVertexCount() const
@@ -91,89 +137,6 @@ namespace Rigid2D {
   Real* RigidBody::getVertexArray() const
   {
     return vertex_array_;
-  }
-
-  Vector2 RigidBody::getForceAccumulator() const
-  {
-    return forceAccumulator_;
-  }
-
-  void RigidBody::getState(Real *dst) const
-  {
-    assert(dst != NULL);
-
-    dst[0] = position_.x;
-    dst[1] = position_.y;
-    dst[2] = momentum_.x;
-    dst[3] = momentum_.y;
-  }
-
-  void RigidBody::setState(Real *source){
-    assert(source != NULL);
-
-    position_.x = source[0];
-    position_.y = source[1];
-    momentum_.x = source[2];
-    momentum_.y = source[3];
-  }
-
-  void RigidBody::getStateDeriv(Real *dst) const
-  {
-    assert(dst != NULL);
-
-    dst[0] = momentum_.x / mass_;
-    dst[1] = momentum_.y / mass_;
-    dst[2] = forceAccumulator_.x;
-    dst[3] = forceAccumulator_.y;
-  }
-
-  void RigidBody::computeStateDeriv(Real t, Real * S, Real * dSdt)
-  {
-    // call all sumForces with t and s
-    // create dSdt
-    
-  }
-
-  void RigidBody::setPosition(const Vector2 & position)
-  {
-    position_ = position;
-  }
-
-  void RigidBody::setPosition (Real xPos, Real yPos)
-  {
-    position_.x = xPos;
-    position_.y = yPos;
-  }
-
-  void RigidBody::setVelocity(const Vector2 & velocity)
-  {
-    velocity_ = velocity;
-    momentum_ = velocity_ * mass_;
-  }
-
-  void RigidBody::setVelocity (Real xComponent, Real yComponent)
-  {
-    velocity_.x = xComponent;
-    velocity_.y = yComponent;
-
-    momentum_ = velocity_ * mass_;
-  }
-
-  void RigidBody::setMass(const Real &mass)
-  {
-    mass_ = mass;
-    momentum_ = mass_ * velocity_;
-  }
-
-  void RigidBody::addToForceAccum(const Vector2 &force)
-  {
-    forceAccumulator_ += force;
-  }
-
-  void RigidBody::zeroForceAccum()
-  {
-    forceAccumulator_.x = 0;
-    forceAccumulator_.y = 0;
   }
 
   bool RigidBody::pointIsInterior(Real x, Real y)

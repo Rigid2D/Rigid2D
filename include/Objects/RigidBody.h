@@ -11,6 +11,13 @@
 
 namespace Rigid2D
 {
+  // Stores the state needed for force calculations.
+  typedef struct {
+    Vector2 position;
+    Vector2 momentum;
+  } RBState;
+
+  // Stores a rigid body - the base object used in the physics simulation.
   class RigidBody
   {
     public:
@@ -18,13 +25,18 @@ namespace Rigid2D
        *
        * @param vertex_array should be an array of tuples in the form of (x,y). It will get deep-copied
        * @param vertex_count is the number of tuples (not the number of Reals) */
-      RigidBody(Vector2 position, Real mass, Real *vertex_array, int vertex_count, Vector2 velocity);
+      RigidBody(Vector2 position, Vector2 velocity, Real mass, int vertex_count, Real *vertex_array);
       ~RigidBody();
 
       /** Computes and sets the state of the object for next frame.
        * ODE computations are done from this function.
       */
       void update();
+
+      /** Zeroes and then sums forces into forceAccumulator_ */
+      void computeForces(RBState *state) const;
+      void computeStateDeriv(RBState *dState) const;
+
 
       /** Tells RigidBodySystem to apply the given force from here on out.
 			 * If the force was already previously given, it does not apply it a
@@ -67,65 +79,36 @@ namespace Rigid2D
        */
 			void removeForces (Force **forces, unsigned int numForces);
 
-
-      // returns position of center of mass for RigidBody
       Vector2 getPosition() const;
-
       Vector2 getVelocity() const;
-
       Vector2 getMomentum() const;
-
       Real getMass() const;
+      RBState * getState() const;
 
-      int getVertexCount() const;
-
-      Real* getVertexArray() const;
-
-      Vector2 getForceAccumulator() const;
-
-			// Copies RigidBody state information, such as position, momentum,
-			// orientation, and force accumulator, to the destination array dst.
-      void getState(Real *dst) const;
-
-			// Copies state information from source array, such as position, momentum,
-			// orientation, and force accumulator, and stores within respective fields
-			// for the current RigidBody.
-			void setState(Real *source);
-
-			// Builds the state derivative array dSdt from current RigidBody state
-			// information and stores entries in destination array dst.
-      void getStateDeriv(Real *dst) const;
-
+			void setState(RBState *state);
       void setPosition (const Vector2 & position);
-
       void setPosition (Real xPos, Real yPos);
-
       void setVelocity (const Vector2 & velocity);
-
-      void setVelocity (Real xComponent, Real yComponent);
-
-      //void setMomentum (const Vector2 & momentum);
-
-      //void setMomentum (Real xComponent, Real yComponent);
-
+      void setVelocity (Real xVel, Real yVel);
       void setMass(const Real &);
 
-      void addToForceAccum(const Vector2 &);
 
-      void zeroForceAccum();
+      int getVertexCount() const;
+      Real* getVertexArray() const;
 
       /* Given a point in graphics coordinate space, this function returns true if
        * the point lies within the convex polygon defined by vertex_array_.*/
       bool pointIsInterior(Real x, Real y);
 
     protected:
-      Vector2 position_;          // Position of center of mass
-      Vector2 velocity_;          // Velocity of center of mass
-      Vector2 momentum_;          // Total momentum of RigidBody
+      RBState state_;             // Position, momentum
+      //Vector2 position_;          // Position of center of mass
+      Vector2 velocity_;          // Velocity of center of mass (implicitly calculated)
+      //Vector2 momentum_;          // Total momentum of RigidBody
       Vector2 forceAccumulator_;  // Sum of forces acting on the center of mass of RigidBody
-      Real mass_;                 // Total mass
-      int vertex_count_;
+      Real mass_;                 // Object mass
       unordered_set<Force*> forces_;    // all forces being applied to this RB
+      int vertex_count_;
       Real *vertex_array_;
 
   };
