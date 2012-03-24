@@ -22,7 +22,7 @@ namespace Rigid2D {
     unordered_set<RigidBody*>::iterator it;
     for (it = rigidBodies_.begin(); it != rigidBodies_.end(); ++it)
     {
-      it->update();
+      (*it)->update();
     }
   }
 

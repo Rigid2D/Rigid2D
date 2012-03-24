@@ -29,8 +29,7 @@ SampleDemo::SampleDemo(QWidget *parent)
 	// Init sample rigid body;
   Real vertex_array[8] = {-5, 5, 5, 5,
                           5, -5, -5, -5};
-  Vector2 t1(5,0), t2(0,0);
-  body = new RigidBody(t1, t2, 10.0, vertex_array, 4);
+  body = new RigidBody(Vector2(5, 0), Vector2(0,0), 10.0, vertex_array, 4);
   body->addForce(mouseForce);
 
 	// Add body and force to rigidBodySystem

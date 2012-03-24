@@ -4,12 +4,14 @@
 #include "Common/RigidSettings.h"
 #include "Common/MathUtils.h"
 #include "Common/Vector2.h"
-#include "Common/RungeKutta4RigidBodySolver.h"
+//#include "Common/RungeKutta4RigidBodySolver.h"
 #include "Objects/Force.h"
 #include <unordered_set>
 
 namespace Rigid2D
 {
+  class Force;
+
   // Stores the state needed for force calculations.
   typedef struct RBSTATE {
     Vector2 position;

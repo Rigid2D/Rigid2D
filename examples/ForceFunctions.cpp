@@ -22,7 +22,7 @@
  * kd: damping constant
  *
 */
-void mouseSpringForce(RigidBody * const rigidBody, RBState *state, Vector2 * dst, void * userData){
+void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * dst, void * userData){
   assert(rigidBody != NULL);
   assert(dst != NULL);
   assert(userData != NULL);

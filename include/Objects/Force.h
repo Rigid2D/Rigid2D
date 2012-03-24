@@ -3,9 +3,10 @@
 #include "Common/RigidSettings.h"
 #include "Common/Vector2.h"
 #include "Objects/RigidBody.h"
-#include <unordered_set>
 
 namespace Rigid2D {
+
+  class RigidBody;
 
   typedef
   void (*ForceFunctionPtr)
@@ -13,7 +14,7 @@ namespace Rigid2D {
                                      // RigidBody that the force is acting
                                      // upon.
 
-     struct RBSTATE * state,                // RB state vector (position, momentum, ...)
+     struct RBSTATE * state,         // RB state vector (position, momentum, ...)
 
      Vector2 * dst,                  // Destination for storing force
                                      // components.
@@ -27,14 +28,14 @@ namespace Rigid2D {
   /// the ForceFunction.
   class Force {
     public:
-      Force(ForceFunctionPtr forceFunction, void * userData = 0);
+      Force(ForceFunctionPtr forceFunction, void *userData = 0);
       ~Force();
 
       // Calls the ForceFunction with the parameters specified.
       // @state is the array containing position, momentum, etc.
       // @results a two dimensional array containing the resultant 
       // force.x and force.y.
-      void computeForce(RigidBody * const rb, struct RBSTATE *state, Vector2 & result);
+      void computeForce(RigidBody * const rb, struct RBSTATE *state, Vector2 *result);
 
       // Set funct as the new ForceFunctionPtr
       void setForceFunction(ForceFunctionPtr funct);
@@ -45,7 +46,7 @@ namespace Rigid2D {
       // Enable current Force object by passing true, or disable it by passing false.
       // If the Force object is diabled, it will not act upon its current list of
       // RigidBodies until it is enabled again.
-      void setEnabled(bool trueOrFlase);
+      void setEnabled(bool trueOrFalse);
 
       // Set the value of the userData_ pointer
       void setUserData(void * userData);

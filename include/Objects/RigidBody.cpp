@@ -34,7 +34,7 @@ namespace Rigid2D
     Vector2 forceResult;
     for (it = forces_.begin(); it != forces_.end(); ++it) 
     {
-      (*it)->computeForce(this, &state, forceResult);
+      (*it)->computeForce(this, &state, &forceResult);
       forceAccumulator_ += forceResult;
     }
   }

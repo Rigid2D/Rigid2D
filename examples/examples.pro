@@ -20,8 +20,8 @@ SOURCES = examples.cpp \
   ForceFunctions.cpp \
   ../include/Objects/RigidBody.cpp \
   ../include/Objects/RigidBodySystem.cpp \
-	../include/Common/OdeRungeKutta4.cpp \
-	../include/Common/RungeKutta4RigidBodySolver.cpp \
+	#../include/Common/OdeRungeKutta4.cpp \
+	#../include/Common/RungeKutta4RigidBodySolver.cpp \
 	../include/Common/RigidException.cpp \
   ../include/Objects/Force.cpp \
 	../include/Common/MathUtils.cpp \

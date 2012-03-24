@@ -4,7 +4,7 @@ using namespace std;
 
 namespace Rigid2D {
 
-  Force::Force(ForceFunctionPtr forceFunction, void * userData = 0)
+  Force::Force(ForceFunctionPtr forceFunction, void *userData)
     : userData_(userData),
       enabled_(true),
       forceFunction_(forceFunction)
@@ -12,7 +12,7 @@ namespace Rigid2D {
     // nothing to be done
   }
 
-  void Force::computeForce(RigidBody * const rb, RBState *state, Vector2 & result)
+  void Force::computeForce(RigidBody * const rb, RBState *state, Vector2 *result)
   {
     forceFunction_(rb, state, result, userData_);
   }
@@ -27,7 +27,7 @@ namespace Rigid2D {
     return enabled_;
   }
 
-  void Force::setEnabled(bool trueOrFlase)
+  void Force::setEnabled(bool trueOrFalse)
   {
     enabled_ = trueOrFalse;
   }
