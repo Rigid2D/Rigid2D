@@ -2,7 +2,7 @@
 #define RIGID2D_FORCE_H
 #include "Common/RigidSettings.h"
 #include "Common/Vector2.h"
-#include "Objects/RigidBody.h"
+#include "Objects/RigidBody.h" // needed for RBState
 
 namespace Rigid2D {
 
@@ -14,7 +14,7 @@ namespace Rigid2D {
                                      // RigidBody that the force is acting
                                      // upon.
 
-     struct RBSTATE * state,         // RB state vector (position, momentum, ...)
+     struct RBState * state,         // RB state vector (position, momentum, ...)
 
      Vector2 * dst,                  // Destination for storing force
                                      // components.
@@ -35,7 +35,7 @@ namespace Rigid2D {
       // @state is the array containing position, momentum, etc.
       // @results a two dimensional array containing the resultant 
       // force.x and force.y.
-      void computeForce(RigidBody * const rb, struct RBSTATE *state, Vector2 *result);
+      void computeForce(RigidBody * const rb, struct RBState *state, Vector2 *result);
 
       // Set funct as the new ForceFunctionPtr
       void setForceFunction(ForceFunctionPtr funct);

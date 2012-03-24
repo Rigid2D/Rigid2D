@@ -24,7 +24,9 @@ namespace Rigid2D
 
   void RigidBody::update()
   {
-    //ODESolver::nextStep(this);
+    //RBState result;
+    //RBSolver::nextStep(this, result);
+    //setState(result);
   }
 
   void RigidBody::computeForces(RBState & state)
@@ -39,9 +41,9 @@ namespace Rigid2D
     }
   }
 
-  void RigidBody::computeStateDeriv(RBState & dState) const
+  void RigidBody::computeStateDeriv(const RBState &state, RBState &dState) const
   {
-    dState.position = state_.momentum / mass_;
+    dState.position = state.momentum / mass_;
     dState.momentum = forceAccumulator_;
   }
 

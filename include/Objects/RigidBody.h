@@ -4,19 +4,57 @@
 #include "Common/RigidSettings.h"
 #include "Common/MathUtils.h"
 #include "Common/Vector2.h"
-//#include "Common/RungeKutta4RigidBodySolver.h"
 #include "Objects/Force.h"
 #include <unordered_set>
 
 namespace Rigid2D
 {
   class Force;
+  class RBSolver;
 
   // Stores the state needed for force calculations.
-  typedef struct RBSTATE {
+  struct RBState {
     Vector2 position;
     Vector2 momentum;
-  } RBState;
+
+    RBState() {}
+    RBState(const Vector2 &pos, const Vector2 &mom) {
+      position = pos;
+      momentum = mom;
+    }
+
+    void operator *= (Real scalar) {
+      position *= scalar;
+      momentum *= scalar;
+    }
+
+    void operator /= (Real scalar) {
+      position /= scalar;
+      momentum /= scalar;
+    }
+
+    RBState operator + (const RBState & s) const {
+      return RBState(position + s.position, momentum + s.momentum);
+    }
+
+    RBState operator - (const RBState & s) const {
+      return RBState(position - s.position, momentum - s.momentum);
+    }
+
+    RBState operator * (const Real scalar) const {
+      return RBState(position * scalar, momentum * scalar);
+    }
+
+    friend RBState operator * (const Real scalar, const RBState &state) {
+      return state * scalar;
+    }
+
+    RBState operator / (const Real scalar) const {
+      assert(feq(scalar, 0.0) == false);
+      return RBState(position / scalar, momentum / scalar);
+    }
+  };
+
 
   // Stores a rigid body - the base object used in the physics simulation.
   class RigidBody
@@ -26,7 +64,7 @@ namespace Rigid2D
        *
        * @param vertex_array should be an array of tuples in the form of (x,y). It will get deep-copied
        * @param vertex_count is the number of tuples (not the number of Reals) */
-      RigidBody(const Vector2 & position, const Vector2 & velocity, 
+      RigidBody(const Vector2 &position, const Vector2 &velocity, 
                 Real mass, Real *vertex_array, int vertex_count);
       ~RigidBody();
 
@@ -36,8 +74,8 @@ namespace Rigid2D
       void update();
 
       /** Zeroes and then sums forces into forceAccumulator_ */
-      void computeForces(RBState & state);
-      void computeStateDeriv(RBState & dState) const;
+      void computeForces(RBState &state);
+      void computeStateDeriv(const RBState &state, RBState &dState) const;
 
 
       /** Tells RigidBodySystem to apply the given force from here on out.

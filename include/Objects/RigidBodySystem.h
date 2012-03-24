@@ -8,8 +8,6 @@
 
 namespace Rigid2D
 {
-  class RigidBody;
-
   class RigidBodySystem
 	{
     public:
