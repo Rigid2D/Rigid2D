@@ -24,17 +24,17 @@ SampleDemo::SampleDemo(QWidget *parent)
 	rigidBodySystem = new RigidBodySystem();
 
   // Create a spring force for the mouse
-  mouseForce = new Force(mouseSpringForce, NULL, 0, userData_mouseForce);
+  mouseForce = new Force(mouseSpringForce, userData_mouseForce);
 
 	// Init sample rigid body;
   Real vertex_array[8] = {-5, 5, 5, 5,
                           5, -5, -5, -5};
-  body = new RigidBody(Vector2(5, 0), 10.0, vertex_array, 4, Vector2(0, 0));
-  mouseForce->addRigidBody(body);
+  Vector2 t1(5,0), t2(0,0);
+  body = new RigidBody(t1, t2, 10.0, vertex_array, 4);
+  body->addForce(mouseForce);
 
 	// Add body and force to rigidBodySystem
 	rigidBodySystem->addRigidBody(body);
-  rigidBodySystem->addForce(mouseForce);
 
   //userData_mouseForce[0] = -15;
   //userData_mouseForce[1] = -15;
@@ -96,7 +96,7 @@ void SampleDemo::paintGL()
   glVertexPointer(2, GL_FLOAT, 0, body->getVertexArray());
   glDrawArrays(GL_POLYGON, 0, body->getVertexCount());
 
-  cout.precision(3);
+  std::cout.precision(3);
 
   // Update ALL THE THINGS!! (unless paused)
 	if (!paused) {

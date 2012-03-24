@@ -17,22 +17,22 @@ namespace Rigid2D {
     forceFunction_(rb, state, result, userData_);
   }
 
-  void setForceFunction(ForceFunctionPtr funct)
+  void Force::setForceFunction(ForceFunctionPtr funct)
   {
     forceFunction_ = funct;
   }
 
-  bool isEnabled()
+  bool Force::isEnabled()
   {
     return enabled_;
   }
 
-  void setEnabled(bool trueOrFlase)
+  void Force::setEnabled(bool trueOrFlase)
   {
     enabled_ = trueOrFalse;
   }
 
-  void setUserData(void * userData)
+  void Force::setUserData(void * userData)
   {
     userData_ = userData;
   }

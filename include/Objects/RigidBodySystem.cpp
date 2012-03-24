@@ -1,7 +1,5 @@
 #include "RigidBodySystem.h"
 #include "Common/RigidException.h"
-#include <new>
-#include <cstring> // for memcpy()
 
 using namespace std;
 
@@ -15,7 +13,7 @@ namespace Rigid2D {
 
   RigidBodySystem::~RigidBodySystem() 
   {
-    delete rigidBodies_;
+    // look up what to do with rigidBodies_
   }
 
 

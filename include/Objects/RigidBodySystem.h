@@ -3,11 +3,13 @@
 
 #include "Common/RigidSettings.h"
 #include "Common/OdeSolver.h"
-#include "RigidBody.h"
-#include "Force.h"
+#include "Objects/RigidBody.h"
+#include <unordered_set>
 
 namespace Rigid2D
 {
+  class RigidBody;
+
   class RigidBodySystem
 	{
     public:
@@ -61,7 +63,7 @@ namespace Rigid2D
       void removeRigidBodies (RigidBody **rigidBodyArray, unsigned int numBodies);
 
     private:
-      unordered_set<RigidBody*> rigidBodies_;   // Collection of all tracked rigid bodies
+      std::unordered_set<RigidBody*> rigidBodies_;   // Collection of all tracked rigid bodies
                                                 // all RigidBody state information.
       Real time_;                               // Simulation clock
 	};

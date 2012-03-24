@@ -1,18 +1,17 @@
 #ifndef RIGID2D_RIGID_BODY_H
 #define RIGID2D_RIGID_BODY_H
 
-#include "Objects/RigidBody.h"
-#include "Objects/Force.h"
 #include "Common/RigidSettings.h"
 #include "Common/MathUtils.h"
 #include "Common/Vector2.h"
 #include "Common/RungeKutta4RigidBodySolver.h"
+#include "Objects/Force.h"
 #include <unordered_set>
 
 namespace Rigid2D
 {
   // Stores the state needed for force calculations.
-  typedef struct {
+  typedef struct RBSTATE {
     Vector2 position;
     Vector2 momentum;
   } RBState;
@@ -25,7 +24,8 @@ namespace Rigid2D
        *
        * @param vertex_array should be an array of tuples in the form of (x,y). It will get deep-copied
        * @param vertex_count is the number of tuples (not the number of Reals) */
-      RigidBody(Vector2 position, Vector2 velocity, Real mass, int vertex_count, Real *vertex_array);
+      RigidBody(const Vector2 & position, const Vector2 & velocity, 
+                Real mass, Real *vertex_array, int vertex_count);
       ~RigidBody();
 
       /** Computes and sets the state of the object for next frame.
@@ -34,8 +34,8 @@ namespace Rigid2D
       void update();
 
       /** Zeroes and then sums forces into forceAccumulator_ */
-      void computeForces(RBState *state) const;
-      void computeStateDeriv(RBState *dState) const;
+      void computeForces(RBState & state);
+      void computeStateDeriv(RBState & dState) const;
 
 
       /** Tells RigidBodySystem to apply the given force from here on out.
@@ -83,9 +83,9 @@ namespace Rigid2D
       Vector2 getVelocity() const;
       Vector2 getMomentum() const;
       Real getMass() const;
-      RBState * getState() const;
+      void getState(RBState & state) const;
 
-			void setState(RBState *state);
+			void setState(RBState & state);
       void setPosition (const Vector2 & position);
       void setPosition (Real xPos, Real yPos);
       void setVelocity (const Vector2 & velocity);
@@ -107,7 +107,7 @@ namespace Rigid2D
       //Vector2 momentum_;          // Total momentum of RigidBody
       Vector2 forceAccumulator_;  // Sum of forces acting on the center of mass of RigidBody
       Real mass_;                 // Object mass
-      unordered_set<Force*> forces_;    // all forces being applied to this RB
+      std::unordered_set<Force*> forces_;    // all forces being applied to this RB
       int vertex_count_;
       Real *vertex_array_;
 

@@ -22,13 +22,13 @@
  * kd: damping constant
  *
 */
-void mouseSpringForce(RigidBody * const rigidBody, Vector2 * dst, void * userData){
+void mouseSpringForce(RigidBody * const rigidBody, RBState *state, Vector2 * dst, void * userData){
   assert(rigidBody != NULL);
   assert(dst != NULL);
   assert(userData != NULL);
 
   Vector2 mousePos ( ((Real*)userData)[0], ((Real*)userData)[1] );         // Store mouse coordinants
-  Vector2 centerOfMassPos = rigidBody->getPosition(); // Center of mass of RigidBody
+  Vector2 centerOfMassPos = state->position; // Center of mass of RigidBody
   Real ks = ((Real*)userData)[2];                        // Spring constant
   Real kd = ((Real*)userData)[3];                        // Damping constant
 
@@ -37,7 +37,7 @@ void mouseSpringForce(RigidBody * const rigidBody, Vector2 * dst, void * userDat
       centerOfMassPos.y - mousePos.y);
 
   // l_dot; Assume mouse is not moving, and only factor-in velocity of RigidBody's center of mass.
-  Vector2 deltaVelocity(rigidBody->getVelocity());
+  Vector2 deltaVelocity(state->momentum / rigidBody->getMass());
 
   // <l_dot, l> / norm(l)^2
   // l: deltaPosition
