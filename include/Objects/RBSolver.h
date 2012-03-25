@@ -9,19 +9,19 @@
 namespace Rigid2D
 {
   /// Standard RungeKutta4 implementation
-  class RBSolver 
+  class RBSolver
   {
     public:
       //// NOTE: time is not being passed currently, but it's trivial
       //// to add if needed.
       static void nextStep(class RigidBody &rb, struct RBState &outState, Real stepSize = 0.01)
       {
-        struct RBState k1, k2, k3, k4;
+        struct RBState inState, k1, k2, k3, k4;
 
         // Step 1
-        rb.getState(outState);
-        rb.computeForces(outState);
-        rb.computeStateDeriv(outState, k1);
+        rb.getState(inState);
+        rb.computeForces(inState);
+        rb.computeStateDeriv(inState, k1);
         k1 *= stepSize;
 
         // Step 2
@@ -39,7 +39,7 @@ namespace Rigid2D
         rb.computeStateDeriv(k3, k4);
         k4 *= stepSize;
 
-        outState = (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+        outState = inState + (k1 + 2 * k2 + 2 * k3 + k4) / 6;
       }
   };
 }
