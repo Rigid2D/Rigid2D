@@ -1,6 +1,9 @@
 #include "RigidBody.h"
+#include "RBSolver.h"
 #include <cassert>
 #include <cstring>
+
+#include <iostream>
 
 namespace Rigid2D
 {
@@ -24,9 +27,9 @@ namespace Rigid2D
 
   void RigidBody::update()
   {
-    //RBState result;
-    //RBSolver::nextStep(this, result);
-    //setState(result);
+    RBState result;
+    RBSolver::nextStep(*this, result);
+    state_ = result;
   }
 
   void RigidBody::computeForces(RBState & state)
@@ -77,6 +80,7 @@ namespace Rigid2D
 
   Vector2 RigidBody::getVelocity() const
   {
+    std::cout << state_.momentum.x << std::endl;
     return state_.momentum / mass_;
   }
 

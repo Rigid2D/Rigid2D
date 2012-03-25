@@ -99,8 +99,7 @@ void SampleDemo::paintGL()
 
   // Update ALL THE THINGS!! (unless paused)
 	if (!paused) {
-    //cout << "RB{" << body->getPosition()[0] << " " << body->getPosition()[1] 
-    //   << " " << body->getForceAccumulator()[0] << " " << body->getForceAccumulator()[1] << "}\n";
+    std::cout << "RB{" << body->getPosition()[0] << " " << body->getPosition()[1] << "}\n";
     rigidBodySystem->update();
   }
 }
