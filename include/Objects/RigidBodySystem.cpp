@@ -5,13 +5,13 @@ using namespace std;
 
 namespace Rigid2D {
 
-  RigidBodySystem::RigidBodySystem() 
+  RigidBodySystem::RigidBodySystem()
   {
     time_ = 0.0;
   }
 
 
-  RigidBodySystem::~RigidBodySystem() 
+  RigidBodySystem::~RigidBodySystem()
   {
     // look up what to do with rigidBodies_
   }
@@ -27,14 +27,14 @@ namespace Rigid2D {
   }
 
 
-  void RigidBodySystem::addRigidBody(RigidBody *rigidBody) 
+  void RigidBodySystem::addRigidBody(RigidBody *rigidBody)
   {
     assert(rigidBody != NULL);
     rigidBodies_.insert(rigidBody);
   }
 
 
-  void RigidBodySystem::addRigidBodies(RigidBody **rigidBodyArray, unsigned int numBodies) 
+  void RigidBodySystem::addRigidBodies(RigidBody **rigidBodyArray, unsigned int numBodies)
   {
     for (unsigned int i = 0; i < numBodies; ++i) {
       rigidBodies_.insert(rigidBodyArray[i]);
@@ -42,13 +42,13 @@ namespace Rigid2D {
   }
 
 
-  void RigidBodySystem::removeRigidBody(RigidBody *rigidBody) 
+  void RigidBodySystem::removeRigidBody(RigidBody *rigidBody)
   {
     rigidBodies_.erase(rigidBody);
   }
 
 
-  void RigidBodySystem::removeRigidBodies(RigidBody **rigidBodyArray, unsigned int numBodies) 
+  void RigidBodySystem::removeRigidBodies(RigidBody **rigidBodyArray, unsigned int numBodies)
   {
     for (unsigned int i = 0; i < numBodies; ++i) {
       rigidBodies_.erase(rigidBodyArray[i]);
