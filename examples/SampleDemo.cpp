@@ -37,7 +37,7 @@ SampleDemo::SampleDemo(QWidget *parent)
 
   //userData_mouseForce[0] = -15;
   //userData_mouseForce[1] = -15;
-  userData_mouseForce[2] = 3;
+  userData_mouseForce[2] = 1;
   userData_mouseForce[3] = 4;
 
 	paused = false;
@@ -115,7 +115,7 @@ void SampleDemo::paintGL()
 
 void SampleDemo::mousePressEvent(QMouseEvent *event) 
 {
-  /*makeCurrent();
+  makeCurrent();
   GLint viewport[4];
   GLdouble modelview[16];
   GLdouble projection[16];
@@ -132,12 +132,12 @@ void SampleDemo::mousePressEvent(QMouseEvent *event)
 
   gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
-  if (body->pointIsInterior(posX, posY))
+  //if (body->pointIsInterior(posX, posY))
   {
     userData_mouseForce[0] = posX;
     userData_mouseForce[1] = posY;
-  }*/
-  
+  }
+  /*
   makeCurrent();
   GLint viewport[4];
   GLdouble modelview[16];
@@ -164,7 +164,7 @@ void SampleDemo::mousePressEvent(QMouseEvent *event)
 
     userData_mouseForce[0] = pos.x() * (100.0/572) - 50;
     userData_mouseForce[1] = -(pos.y() * (100.0/572) - 50);
-  }
+  }*/
 }
 
 void SampleDemo::mouseMoveEvent(QMouseEvent *event) 

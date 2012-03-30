@@ -30,7 +30,6 @@ class SampleDemo : public QGLWidget
     int frameCount;
     int fps;
     bool paused;
-    float test_rot; // remove later
     Rigid2D::RigidBodySystem *rigidBodySystem;
     Rigid2D::RigidBody *body;
     Rigid2D::Force *mouseForce;
