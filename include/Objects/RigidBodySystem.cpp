@@ -13,7 +13,7 @@ namespace Rigid2D {
 
   RigidBodySystem::~RigidBodySystem()
   {
-    // look up what to do with rigidBodies_
+    // Delete rigidBodies_ here once we have a memory pool working.
   }
 
 

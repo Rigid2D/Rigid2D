@@ -35,9 +35,9 @@ SampleDemo::SampleDemo(QWidget *parent)
 	// Add body and force to rigidBodySystem
 	rigidBodySystem->addRigidBody(body);
 
-  //userData_mouseForce[0] = -15;
-  //userData_mouseForce[1] = -15;
-  userData_mouseForce[2] = 1;
+  userData_mouseForce[0] = 0;
+  userData_mouseForce[1] = 0.01;
+  userData_mouseForce[2] = 5;
   userData_mouseForce[3] = 4;
 
 	paused = false;
@@ -66,10 +66,8 @@ void SampleDemo::resizeGL(int w, int h)
 
   glViewport( 0, 0, (GLint)w, (GLint)h );
 
-  //std::cout << "W " << w << "\n";
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  //gluPerspective(45.0f,(GLfloat)w / (GLfloat)h, 0.1f, 1000.0f);
   gluOrtho2D(-50, 50, -50, 50);
 
   glMatrixMode(GL_MODELVIEW);
@@ -89,7 +87,6 @@ void SampleDemo::paintGL()
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
 
-  //glTranslatef(0, 0, -2);
   glPushMatrix();
   glTranslatef(body->getPosition()[0], body->getPosition()[1], 0);
   glColor3f (1, 1, 1);
