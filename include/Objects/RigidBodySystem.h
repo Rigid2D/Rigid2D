@@ -26,7 +26,7 @@ namespace Rigid2D
        * @see removeRigidBody()
        * @see removeRigidBodies()
        */
-      void addRigidBody(RigidBody * rigidBody);
+      void addRigidBody(RigidBody *rigidBody);
 
       /**
        * Same as addRigidBody() but for multiple bodies.
@@ -37,7 +37,7 @@ namespace Rigid2D
        * @see removeRigidBody()
        * @see removeRigidBodies()
        */
-      void addRigidBodies(RigidBody ** rigidBodyArray, unsigned int numBodies);
+      void addRigidBodies(RigidBody **rigidBodyArray, unsigned int numBodies);
 
       /** Tells RigidBodySystem to not keep track of a RigidBody. If the body
        * (pointer) was not previously added, it does nothing.
@@ -47,7 +47,7 @@ namespace Rigid2D
        * @see addRigidBodies()
        * @see removeRigidBodies()
        */
-      void removeRigidBody(RigidBody * rigidBody);
+      void removeRigidBody(RigidBody *rigidBody);
 
       /**
        * Same as removeRigidBody() but for multiple bodies.
