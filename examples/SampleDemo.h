@@ -33,7 +33,9 @@ class SampleDemo : public QGLWidget
     Rigid2D::RigidBodySystem *rigidBodySystem;
     Rigid2D::RigidBody *body;
     Rigid2D::Force *mouseForce;
-    Rigid2D::Real userData_mouseForce[4]; // mouse coordinates for the mouse force object (x, y)
+    // mouse coordinates for the mouse force object (x, y) 
+    // and spring constants (strength, damp)
+    Rigid2D::Real userData_mouseForce[4]; 
 
   protected:
     void initializeGL();

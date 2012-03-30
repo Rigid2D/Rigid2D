@@ -95,18 +95,19 @@ void SampleDemo::paintGL()
   glDrawArrays(GL_POLYGON, 0, body->getVertexCount());
   glPopMatrix();
 
-  std::cout.precision(3);
 
 
   // Draw the spring as a line
   glBegin(GL_LINE);
+    glColor3ub(50, 200, 50);
     glVertex2f(userData_mouseForce[0], userData_mouseForce[1]);
     glVertex2f(body->getPosition()[0], body->getPosition()[1]);
   glEnd();
 
   // Update ALL THE THINGS!! (unless paused)
 	if (!paused) {
-    std::cout << "RB{" << body->getPosition()[0] << " " << body->getPosition()[1] << "}\n";
+    //std::cout.precision(3);
+    //std::cout << "RB{" << body->getPosition()[0] << " " << body->getPosition()[1] << "}\n";
     rigidBodySystem->update();
   }
 }
@@ -158,10 +159,9 @@ void SampleDemo::mouseMoveEvent(QMouseEvent *event)
   gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
   {
-    //std::cout << posX << "   " << winY << std::endl;
-    //std::cout << pos.x() << "   " << pos.y() << std::endl;
-   // userData_mouseForce[0] = pos.x() * (100.0/700);
-   // userData_mouseForce[1] = pos.y() * (100.0/700);
+    userData_mouseForce[0] = posX;
+    userData_mouseForce[1] = posY;
+
   }
 }
 
