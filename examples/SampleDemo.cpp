@@ -29,7 +29,7 @@ SampleDemo::SampleDemo(QWidget *parent)
 	// Init sample rigid body;
   Real vertex_array[8] = {-5, 5, 5, 5,
                           5, -5, -5, -5};
-  body = new RigidBody(Vector2(5, 0), Vector2(0,0), 10.0, vertex_array, 4);
+  body = new RigidBody(Vector2(0, 0), Vector2(0,0), 10.0, vertex_array, 4);
   body->addForce(mouseForce);
 
 	// Add body and force to rigidBodySystem
@@ -93,6 +93,7 @@ void SampleDemo::paintGL()
   glPushMatrix();
   glTranslatef(body->getPosition()[0], body->getPosition()[1], 0);
   glColor3f (1, 1, 1);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glVertexPointer(2, GL_FLOAT, 0, body->getVertexArray());
   glDrawArrays(GL_POLYGON, 0, body->getVertexCount());
   glPopMatrix();
@@ -137,34 +138,6 @@ void SampleDemo::mousePressEvent(QMouseEvent *event)
     userData_mouseForce[0] = posX;
     userData_mouseForce[1] = posY;
   }
-  /*
-  makeCurrent();
-  GLint viewport[4];
-  GLdouble modelview[16];
-  GLdouble projection[16];
-  GLfloat winX, winY, winZ;
-  GLdouble posX, posY, posZ;
-
-  glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-  glGetDoublev( GL_PROJECTION_MATRIX, projection );
-  glGetIntegerv( GL_VIEWPORT, viewport );
-
-  QPoint pos = this->mapFromGlobal(QCursor::pos());
-  winX = pos.x();
-  winY = viewport[3] - pos.y();
-  glReadPixels( winX, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
-
-  gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
-
-  {
-    //std::cout << posX << "   " << winY << std::endl;
-    //std::cout << pos.x() << "   " << pos.y() << std::endl;
-    //userdata_mouseforce[0] = pos.x() * (100.0/572) - 50;
-    //userdata_mouseforce[1] = -(pos.y() * (100.0/572) - 50);
-
-    userData_mouseForce[0] = pos.x() * (100.0/572) - 50;
-    userData_mouseForce[1] = -(pos.y() * (100.0/572) - 50);
-  }*/
 }
 
 void SampleDemo::mouseMoveEvent(QMouseEvent *event) 
