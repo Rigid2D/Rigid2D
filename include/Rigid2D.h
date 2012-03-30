@@ -11,5 +11,6 @@
 #include "Objects/RigidBody.h"
 #include "Objects/RigidBodySystem.h"
 #include "Objects/Force.h"
+#include "Objects/RBSolver.h"
 
 #endif

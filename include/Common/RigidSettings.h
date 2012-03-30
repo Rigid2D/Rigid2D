@@ -21,8 +21,8 @@
 
 
 // Place all global library settings and constants in this file.
-namespace Rigid2D{
-	
+namespace Rigid2D 
+{	
 	typedef float Real;
 	typedef double PreciseReal;
 
@@ -30,7 +30,6 @@ namespace Rigid2D{
 
 	// Starting step size for the OdeSolver.
 	const Real StartingStepSize = 0.01;
-
 
 }
 

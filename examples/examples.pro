@@ -11,6 +11,8 @@ INCLUDEPATH += ../include
 QT += opengl
 HEADERS = SampleDemo.h \
   ../include/Rigid2D.h \
+  #../include/Objects/RigidBody.h \
+  #../include/Objects/RBSolver.h \
   ForceFunctions.h \
   DemosFramework.h
 
@@ -20,12 +22,10 @@ SOURCES = examples.cpp \
   ForceFunctions.cpp \
   ../include/Objects/RigidBody.cpp \
   ../include/Objects/RigidBodySystem.cpp \
-	../include/Common/OdeRungeKutta4.cpp \
-	../include/Common/RungeKutta4RigidBodySolver.cpp \
-	../include/Common/RigidException.cpp \
   ../include/Objects/Force.cpp \
-	../include/Common/MathUtils.cpp \
-	../include/Common/feq.cpp \
+  ../include/Common/RigidException.cpp \
+  ../include/Common/MathUtils.cpp \
+  ../include/Common/feq.cpp \
 
 QMAKE_CXXFLAGS += -std=c++0x -ggdb
 QMAKE_CLEAN += examples *.o
