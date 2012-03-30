@@ -90,12 +90,21 @@ void SampleDemo::paintGL()
   glLoadIdentity();
 
   //glTranslatef(0, 0, -2);
+  glPushMatrix();
   glTranslatef(body->getPosition()[0], body->getPosition()[1], 0);
   glColor3f (1, 1, 1);
   glVertexPointer(2, GL_FLOAT, 0, body->getVertexArray());
   glDrawArrays(GL_POLYGON, 0, body->getVertexCount());
+  glPopMatrix();
 
   std::cout.precision(3);
+
+
+  // Draw the spring as a line
+  glBegin(GL_LINE);
+    glVertex2f(userData_mouseForce[0], userData_mouseForce[1]);
+    glVertex2f(body->getPosition()[0], body->getPosition()[1]);
+  glEnd();
 
   // Update ALL THE THINGS!! (unless paused)
 	if (!paused) {
