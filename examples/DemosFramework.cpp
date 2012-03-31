@@ -42,7 +42,7 @@ DemosFramework::DemosFramework()
 
   // Create an OGLDemo
   GLLayout = new QVBoxLayout;
-  CurrentDemo = new SampleDemo;
+  CurrentDemo = new Demo1;
   CurrentDemo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   GLLayout->addWidget(CurrentDemo);
 
@@ -78,14 +78,14 @@ DemosFramework::DemosFramework()
 DemosFramework::~DemosFramework()
 {
   // delete a bunch of stuff here
-  // not really necessary though cause kernel
+  // not really necessary though cause OS
 }
 
 //TODO: Make a method for loading a demo - restartDemo should call that method.
 void DemosFramework::restartDemo()
 {
   delete CurrentDemo;
-  CurrentDemo = new SampleDemo();
+  CurrentDemo = new Demo1();
   CurrentDemo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   GLLayout->addWidget(CurrentDemo);
   QObject::connect(PauseButton, SIGNAL(clicked()), CurrentDemo, SLOT(togglePause()));

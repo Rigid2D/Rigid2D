@@ -12,6 +12,8 @@ namespace Rigid2D {
     // nothing to be done
   }
 
+  Force::~Force() {}
+
   void Force::computeForce(RigidBody * const rb, RBState *state, Vector2 *result)
   {
     forceFunction_(rb, state, result, userData_);

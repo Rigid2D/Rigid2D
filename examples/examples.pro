@@ -9,16 +9,16 @@ INCLUDEPATH += ../include
 
 # Input
 QT += opengl
-HEADERS = SampleDemo.h \
+HEADERS = DemoBase.h \
+  Demo1.h \
   ../include/Rigid2D.h \
-  #../include/Objects/RigidBody.h \
-  #../include/Objects/RBSolver.h \
   ForceFunctions.h \
   DemosFramework.h
 
 SOURCES = examples.cpp \
   DemosFramework.cpp \
-  SampleDemo.cpp \
+  DemoBase.cpp \
+  Demo1.cpp \
   ForceFunctions.cpp \
   ../include/Objects/RigidBody.cpp \
   ../include/Objects/RigidBodySystem.cpp \

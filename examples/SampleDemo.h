@@ -1,5 +1,5 @@
-#ifndef SAMPLE_DEMO_H
-#define SAMPLE_DEMO_H
+#ifndef DEMO_BASE_H
+#define DEMO_BASE_H
 
 #include <QGLWidget>
 #include <QTime>
@@ -7,13 +7,13 @@
 #include <iostream>
 #include "Rigid2D.h"
 
-class SampleDemo : public QGLWidget
+class DemoBase : public QGLWidget
 {
   Q_OBJECT
 
   public: 
-    SampleDemo(QWidget *parent = NULL);
-    ~SampleDemo();
+    DemoBase(QWidget *parent = NULL);
+    ~DemoBase();
     int getFps();
     void pause();
 
@@ -30,12 +30,6 @@ class SampleDemo : public QGLWidget
     int frameCount;
     int fps;
     bool paused;
-    Rigid2D::RigidBodySystem *rigidBodySystem;
-    Rigid2D::RigidBody *body;
-    Rigid2D::Force *mouseForce;
-    // mouse coordinates for the mouse force object (x, y) 
-    // and spring constants (strength, damp)
-    Rigid2D::Real userData_mouseForce[4];
 
   protected:
     void initializeGL();

@@ -10,7 +10,8 @@
 #include <QLabel>
 #include <QGLWidget>
 #include <QPushButton>
-#include "SampleDemo.h"
+#include "DemoBase.h"
+#include "Demo1.h"
 
 class DemosFramework : public QObject
 {
@@ -37,7 +38,7 @@ class DemosFramework : public QObject
     QPushButton *StartButton;
     QPushButton *PauseButton;
     QPushButton *RestartButton;
-    SampleDemo *CurrentDemo;
+    DemoBase *CurrentDemo;
 
     QHBoxLayout *FPSLayout;
     QLabel *FPSTextLabel;
