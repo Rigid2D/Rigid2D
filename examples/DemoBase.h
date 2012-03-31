@@ -34,9 +34,9 @@ class DemoBase : public QGLWidget
   protected:
     void initializeGL();
     void resizeGL(int w, int h);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event) =0;
+    virtual void mouseMoveEvent(QMouseEvent *event) =0;
+    virtual void keyPressEvent(QKeyEvent *event) =0;
     void calculateFps();
 };
 
