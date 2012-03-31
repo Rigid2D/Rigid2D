@@ -1,4 +1,4 @@
-#include "SampleDemo.h"
+#include "DemoBase.h"
 #include "ForceFunctions.h"
 #include "Common/MathUtils.h"
 #include <QMouseEvent>
@@ -6,7 +6,7 @@
 
 using namespace Rigid2D;
 
-SampleDemo::SampleDemo(QWidget *parent)
+DemoBase::DemoBase(QWidget *parent)
         : QGLWidget(parent) 
 {
   setMouseTracking(true);
@@ -20,38 +20,16 @@ SampleDemo::SampleDemo(QWidget *parent)
   fpsTimer->start();
   frameCount = 0;
 
-	// Init RigidBodySystem
-	rigidBodySystem = new RigidBodySystem();
-
-  // Create a spring force for the mouse
-  mouseForce = new Force(mouseSpringForce, userData_mouseForce);
-
-	// Init sample rigid body;
-  Real vertex_array[8] = {-5, 5, 5, 5,
-                          5, -5, -5, -5};
-  body = new RigidBody(Vector2(0, 0), Vector2(0,0), 10.0, vertex_array, 4);
-  body->addForce(mouseForce);
-
-	// Add body and force to rigidBodySystem
-	rigidBodySystem->addRigidBody(body);
-
-  userData_mouseForce[0] = 0;
-  userData_mouseForce[1] = 0.01;
-  userData_mouseForce[2] = 5;
-  userData_mouseForce[3] = 4;
-
 	paused = false;
 }
 
-SampleDemo::~SampleDemo()
+DemoBase::~DemoBase()
 {
 	delete animationTimer;
 	delete fpsTimer;
-	delete rigidBodySystem;
-	delete body;
 }
 
-void SampleDemo::initializeGL()
+void DemoBase::initializeGL()
 {
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClearDepth(1.0f);
@@ -60,7 +38,7 @@ void SampleDemo::initializeGL()
   glEnableClientState(GL_VERTEX_ARRAY);
 }
 
-void SampleDemo::resizeGL(int w, int h)
+void DemoBase::resizeGL(int w, int h)
 {
   h = h?h:1;
 
@@ -74,45 +52,17 @@ void SampleDemo::resizeGL(int w, int h)
   glLoadIdentity();
 }
 
-void SampleDemo::togglePause()
+void DemoBase::togglePause()
 {
 	paused = !paused;
 }
 
-void SampleDemo::paintGL()
+void DemoBase::paintGL()
 {
   calculateFps();
-
-  // Do drawing here!
-  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
-
-  glPushMatrix();
-  glTranslatef(body->getPosition()[0], body->getPosition()[1], 0);
-  glColor3f (1, 1, 1);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glVertexPointer(2, GL_FLOAT, 0, body->getVertexArray());
-  glDrawArrays(GL_POLYGON, 0, body->getVertexCount());
-  glPopMatrix();
-
-
-
-  // Draw the spring as a line
-  glBegin(GL_LINE);
-    glColor3ub(50, 200, 50);
-    glVertex2f(userData_mouseForce[0], userData_mouseForce[1]);
-    glVertex2f(body->getPosition()[0], body->getPosition()[1]);
-  glEnd();
-
-  // Update ALL THE THINGS!! (unless paused)
-	if (!paused) {
-    //std::cout.precision(3);
-    //std::cout << "RB{" << body->getPosition()[0] << " " << body->getPosition()[1] << "}\n";
-    rigidBodySystem->update();
-  }
 }
 
-void SampleDemo::mousePressEvent(QMouseEvent *event) 
+void DemoBase::mousePressEvent(QMouseEvent *event) 
 {
   makeCurrent();
   GLint viewport[4];
@@ -138,7 +88,7 @@ void SampleDemo::mousePressEvent(QMouseEvent *event)
   }
 }
 
-void SampleDemo::mouseMoveEvent(QMouseEvent *event) 
+void DemoBase::mouseMoveEvent(QMouseEvent *event) 
 {
   makeCurrent();
   GLint viewport[4];
@@ -165,17 +115,17 @@ void SampleDemo::mouseMoveEvent(QMouseEvent *event)
   }
 }
 
-void SampleDemo::keyPressEvent(QKeyEvent *event)
+void DemoBase::keyPressEvent(QKeyEvent *event)
 {
 
 }
 
-int SampleDemo::getFps()
+int DemoBase::getFps()
 {
   return fps;
 }
 
-void SampleDemo::calculateFps()
+void DemoBase::calculateFps()
 {
   // Figure out fps
   float elapsed = fpsTimer->elapsed();
