@@ -21,7 +21,7 @@ Demo1::Demo1(QWidget *parent)
 	rigidBodySystem->addRigidBody(body);
 
   userData_mouseForce[0] = 0;
-  userData_mouseForce[1] = 0.01;
+  userData_mouseForce[1] = 0;
   userData_mouseForce[2] = 5;
   userData_mouseForce[3] = 4;
 
