@@ -11,12 +11,12 @@ DemoBase::DemoBase(QWidget *parent)
 {
   setMouseTracking(true);
   setAutoBufferSwap(true);
- 
+
   animationTimer = new QTimer(this);
   connect(animationTimer, SIGNAL(timeout()), this, SLOT(updateGL()));
-  animationTimer->start(0);
+  animationTimer->start(1000/100);     // time per frame
 
-  fpsTimer = new QTime;
+  fpsTimer = new QTime();
   fpsTimer->start();
   frameCount = 0;
 
