@@ -2,6 +2,7 @@
 
 using namespace Rigid2D;
 
+
 Demo1::Demo1(QWidget *parent)
       : DemoBase(parent)
 {
@@ -15,7 +16,7 @@ Demo1::Demo1(QWidget *parent)
   Real vertex_array[8] = {-5, 5, 5, 5,
                           5, -5, -5, -5};
   body = new RigidBody(Vector2(0, 0), Vector2(0,0), 10.0, vertex_array, 4);
-  body->addForce(mouseForce);
+  //body->addForce(mouseForce);
 
 	// Add body and force to rigidBodySystem
 	rigidBodySystem->addRigidBody(body);
@@ -24,7 +25,7 @@ Demo1::Demo1(QWidget *parent)
   userData_mouseForce[1] = 0;
   userData_mouseForce[2] = 5;
   userData_mouseForce[3] = 4;
-
+  rbActedOn = NULL;
 }
 
 
@@ -53,11 +54,13 @@ void Demo1::paintGL()
   glPopMatrix();
 
   // Draw the spring as a line
-  glBegin(GL_LINE);
-    glColor3ub(50, 200, 50);
-    glVertex2f(userData_mouseForce[0], userData_mouseForce[1]);
-    glVertex2f(body->getPosition()[0], body->getPosition()[1]);
-  glEnd();
+  if (rbActedOn != NULL) {
+    glBegin(GL_LINE);
+      glColor3ub(50, 200, 50);
+      glVertex2f(userData_mouseForce[0], userData_mouseForce[1]);
+      glVertex2f(body->getPosition()[0], body->getPosition()[1]);
+    glEnd();
+  }
 
   // Update ALL THE THINGS!! (unless paused)
 	if (!paused) {
@@ -87,35 +90,58 @@ void Demo1::mousePressEvent(QMouseEvent *event)
 
   gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
-  //if (body->pointIsInterior(posX, posY))
+  // set one end of mouse spring
+
+  userData_mouseForce[0] = posX;
+  userData_mouseForce[1] = posY;
+  // transform mouse position to match RB
+  posX -= body->getPosition()[0];
+  posY -= body->getPosition()[1];
+
+  if (body->pointIsInterior(posX, posY))
   {
-    userData_mouseForce[0] = posX;
-    userData_mouseForce[1] = posY;
+    //std::cout << 1 << std::endl;
+    rbActedOn = body;
+    body->addForce(mouseForce);
+  } 
+  else
+  {
+    //std::cout << 0 << std::endl;
+  }
+}
+
+
+void Demo1::mouseReleaseEvent(QMouseEvent *event) 
+{
+  if (rbActedOn != NULL) 
+  {
+    rbActedOn->removeForce(mouseForce);
+    rbActedOn = NULL;
   }
 }
 
 
 void Demo1::mouseMoveEvent(QMouseEvent *event) 
 {
-  makeCurrent();
-  GLint viewport[4];
-  GLdouble modelview[16];
-  GLdouble projection[16];
-  GLfloat winX, winY, winZ;
-  GLdouble posX, posY, posZ;
+  if (rbActedOn != NULL) {
+    makeCurrent();
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLfloat winX, winY, winZ;
+    GLdouble posX, posY, posZ;
 
-  glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-  glGetDoublev( GL_PROJECTION_MATRIX, projection );
-  glGetIntegerv( GL_VIEWPORT, viewport );
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+    glGetDoublev( GL_PROJECTION_MATRIX, projection );
+    glGetIntegerv( GL_VIEWPORT, viewport );
 
-  QPoint pos = this->mapFromGlobal(QCursor::pos());
-  winX = pos.x();
-  winY = viewport[3] - pos.y();
-  glReadPixels( winX, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
+    QPoint pos = this->mapFromGlobal(QCursor::pos());
+    winX = pos.x();
+    winY = viewport[3] - pos.y();
+    glReadPixels( winX, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
 
-  gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+    gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
-  {
     userData_mouseForce[0] = posX;
     userData_mouseForce[1] = posY;
   }
