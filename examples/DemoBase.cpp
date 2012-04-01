@@ -46,7 +46,11 @@ void DemoBase::resizeGL(int w, int h)
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluOrtho2D(-50, 50, -50, 50);
+  if (w >= h) {
+    gluOrtho2D(-50 * (GLfloat)w/h, 50 * (GLfloat)w/h, -50, 50);
+  } else {
+    gluOrtho2D(-50, 50, -50 * (GLfloat)h/w, 50 * (GLfloat)h/w);
+  } 
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
