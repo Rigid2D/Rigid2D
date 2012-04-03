@@ -15,34 +15,34 @@ namespace Rigid2D
   // Stores the state needed for force calculations.
   struct RBState {
     Vector2 position;
-    Vector2 momentum;
+    Vector2 linearMomentum;
 
     RBState() {}
-    RBState(const Vector2 &pos, const Vector2 &mom) {
-      position = pos;
-      momentum = mom;
+    RBState(const Vector2 &position, const Vector2 &linearMomentum) {
+      this->position = position;
+      this->linearMomentum = linearMomentum;
     }
 
     void operator *= (Real scalar) {
       position *= scalar;
-      momentum *= scalar;
+      linearMomentum *= scalar;
     }
 
     void operator /= (Real scalar) {
       position /= scalar;
-      momentum /= scalar;
+      linearMomentum /= scalar;
     }
 
     RBState operator + (const RBState & s) const {
-      return RBState(position + s.position, momentum + s.momentum);
+      return RBState(position + s.position, linearMomentum + s.linearMomentum);
     }
 
     RBState operator - (const RBState & s) const {
-      return RBState(position - s.position, momentum - s.momentum);
+      return RBState(position - s.position, linearMomentum - s.linearMomentum);
     }
 
     RBState operator * (const Real scalar) const {
-      return RBState(position * scalar, momentum * scalar);
+      return RBState(position * scalar, linearMomentum * scalar);
     }
 
     friend RBState operator * (const Real scalar, const RBState &state) {
@@ -51,7 +51,7 @@ namespace Rigid2D
 
     RBState operator / (const Real scalar) const {
       assert(feq(scalar, 0.0) == false);
-      return RBState(position / scalar, momentum / scalar);
+      return RBState(position / scalar, linearMomentum / scalar);
     }
   };
 
@@ -121,7 +121,7 @@ namespace Rigid2D
 
       Vector2 getPosition() const;
       Vector2 getVelocity() const;
-      Vector2 getMomentum() const;
+      Vector2 linearMomentum() const;
       Real getMass() const;
       void getState(RBState & state) const;
 
@@ -141,13 +141,11 @@ namespace Rigid2D
       bool pointIsInterior(Real x, Real y);
 
     protected:
-      RBState state_;             // Position, momentum
-      //Vector2 position_;          // Position of center of mass
-      Vector2 velocity_;          // Velocity of center of mass (implicitly calculated)
-      //Vector2 momentum_;          // Total momentum of RigidBody
-      Vector2 forceAccumulator_;  // Sum of forces acting on the center of mass of RigidBody
-      Real mass_;                 // Object mass
-      std::unordered_set<Force*> forces_;    // all forces being applied to this RB
+      RBState state_;                        // Position, linear momentum, orientation, angular momentum
+      Vector2 velocity_;                     // Velocity of center of mass (implicitly calculated)
+      Vector2 forceAccumulator_;             // Sum of forces acting on the center of mass of RigidBody
+      Real mass_;                            // Object mass
+      std::unordered_set<Force*> forces_;    // All forces currently acting on this RB
       int vertex_count_;
       Real *vertex_array_;
 

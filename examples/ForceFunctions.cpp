@@ -42,7 +42,7 @@ void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * ds
   }
   else {
     // l_dot; Assume mouse is not moving, and only factor-in velocity of RigidBody's center of mass.
-    Vector2 deltaVelocity(state->momentum / rigidBody->getMass());
+    Vector2 deltaVelocity(state->linearMomentum / rigidBody->getMass());
 
     // kdFactor = (l_dot * l)/ norm(l)^2
     Real kdFactor = deltaVelocity.dot(deltaPosition) / deltaPosition.getLengthSquared();

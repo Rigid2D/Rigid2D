@@ -5,7 +5,6 @@
 #include "RigidBody.h"
 
 #include <iostream>
-
 namespace Rigid2D
 {
   /// Standard RungeKutta4 implementation

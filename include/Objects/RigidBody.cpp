@@ -12,7 +12,7 @@ namespace Rigid2D
       Real *vertex_array, int vertex_count)
   {
     state_.position = position;
-    state_.momentum = velocity * mass;
+    state_.linearMomentum = velocity * mass;
     mass_ = mass;
     vertex_count_ = vertex_count;
     vertex_array_ = new Real[2 * vertex_count];
@@ -46,8 +46,8 @@ namespace Rigid2D
 
   void RigidBody::computeStateDeriv(const RBState &state, RBState &dState) const
   {
-    dState.position = state.momentum / mass_;
-    dState.momentum = forceAccumulator_;
+    dState.position = state.linearMomentum / mass_;
+    dState.linearMomentum = forceAccumulator_;
   }
 
   void RigidBody::addForce(Force *force) 
@@ -80,13 +80,13 @@ namespace Rigid2D
 
   Vector2 RigidBody::getVelocity() const
   {
-    std::cout << state_.momentum.x << std::endl;
-    return state_.momentum / mass_;
+    std::cout << state_.linearMomentum.x << std::endl;
+    return state_.linearMomentum / mass_;
   }
 
-  Vector2 RigidBody::getMomentum() const
+  Vector2 RigidBody::linearMomentum() const
   {
-    return state_.momentum;
+    return state_.linearMomentum;
   }
 
   Real RigidBody::getMass() const
@@ -117,17 +117,17 @@ namespace Rigid2D
 
   void RigidBody::setVelocity(const Vector2 & velocity)
   {
-    state_.momentum = velocity * mass_;
+    state_.linearMomentum = velocity * mass_;
   }
 
   void RigidBody::setVelocity (Real xVel, Real yVel)
   {
-    state_.momentum = Vector2(xVel, yVel) * mass_;
+    state_.linearMomentum = Vector2(xVel, yVel) * mass_;
   }
 
   void RigidBody::setMass(const Real &mass)
   {
-    state_.momentum /= mass_ / mass;
+    state_.linearMomentum /= mass_ / mass;
     mass_ = mass;
   }
 
