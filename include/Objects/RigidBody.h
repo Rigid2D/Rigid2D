@@ -5,6 +5,7 @@
 #include "Common/MathUtils.h"
 #include "Common/Vector2.h"
 #include "Objects/Force.h"
+#include "Objects/AABB.h"
 #include <unordered_set>
 
 namespace Rigid2D
