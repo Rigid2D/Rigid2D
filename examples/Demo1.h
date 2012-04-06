@@ -18,7 +18,7 @@ class Demo1 : public DemoBase
 
   protected:
     Rigid2D::RigidBodySystem *rigidBodySystem;
-    Rigid2D::RigidBody *body;
+    Rigid2D::RigidBody *body1, *body2;
 
     // mouse coordinates for the mouse force object (x, y) 
     // and spring constants (strength, damp)
