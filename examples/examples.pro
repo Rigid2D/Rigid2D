@@ -23,6 +23,7 @@ SOURCES = examples.cpp \
   ../include/Objects/RigidBody.cpp \
   ../include/Objects/RigidBodySystem.cpp \
   ../include/Objects/Force.cpp \
+  ../include/Objects/AABB.cpp \
   ../include/Common/RigidException.cpp \
   ../include/Common/MathUtils.cpp \
   ../include/Common/feq.cpp \

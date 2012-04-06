@@ -54,19 +54,35 @@ void Demo1::paintGL()
   // Draw body1
   glPushMatrix();
   glTranslatef(body1->getPosition()[0], body1->getPosition()[1], 0);
-  glColor3f (1, 1, 1);
+  glColor3ub (255, 255, 255);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glVertexPointer(2, GL_FLOAT, 0, body1->getVertexArray());
   glDrawArrays(GL_POLYGON, 0, body1->getVertexCount());
+  AABB *bb = body1->getStaticBB();
+  glColor3ub(180,50,50);
+  glBegin(GL_QUADS);
+    glVertex2f(bb->minVertex_.x, bb->minVertex_.y);
+    glVertex2f(bb->minVertex_.x, bb->maxVertex_.y);
+    glVertex2f(bb->maxVertex_.x, bb->maxVertex_.y);
+    glVertex2f(bb->maxVertex_.x, bb->minVertex_.y);
+  glEnd();
   glPopMatrix();
 
   // Draw body2
   glPushMatrix();
   glTranslatef(body2->getPosition()[0], body2->getPosition()[1], 0);
-  glColor3f (1, 1, 1);
+  glColor3ub (255, 255, 255);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glVertexPointer(2, GL_FLOAT, 0, body2->getVertexArray());
   glDrawArrays(GL_POLYGON, 0, body2->getVertexCount());
+  bb = body2->getStaticBB();
+  glColor3ub(180,50,50);
+  glBegin(GL_QUADS);
+    glVertex2f(bb->minVertex_.x, bb->minVertex_.y);
+    glVertex2f(bb->minVertex_.x, bb->maxVertex_.y);
+    glVertex2f(bb->maxVertex_.x, bb->maxVertex_.y);
+    glVertex2f(bb->maxVertex_.x, bb->minVertex_.y);
+  glEnd();
   glPopMatrix();
 
   // Draw the spring as a line

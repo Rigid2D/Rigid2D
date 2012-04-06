@@ -2,14 +2,13 @@
 #include "RBSolver.h"
 #include <cassert>
 #include <cstring>
-
 #include <iostream>
 
 namespace Rigid2D
 {
 
   RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-      Real *vertex_array, int vertex_count)
+      Real *vertex_array, unsigned int vertex_count)
   {
     state_.position = position;
     state_.momentum = velocity * mass;
@@ -18,6 +17,9 @@ namespace Rigid2D
     vertex_array_ = new Real[2 * vertex_count];
     memcpy(vertex_array_, vertex_array, 2 * vertex_count * sizeof(Real));
     forceAccumulator_ = Vector2(0, 0);
+  
+    // compute staticBB
+    staticBB_ = AABB(vertex_array, vertex_count);
   }
 
   RigidBody::~RigidBody()
@@ -139,6 +141,11 @@ namespace Rigid2D
   Real* RigidBody::getVertexArray() const
   {
     return vertex_array_;
+  }
+
+  AABB* RigidBody::getStaticBB() 
+  {
+    return &staticBB_;
   }
 
   bool RigidBody::pointIsInterior(Real x, Real y)

@@ -66,7 +66,7 @@ namespace Rigid2D
        * @param vertex_array should be an array of tuples in the form of (x,y). It will get deep-copied
        * @param vertex_count is the number of tuples (not the number of Reals) */
       RigidBody(const Vector2 &position, const Vector2 &velocity, 
-                Real mass, Real *vertex_array, int vertex_count);
+                Real mass, Real *vertex_array, unsigned int vertex_count);
       ~RigidBody();
 
       /** Computes and sets the state of the object for next frame.
@@ -133,9 +133,9 @@ namespace Rigid2D
       void setVelocity (Real xVel, Real yVel);
       void setMass(const Real &);
 
-
       int getVertexCount() const;
       Real* getVertexArray() const;
+      AABB* getStaticBB();
 
       /* Given a point in graphics coordinate space, this function returns true if
        * the point lies within the convex polygon defined by vertex_array_.*/
@@ -143,15 +143,16 @@ namespace Rigid2D
 
     protected:
       RBState state_;             // Position, momentum
-      //Vector2 position_;          // Position of center of mass
       Vector2 velocity_;          // Velocity of center of mass (implicitly calculated)
-      //Vector2 momentum_;          // Total momentum of RigidBody
       Vector2 forceAccumulator_;  // Sum of forces acting on the center of mass of RigidBody
       Real mass_;                 // Object mass
       std::unordered_set<Force*> forces_;    // all forces being applied to this RB
+
+      // Geometry
       int vertex_count_;
       Real *vertex_array_;
-
+      AABB staticBB_;             // local space, does not change
+      AABB worldBB_;              // world space, changes, used for broad phase
   };
 }
 
