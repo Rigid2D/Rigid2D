@@ -35,7 +35,7 @@ namespace Rigid2D
     RBSolver::nextStep(*this, result);
     state_ = result;
 
-    worldBB_ = staticBB_.transform(state_.position, 0);
+    worldBB_ = staticBB_.transform(state_.position, 1.00);
   }
 
   void RigidBody::computeForces(RBState & state)
