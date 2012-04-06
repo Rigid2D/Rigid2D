@@ -60,6 +60,9 @@ namespace Rigid2D
        */
       void removeRigidBodies (RigidBody **rigidBodyArray, unsigned int numBodies);
 
+      // tells an RB if it's colliding with another RB
+      void checkCollision();
+
     private:
       std::unordered_set<RigidBody*> rigidBodies_;   // Collection of all tracked rigid bodies
       Real time_;  // Simulation clock

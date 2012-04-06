@@ -10,7 +10,7 @@ namespace Rigid2D
     minY = maxY = vertex_arr[1];
 
     // find minmax vertices
-    for (int i = 1; i < num_vertices; i++) {
+    for (unsigned int i = 1; i < num_vertices; i++) {
       if (vertex_arr[2*i] < minX) {
         minX = vertex_arr[2*i];
       } else if (vertex_arr[2*i] > maxX) {
@@ -46,21 +46,26 @@ namespace Rigid2D
     Real sin_theta = sin(rotation);
 
     for (int i = 0; i < 4; i++) {
-      vertex_arr[i] = vertex_arr[i] * cos_theta - vertex_arr[i+1] * sin_theta;
-      vertex_arr[i+1] = vertex_arr[i] * sin_theta + vertex_arr[1+1] * cos_theta;
+      vertex_arr[2*i] = vertex_arr[2*i] * cos_theta - vertex_arr[2*i+1] * sin_theta;
+      vertex_arr[2*i+1] = vertex_arr[2*i] * sin_theta + vertex_arr[2*i+1] * cos_theta;
     }
 
     // Apply translation
     for (int j = 0; j < 4; j++) {
-      vertex_arr[j] += translation.x;
-      vertex_arr[j+1] += translation.y;
+      vertex_arr[2*j] += translation.x;
+      vertex_arr[2*j+1] += translation.y;
     }
 
     return AABB(vertex_arr, 4);
   }
 
-  bool AABB::intersects(AABB &other) const
+  bool AABB::isIntersecting(AABB &other) const
   {
-    return false;
+    if (maxVertex_.x < other.minVertex_.x || minVertex_.x > other.maxVertex_.x) 
+      return 0;
+    if (maxVertex_.y < other.minVertex_.y || minVertex_.y > other.maxVertex_.y) 
+      return 0;
+
+    return 1;
   }
 }

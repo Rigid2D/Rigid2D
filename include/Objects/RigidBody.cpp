@@ -17,7 +17,8 @@ namespace Rigid2D
     vertex_array_ = new Real[2 * vertex_count];
     memcpy(vertex_array_, vertex_array, 2 * vertex_count * sizeof(Real));
     forceAccumulator_ = Vector2(0, 0);
-  
+    bp_isColliding_ = false;
+
     // compute staticBB
     staticBB_ = AABB(vertex_array, vertex_count);
   }
@@ -29,9 +30,12 @@ namespace Rigid2D
 
   void RigidBody::update()
   {
+    bp_isColliding_ = false;
     RBState result;
     RBSolver::nextStep(*this, result);
     state_ = result;
+
+    worldBB_ = staticBB_.transform(state_.position, 0);
   }
 
   void RigidBody::computeForces(RBState & state)
@@ -50,6 +54,16 @@ namespace Rigid2D
   {
     dState.position = state.momentum / mass_;
     dState.momentum = forceAccumulator_;
+  }
+
+  bool RigidBody::checkCollision(RigidBody *rb)
+  {
+    if (worldBB_.isIntersecting(*(rb->getWorldBB()))) {
+      bp_isColliding_ = true;
+      rb->bp_isColliding_ = true;
+      return true;
+    }
+    return false;
   }
 
   void RigidBody::addForce(Force *force) 
@@ -146,6 +160,16 @@ namespace Rigid2D
   AABB* RigidBody::getStaticBB() 
   {
     return &staticBB_;
+  }
+
+  AABB* RigidBody::getWorldBB() 
+  {
+    return &worldBB_;
+  }
+
+  bool RigidBody::bp_isIntersecting() const
+  {
+    return bp_isColliding_;
   }
 
   bool RigidBody::pointIsInterior(Real x, Real y)

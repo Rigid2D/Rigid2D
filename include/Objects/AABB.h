@@ -12,7 +12,7 @@ namespace Rigid2D
       AABB() {};
       AABB(Real *vertex_arr, unsigned int num_vertices);
       AABB transform(Vector2 translation, Real rotation) const;
-      bool intersects(AABB &other) const;
+      bool isIntersecting(AABB &other) const;
 
       Vector2 minVertex_;    // bottom-left
       Vector2 maxVertex_;    // top-right

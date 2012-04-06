@@ -78,6 +78,7 @@ namespace Rigid2D
       void computeForces(RBState &state);
       void computeStateDeriv(const RBState &state, RBState &dState) const;
 
+      bool checkCollision(RigidBody *rb);
 
       /** Tells RigidBodySystem to apply the given force from here on out.
 			 * If the force was already previously given, it does not apply it a
@@ -136,6 +137,8 @@ namespace Rigid2D
       int getVertexCount() const;
       Real* getVertexArray() const;
       AABB* getStaticBB();
+      AABB* getWorldBB();
+      bool bp_isIntersecting() const;
 
       /* Given a point in graphics coordinate space, this function returns true if
        * the point lies within the convex polygon defined by vertex_array_.*/
@@ -153,6 +156,7 @@ namespace Rigid2D
       Real *vertex_array_;
       AABB staticBB_;             // local space, does not change
       AABB worldBB_;              // world space, changes, used for broad phase
+      bool bp_isColliding_;       // is the body colliding in BP
   };
 }
 
