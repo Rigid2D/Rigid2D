@@ -6,6 +6,7 @@
 #include "Common/Vector2.h"
 #include "Objects/Force.h"
 #include <unordered_set>
+#include <cmath>
 
 namespace Rigid2D
 {
@@ -16,12 +17,17 @@ namespace Rigid2D
   struct RBState {
     Vector2 position;
     Vector2 linearMomentum;
+    Real orientAngle;       // Orientation angle in radians.  This angle
+                            // defaults to zero when creating a RigidBody.
+    Real angularMomentum;
 
     RBState() {}
-    RBState(const Vector2 &position, const Vector2 &linearMomentum) {
-      this->position = position;
-      this->linearMomentum = linearMomentum;
-    }
+    RBState(const Vector2 &position, const Vector2 &linearMomentum,
+        const Real &orientAngle, const Real &angularMomentum) :
+      position(position),
+      linearMomentum(linearMomentum),
+      orientAngle(orientAngle),
+      angularMomentum(angularMomentum) { }
 
     void operator *= (Real scalar) {
       position *= scalar;
@@ -34,15 +40,24 @@ namespace Rigid2D
     }
 
     RBState operator + (const RBState & s) const {
-      return RBState(position + s.position, linearMomentum + s.linearMomentum);
+      return RBState(position + s.position,
+                     linearMomentum + s.linearMomentum,
+                     orientAngle + s.orientAngle,
+                     angularMomentum + s.angularMomentum);
     }
 
     RBState operator - (const RBState & s) const {
-      return RBState(position - s.position, linearMomentum - s.linearMomentum);
+      return RBState(position - s.position,
+                     linearMomentum - s.linearMomentum,
+                     orientAngle - s.orientAngle,
+                     angularMomentum - s.angularMomentum);
     }
 
     RBState operator * (const Real scalar) const {
-      return RBState(position * scalar, linearMomentum * scalar);
+      return RBState(position * scalar,
+                     linearMomentum * scalar,
+                     orientAngle * scalar,
+                     angularMomentum * scalar);
     }
 
     friend RBState operator * (const Real scalar, const RBState &state) {
@@ -51,7 +66,14 @@ namespace Rigid2D
 
     RBState operator / (const Real scalar) const {
       assert(feq(scalar, 0.0) == false);
-      return RBState(position / scalar, linearMomentum / scalar);
+      return RBState(position / scalar,
+                     linearMomentum / scalar,
+                     orientAngle / scalar,
+                     angularMomentum / scalar);
+    }
+
+    void normalizeOrientAngle() {
+      orientAngle = fmod(orientAngle, TAU);
     }
   };
 

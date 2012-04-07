@@ -41,8 +41,6 @@ TESTS = Matrix2-UnitTest \
 				RigidException-UnitTest \
         Vector3-UnitTest \
         Vector2-UnitTest \
-				OdeRungeKutta4-UnitTest \
-				RungeKutta4RigidBodySolver-UnitTest
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -130,35 +128,7 @@ Vector2-UnitTest.o : $(TEST_DIR)Vector2-UnitTest.cpp $(COMMON_DIR)Vector2.h $(GT
 Vector2-UnitTest : Vector2-UnitTest.o feq.o gtest_main.a
 	$(LINK)
 
-OdeRungeKutta4.o : $(COMMON_DIR)OdeRungeKutta4.h $(COMMON_DIR)OdeRungeKutta4.cpp \
-									 $(COMMON_DIR)OdeSolver.h $(COMMON_DIR)RigidSettings.h \
-									 $(COMMON_DIR)RigidException.h
-	$(COMPILE) $(COMMON_DIR)OdeRungeKutta4.cpp
-
 ForceFunctions.h : $(COMMON_DIR)RigidSettings.h
 
 ForceFunctions.o : ForceFunctions.cpp ForceFunctions.h
 	$(COMPILE) ForceFunctions.cpp
-
-OdeRungeKutta4-UnitTest.o : OdeRungeKutta4-UnitTest.cpp $(COMMON_DIR)OdeRungeKutta4.h \
-													 	$(COMMON_DIR)OdeSolver.h ForceFunctions.h $(GTEST_HEADERS)
-	$(COMPILE) OdeRungeKutta4-UnitTest.cpp
-
-OdeRungeKutta4-UnitTest : OdeRungeKutta4-UnitTest.o OdeRungeKutta4.o \
-													RigidException.o ForceFunctions.o gtest_main.a
-	$(LINK)
-
-RungeKutta4RigidBodySolver.o : $(COMMON_DIR)RungeKutta4RigidBodySolver.cpp \
-															 $(COMMON_DIR)RungeKutta4RigidBodySolver.h \
-															 $(COMMON_DIR)OdeRungeKutta4.h
-	$(COMPILE) $(COMMON_DIR)RungeKutta4RigidBodySolver.cpp
-
-RungeKutta4RigidBodySolver-UnitTest.o : RungeKutta4RigidBodySolver-UnitTest.cpp \
-																				$(COMMON_DIR)RungeKutta4RigidBodySolver.cpp \
-																				$(COMMON_DIR)RungeKutta4RigidBodySolver.h \
-																				$(GTEST_HEADERS)
-	$(COMPILE) RungeKutta4RigidBodySolver-UnitTest.cpp
-
-RungeKutta4RigidBodySolver-UnitTest : RungeKutta4RigidBodySolver-UnitTest.o \
-																			RungeKutta4RigidBodySolver.o gtest_main.a
-	$(LINK)

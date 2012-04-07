@@ -30,4 +30,6 @@ void RBSolver::nextStep(class RigidBody &rb, struct RBState &outState, Real step
   k4 *= stepSize;
 
   outState = initialState + (k1 + 2 * k2 + 2 * k3 + k4) / 6;
+
+  outState.normalizeOrientAngle();
 }
