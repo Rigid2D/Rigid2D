@@ -14,10 +14,10 @@
 //#define DEBUG( x )
 //#endif
 
-//// NULL is not guaranteed to be defined.
-//#ifndef NULL
-//#define NULL 0
-//#endif
+// NULL is not guaranteed to be defined.
+#ifndef NULL
+#define NULL 0
+#endif
 
 
 // Place all global library settings and constants in this file.

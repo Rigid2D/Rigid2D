@@ -1,4 +1,6 @@
 #include "MathUtils.h"
+#include "RigidSettings.h"
+#include "feq.h"
 #include <cassert>
 
 namespace Rigid2D
@@ -22,24 +24,28 @@ namespace Rigid2D
       - (a2 * b1 * c0) - (a1 * b0 * c2) - (a0 * b2 * c1));
   }
 
-	Vector2 centroid (unsigned int vertice_count, Vector2 **vertices)
-	{
-	  	
-	}
+	//Vector2 centroid (unsigned int vertice_count, Vector2 **vertices)
+	//{
+			
+	//}
 
-	Real signedArea (unsigned int vertice_count, Vector2 **vertices)
+	Real signedArea (unsigned int num_vertices, Vector2 **vertices)
 	{
-    if (vertice_count < 2)
+    if (num_vertices < 2)
       return 0.0F;
 
     assert(vertices != NULL);
 
     Vector2 **v = vertices;
+    unsigned int n = num_vertices;
     Real result = 0;
 
-    for(unsigned int i = 0; i < vertice_count; ++i) {
-      result += v[i]->x * v[i+1]->y - v[i+1]->x * v[i]->y
+    for(unsigned int i = 0; i < n - 1; ++i) {
+      result += v[i]->x * v[i+1]->y - v[i+1]->x * v[i]->y;
     }
+
+    // Last result wraps around to index 0
+    result += v[n-1]->x * v[0]->y - v[0]->x * v[n-1]->y;
 
     return (0.5 * result);
 	}

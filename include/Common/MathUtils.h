@@ -17,14 +17,15 @@ namespace Rigid2D
 
 	// Returns the centroid, represented as a Vector2, of the polygon
 	// whos vertices are given by the parameter <vertices>.
-	Vector2 centroid (unsigned int vertice_count, Vector2 **vertices);
+  //
+	//Vector2 centroid (unsigned int num_vertices, Vector2 **vertices);
 
 	// Returns the signed area of the polygon represented by <vertices>.
 	// If the polygon is simple (non-intersecting sides), with the
 	// vertices numbered in a counterclockwise direction, the signed area
 	// is the area.
-  // If vertice_count is less than 2, then zero is the signed area returned.
-	Real signedArea (unsigned int vertice_count, Vector2 **vertices);
+  // If num_vertices is less than 2, then signedArea returns zero.
+	Real signedArea (unsigned int num_vertices, Vector2 **vertices);
 }
 
 #endif
