@@ -41,6 +41,7 @@ TESTS = Matrix2-UnitTest \
 				RigidException-UnitTest \
         Vector3-UnitTest \
         Vector2-UnitTest \
+				MathUtils-UnitTest
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -93,7 +94,7 @@ feq.o : $(COMMON_DIR)feq.cpp $(COMMON_DIR)feq.h
 
 Matrix2.h : $(COMMON_DIR)RigidSettings.h $(COMMON_DIR)feq.h
 
-Matrix2.o : $(COMMON_DIR)Matrix2.cpp $(COMMON_DIR)Matrix2.h $(GTEST_HEADERS)
+Matrix2.o : $(COMMON_DIR)Matrix2.cpp $(COMMON_DIR)Matrix2.h 
 	$(COMPILE) $(COMMON_DIR)Matrix2.cpp
 
 Matrix2-UnitTest.o : $(TEST_DIR)Matrix2-UnitTest.cpp $(COMMON_DIR)Matrix2.h $(GTEST_HEADERS)
@@ -102,7 +103,7 @@ Matrix2-UnitTest.o : $(TEST_DIR)Matrix2-UnitTest.cpp $(COMMON_DIR)Matrix2.h $(GT
 Matrix2-UnitTest : Matrix2.o Matrix2-UnitTest.o feq.o gtest_main.a
 	$(LINK)
 
-RigidException.o : $(COMMON_DIR)RigidException.cpp $(COMMON_DIR)RigidException.h $(GTEST_HEADERS)
+RigidException.o : $(COMMON_DIR)RigidException.cpp $(COMMON_DIR)RigidException.h
 	$(COMPILE) $(COMMON_DIR)RigidException.cpp
 
 RigidException-UnitTest.o : $(TEST_DIR)RigidException-UnitTest.cpp \
@@ -132,3 +133,6 @@ ForceFunctions.h : $(COMMON_DIR)RigidSettings.h
 
 ForceFunctions.o : ForceFunctions.cpp ForceFunctions.h
 	$(COMPILE) ForceFunctions.cpp
+
+MathUtils.o : $(SRC_DIR)MathUtils.cpp $(SRC_DIR)MathUtils.h $(SRC_DIR)Vector2.h
+	$(COMPILE) $(SRC_DIR)MathUtils.cpp
