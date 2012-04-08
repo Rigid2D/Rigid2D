@@ -3,8 +3,6 @@
 #include <cassert>
 #include <cstring>
 
-#include <iostream>
-
 namespace Rigid2D
 {
 
@@ -80,11 +78,10 @@ namespace Rigid2D
 
   Vector2 RigidBody::getVelocity() const
   {
-    std::cout << state_.linearMomentum.x << std::endl;
     return state_.linearMomentum / mass_;
   }
 
-  Vector2 RigidBody::linearMomentum() const
+  Vector2 RigidBody::getLinearMomentum() const
   {
     return state_.linearMomentum;
   }

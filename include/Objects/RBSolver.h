@@ -3,7 +3,6 @@
 
 #include "Common/RigidSettings.h"
 #include "RigidBody.h"
-#include <iostream>
 
 namespace Rigid2D
 {

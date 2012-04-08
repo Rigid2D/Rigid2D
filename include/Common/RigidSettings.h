@@ -26,7 +26,7 @@ namespace Rigid2D
 	typedef float Real;
 	typedef double PreciseReal;
 
-	const PreciseReal TAU = 6.283185307;
+	const Real TAU = 6.283185307;
 
 	// Starting step size for the OdeSolver.
 	const Real StartingStepSize = 0.01;

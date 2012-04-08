@@ -33,3 +33,4 @@ void RBSolver::nextStep(class RigidBody &rb, struct RBState &outState, Real step
 
   outState.normalizeOrientAngle();
 }
+

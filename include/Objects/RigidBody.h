@@ -14,7 +14,8 @@ namespace Rigid2D
   class RBSolver;
 
   // Stores the state needed for force calculations.
-  struct RBState {
+  struct RBState
+  {
     Vector2 position;
     Vector2 linearMomentum;
     Real orientAngle;       // Orientation angle in radians.  This angle
@@ -29,42 +30,53 @@ namespace Rigid2D
       orientAngle(orientAngle),
       angularMomentum(angularMomentum) { }
 
-    void operator *= (Real scalar) {
+    void operator *= (Real scalar)
+    {
       position *= scalar;
       linearMomentum *= scalar;
+      orientAngle *= scalar;
+      angularMomentum *= scalar;
     }
 
-    void operator /= (Real scalar) {
+    void operator /= (Real scalar)
+    {
       position /= scalar;
       linearMomentum /= scalar;
+      orientAngle /= scalar;
+      angularMomentum /= scalar;
     }
 
-    RBState operator + (const RBState & s) const {
+    RBState operator + (const RBState & s) const
+    {
       return RBState(position + s.position,
                      linearMomentum + s.linearMomentum,
                      orientAngle + s.orientAngle,
                      angularMomentum + s.angularMomentum);
     }
 
-    RBState operator - (const RBState & s) const {
+    RBState operator - (const RBState & s) const
+    {
       return RBState(position - s.position,
                      linearMomentum - s.linearMomentum,
                      orientAngle - s.orientAngle,
                      angularMomentum - s.angularMomentum);
     }
 
-    RBState operator * (const Real scalar) const {
+    RBState operator * (const Real scalar) const
+    {
       return RBState(position * scalar,
                      linearMomentum * scalar,
                      orientAngle * scalar,
                      angularMomentum * scalar);
     }
 
-    friend RBState operator * (const Real scalar, const RBState &state) {
+    friend RBState operator * (const Real scalar, const RBState &state)
+    {
       return state * scalar;
     }
 
-    RBState operator / (const Real scalar) const {
+    RBState operator / (const Real scalar) const
+    {
       assert(feq(scalar, 0.0) == false);
       return RBState(position / scalar,
                      linearMomentum / scalar,
@@ -72,7 +84,8 @@ namespace Rigid2D
                      angularMomentum / scalar);
     }
 
-    void normalizeOrientAngle() {
+    void normalizeOrientAngle()
+    {
       orientAngle = fmod(orientAngle, TAU);
     }
   };
@@ -86,7 +99,7 @@ namespace Rigid2D
        *
        * @param vertex_array should be an array of tuples in the form of (x,y). It will get deep-copied
        * @param vertex_count is the number of tuples (not the number of Reals) */
-      RigidBody(const Vector2 &position, const Vector2 &velocity, 
+      RigidBody(const Vector2 &position, const Vector2 &velocity,
                 Real mass, Real *vertex_array, int vertex_count);
       ~RigidBody();
 
@@ -143,7 +156,7 @@ namespace Rigid2D
 
       Vector2 getPosition() const;
       Vector2 getVelocity() const;
-      Vector2 linearMomentum() const;
+      Vector2 getLinearMomentum() const;
       Real getMass() const;
       void getState(RBState & state) const;
 
