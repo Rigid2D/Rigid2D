@@ -163,9 +163,9 @@ namespace Rigid2D
       int vertex_count_;
       Real *vertex_array_;
       AABB staticBB_;               // local space, does not change
-      AABB worldBB_;                // world space, changes, used for broad phase
-      bool bp_isIntersecting_;      // is the body colliding in BP
-      bool np_isIntersecting_;      // is the body colliding in BP
+      AABB worldBB_;                // world space, changes, used for broadPhase
+      bool bp_isIntersecting_;      // is the body colliding in broadPhase
+      bool np_isIntersecting_;      // is the body colliding in narrowPhase
   };
 }
 

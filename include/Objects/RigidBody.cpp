@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstring>
 #include <iostream>
+#include <limits>       // for infinity
 
 namespace Rigid2D
 {
@@ -190,11 +191,91 @@ namespace Rigid2D
   bool RigidBody::narrowPhase(RigidBody *rb)
   {
     // Use the Separation Axis Theorem to find distance between
-    // two polygons.
-    
+    // two polygons. The steps are as follows:
+    // 1) For each edge of both polygons find perpendicular
+    // 2) Project all vertices into this perpendicular axis
+    // 3) If the projected interval of p1 and p2 don't overlap, 
+    // there is no collision, otherwise continue
+    // 4) If for every 'edge-axis' projected intervals overlap,
+    // there is a collision, otherwise there isn't
+
+    // extremum points for the intervals of each RB
+    Real min1, max1, min2, max2;
+
+    Real axis_slope, axis_length;
+    Real deltaX, deltaY, pos;
+
+    // SAT for edges of "this" RB
+    for (int i = 0; i < vertex_count_-1; i++) {
+      deltaX = vertex_array_[i*2 + 2] - vertex_array_[i*2];
+      deltaY = vertex_array_[i*2 + 1] - vertex_array_[i*2 + 3];
+
+      // find perpendicular slope of edge
+      if (deltaY == 0) {
+        if (deltaX == 0) {        // repeating vertex
+          continue;
+        } else {                  // horizontal line
+          axis_slope = std::numeric_limits<Real>::infinity();
+        }
+      } else if (deltaX == 0) {   // vertical line
+        axis_slope = 0;
+      } else {
+        axis_slope = -deltaX/deltaY;
+      }
+
+      axis_length = sqrt(1 + axis_slope * axis_slope);
+
+      // project each vertex of "this" RB
+      for (int j = 0; j < vertex_count_; j++) {
+        if (axis_slope == 0) {
+          pos = vertex_array_[j*2];
+        } else if (axis_slope == std::numeric_limits<Real>::infinity()) {
+          pos = vertex_array_[j*2 + 1];
+        } else {
+          pos = (vertex_array_[j*2] + vertex_array_[j*2 + 1] * axis_slope);
+          pos /= axis_length;
+        }
+
+       if (j == 0) {              // set inital values, can we eliminate this?
+          min1 = pos;
+          max1 = pos;
+        } else {                  // update min/max interval values
+          if (pos > max1) {
+            max1 = pos;
+          } else if (pos < min1) {
+            min1 = pos;
+          }
+        }
+      }
+
+      // project each vertex of other RB
+      for (int j = 0; j < rb->vertex_count_; j++) {
+        if (axis_slope == 0) {
+          pos = rb->vertex_array_[j*2];
+        } else if (axis_slope == std::numeric_limits<Real>::infinity()) {
+          pos = rb->vertex_array_[j*2 + 1];
+        } else {
+          pos = (rb->vertex_array_[j*2] + rb->vertex_array_[j*2 + 1] * axis_slope);
+          pos /= axis_length;
+        }
+
+       if (j == 0) {              // set inital values, can we eliminate this?
+          min2 = pos;
+          max2 = pos;
+        } else {                  // update min/max interval values
+          if (pos > max2) {
+            max2 = pos;
+          } else if (pos < min2) {
+            min2 = pos;
+          }
+        }
+      }
+
+    }
 
     return false;
   }
+
 
   bool RigidBody::pointIsInterior(Real x, Real y)
   {
