@@ -139,24 +139,33 @@ namespace Rigid2D
       AABB* getStaticBB();
       AABB* getWorldBB();
       bool bp_isIntersecting() const;
+      bool np_isIntersecting() const;
 
       /* Given a point in graphics coordinate space, this function returns true if
        * the point lies within the convex polygon defined by vertex_array_.*/
       bool pointIsInterior(Real x, Real y);
 
     protected:
-      RBState state_;             // Position, momentum
-      Vector2 velocity_;          // Velocity of center of mass (implicitly calculated)
-      Vector2 forceAccumulator_;  // Sum of forces acting on the center of mass of RigidBody
-      Real mass_;                 // Object mass
+      /** Check for BB intersection. Call narrowPhase if true. */
+      bool broadPhase(RigidBody *rb);
+
+      /** Check for exact intersection. Called after broadPhase returns true. */
+      bool narrowPhase(RigidBody *rb);
+
+    protected:
+      RBState state_;               // Position, momentum
+      Vector2 velocity_;            // Velocity of center of mass (implicitly calculated)
+      Vector2 forceAccumulator_;    // Sum of forces acting on the center of mass of RigidBody
+      Real mass_;                   // Object mass
       std::unordered_set<Force*> forces_;    // all forces being applied to this RB
 
       // Geometry
       int vertex_count_;
       Real *vertex_array_;
-      AABB staticBB_;             // local space, does not change
-      AABB worldBB_;              // world space, changes, used for broad phase
-      bool bp_isColliding_;       // is the body colliding in BP
+      AABB staticBB_;               // local space, does not change
+      AABB worldBB_;                // world space, changes, used for broad phase
+      bool bp_isIntersecting_;      // is the body colliding in BP
+      bool np_isIntersecting_;      // is the body colliding in BP
   };
 }
 

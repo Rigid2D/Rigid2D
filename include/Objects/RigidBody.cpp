@@ -17,7 +17,7 @@ namespace Rigid2D
     vertex_array_ = new Real[2 * vertex_count];
     memcpy(vertex_array_, vertex_array, 2 * vertex_count * sizeof(Real));
     forceAccumulator_ = Vector2(0, 0);
-    bp_isColliding_ = false;
+    bp_isIntersecting_ = false;
 
     // compute staticBB
     staticBB_ = AABB(vertex_array, vertex_count);
@@ -30,7 +30,7 @@ namespace Rigid2D
 
   void RigidBody::update()
   {
-    bp_isColliding_ = false;
+    bp_isIntersecting_ = false;
     RBState result;
     RBSolver::nextStep(*this, result);
     state_ = result;
@@ -58,12 +58,11 @@ namespace Rigid2D
 
   bool RigidBody::checkCollision(RigidBody *rb)
   {
-    if (worldBB_.isIntersecting(*(rb->getWorldBB()))) {
-      bp_isColliding_ = true;
-      rb->bp_isColliding_ = true;
-      return true;
+    if (broadPhase(rb)) {
+       return narrowPhase(rb);
+    } else {
+      return false;
     }
-    return false;
   }
 
   void RigidBody::addForce(Force *force) 
@@ -169,7 +168,32 @@ namespace Rigid2D
 
   bool RigidBody::bp_isIntersecting() const
   {
-    return bp_isColliding_;
+    return bp_isIntersecting_;
+  }
+
+  bool RigidBody::np_isIntersecting() const
+  {
+    return np_isIntersecting_;
+  }
+
+  bool RigidBody::broadPhase(RigidBody *rb)
+  {
+    if (worldBB_.isIntersecting(*(rb->getWorldBB()))) {
+      bp_isIntersecting_ = true;
+      rb->bp_isIntersecting_ = true;
+      return true;
+    }
+
+    return false;
+  }
+
+  bool RigidBody::narrowPhase(RigidBody *rb)
+  {
+    // Use the Separation Axis Theorem to find distance between
+    // two polygons.
+    
+
+    return false;
   }
 
   bool RigidBody::pointIsInterior(Real x, Real y)
