@@ -24,10 +24,6 @@ namespace Rigid2D
       - (a2 * b1 * c0) - (a1 * b0 * c2) - (a0 * b2 * c1));
   }
 
-	//Vector2 centroid (unsigned int vertice_count, Vector2 **vertices)
-	//{
-			
-	//}
 
 	Real signedArea (unsigned int num_vertices, Vector2 **vertices)
 	{
@@ -49,4 +45,37 @@ namespace Rigid2D
 
     return (0.5 * result);
 	}
+
+  Vector2 centroid (unsigned int num_vertices, Vector2 **vertices) throw (Rigid2D::Exception)
+  {
+    assert(vertices != NULL);
+
+    if (num_vertices < 3) {
+      throw InvalidParameterException(__LINE__, __FUNCTION__, __FILE__,
+          "num_vertices cannot be 0");
+    }
+
+    Vector2 **v = vertices;
+    Real Cx = 0;
+    Real Cy = 0;
+    Real A;
+    unsigned int n = num_vertices;
+    unsigned int i;
+
+    for(i = 0; i < n - 1; ++i) {
+      Cx += (v[i]->x + v[i+1]->x) * (v[i]->x * v[i+1]->y - v[i+1]->x * v[i]->y);
+      Cy += (v[i]->y + v[i+1]->y) * (v[i]->x * v[i+1]->y - v[i+1]->x * v[i]->y);
+    }
+
+    // Last index wraps around to 0
+    Cx += (v[n-1]->x + v[0]->x) * (v[n-1]->x * v[0]->y - v[0]->x * v[n-1]->y);
+    Cy += (v[n-1]->y + v[0]->y) * (v[n-1]->x * v[0]->y - v[0]->x * v[n-1]->y);
+
+    A = signedArea(n, v);
+
+    Cx /= 6*A;
+    Cy /= 6*A;
+
+    return Vector2(Cx, Cy);
+  }
 }

@@ -130,12 +130,12 @@ Vector2-UnitTest : Vector2-UnitTest.o feq.o gtest_main.a
 	$(LINK)
 
 MathUtils.o : $(SRC_DIR)MathUtils.cpp $(SRC_DIR)MathUtils.h $(SRC_DIR)Vector2.h \
-							$(SRC_DIR)feq.h
+							$(SRC_DIR)feq.h $(SRC_DIR)RigidException.h
 	$(COMPILE) $(SRC_DIR)MathUtils.cpp
 
 MathUtils-UnitTest.o : MathUtils-UnitTest.cpp $(SRC_DIR)MathUtils.h $(GTEST_HEADERS)
 	$(COMPILE) MathUtils-UnitTest.cpp
 
-MathUtils-UnitTest : MathUtils-UnitTest.o MathUtils.o feq.o gtest_main.a
+MathUtils-UnitTest : MathUtils-UnitTest.o MathUtils.o feq.o RigidException.o gtest_main.a
 	$(LINK)
 
