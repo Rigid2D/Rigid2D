@@ -12,7 +12,12 @@
 
 namespace Rigid2D
 {
-  int or2d(Vector2 & pt1, Vector2 & pt2, Vector2 & pt3);
+  // Given points A, B, and C, if orient2d(A,B,C) > 0, C lies to the left of the
+  // directed lien AB, and the triangle ABC is oriented counterclockwise.  If
+  // orient2d(A,B,C) < 0, C lies to the right of the directed line AB, and the
+  // triangle ABC is oriented clockwise.  When orient2d(A,B,C) = 0, the three
+  // points are collinear.
+  int orient2d(Vector2 & pt1, Vector2 & pt2, Vector2 & pt3);
 
   Real det3(Real a0, Real a1, Real a2, Real b0, Real b1, Real b2, Real c0, Real c1, Real c2);
 

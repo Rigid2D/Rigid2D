@@ -101,6 +101,9 @@ namespace Rigid2D
        * @param vertex_count is the number of tuples (not the number of Reals) */
       RigidBody(const Vector2 &position, const Vector2 &velocity,
                 Real mass, Real *vertex_array, int vertex_count);
+
+			RigidBody() {}
+
       ~RigidBody();
 
       /** Computes and sets the state of the object for next frame.

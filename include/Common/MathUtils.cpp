@@ -5,7 +5,7 @@
 
 namespace Rigid2D
 {
-  int or2d(Vector2 & pt1, Vector2 & pt2, Vector2 & pt3)
+  int orient2d(Vector2 & pt1, Vector2 & pt2, Vector2 & pt3)
   {
     Real det = det3(1.0, 1.0, 1.0,
               pt1.x, pt2.x, pt3.x,

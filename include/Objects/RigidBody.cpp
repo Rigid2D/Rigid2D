@@ -151,7 +151,7 @@ namespace Rigid2D
       pt2.y = vertex_array_[i*2 + 1];
       pt3.x = vertex_array_[i*2 + 2];
       pt3.y = vertex_array_[i*2 + 3];
-      if (or2d(pt1, pt2, pt3) != -1)
+      if (orient2d(pt1, pt2, pt3) != -1)
         return false;
     }
     // special check for last edge
@@ -159,7 +159,7 @@ namespace Rigid2D
     pt2.y = vertex_array_[2 * vertex_count_ - 1];
     pt3.x = vertex_array_[0];
     pt3.y = vertex_array_[1];
-    if (or2d(pt1, pt2, pt3) != -1)
+    if (orient2d(pt1, pt2, pt3) != -1)
       return false;
     return true;
   }
