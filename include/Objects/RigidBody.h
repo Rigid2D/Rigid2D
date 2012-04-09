@@ -186,7 +186,7 @@ namespace Rigid2D
       std::unordered_set<Force*> forces_;    // All forces currently acting on this RB
       int num_vertices_;
       Real *vertex_array_;
-
+			Vector2 **vertices_;	// Collection of Vector2 objects representing the vertices that compose the RigidBody.
   };
 }
 

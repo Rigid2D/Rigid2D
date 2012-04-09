@@ -1,5 +1,6 @@
 #include "RigidBody.h"
 #include "RBSolver.h"
+#include "MathUtils.h"
 #include <cassert>
 #include <cstring>
 
@@ -16,6 +17,8 @@ namespace Rigid2D
     vertex_array_ = new Real[2 * num_vertices];
     memcpy(vertex_array_, vertex_array, 2 * num_vertices * sizeof(Real));
     forceAccumulator_ = Vector2(0, 0);
+
+		vertices = realsToVector2s(num_vertices, vertex_array);
   }
 
   RigidBody::~RigidBody()
