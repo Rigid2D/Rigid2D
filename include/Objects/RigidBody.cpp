@@ -20,7 +20,7 @@ namespace Rigid2D
 
   RigidBody::~RigidBody()
   {
-    delete vertex_array_;
+    delete [] vertex_array_;
   }
 
   void RigidBody::update()
