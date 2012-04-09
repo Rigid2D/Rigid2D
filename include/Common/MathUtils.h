@@ -42,7 +42,7 @@ namespace Rigid2D
   // objects created is then returned.
   // Assumes num_vertices > 0.  If num_vertices = 0, method will throw an
   // InvalidParameterException error.
-  Vector2 ** realsToVector2s(unsigned int num_vertices, Real *vertex_array) throw (Rigid2D::Exception, std::bad_alloc);
+  Vector2 ** realsToVector2s(unsigned int num_vertices, const Real *vertex_array) throw (Rigid2D::Exception, std::bad_alloc);
 }
 
 #endif

@@ -23,6 +23,7 @@ namespace Rigid2D
     Real angularMomentum;
 
     RBState() {}
+
     RBState(const Vector2 &position, const Vector2 &linearMomentum,
         const Real &orientAngle, const Real &angularMomentum) :
       position(position),
@@ -97,10 +98,17 @@ namespace Rigid2D
     public:
       /** Constructor for RigidBody
        *
-       * @param vertex_array should be an array of tuples in the form of (x,y). It will get deep-copied
-       * @param num_vertices is the number of tuples (not the number of Reals) */
+       * @param vertex_array should be an array of vertex coordinates given in counterclockwise order.
+       *        Ex: vertex_array = {x0,y0,x1,y1,...,xn,yn}.
+       * @param num_vertices is the number of vertices.  This should be the
+       * number of elements within vertex_array divided by 2. */
       RigidBody(const Vector2 &position, const Vector2 &velocity,
-                Real mass, Real *vertex_array, int num_vertices);
+                Real mass, const Real *vertex_array, unsigned int num_vertices);
+
+
+      // Deep copies vertices.
+      RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
+          const Vector2 **vertices, unsigned int num_vertices);
 
 			RigidBody() {}
 
@@ -171,22 +179,24 @@ namespace Rigid2D
       void setMass(const Real &);
 
 
-      int getVertexCount() const;
-      Real* getVertexArray() const;
+      unsigned int getNumVertices() const;
+
+      // Deep copy vertices and return copy.
+      Vector2 ** getVertices() const;
 
       /* Given a point in graphics coordinate space, this function returns true if
        * the point lies within the convex polygon defined by vertex_array_.*/
       bool pointIsInterior(Real x, Real y);
 
     protected:
-      RBState state_;                        // Position, linear momentum, orientation, angular momentum
-      Vector2 velocity_;                     // Velocity of center of mass (implicitly calculated)
-      Vector2 forceAccumulator_;             // Sum of forces acting on the center of mass of RigidBody
-      Real mass_;                            // Object mass
-      std::unordered_set<Force*> forces_;    // All forces currently acting on this RB
-      int num_vertices_;
-      Real *vertex_array_;
-			Vector2 **vertices_;	// Collection of Vector2 objects representing the vertices that compose the RigidBody.
+      RBState state_;                        // Structure to hold state variables for RigidBody.
+      Vector2 velocity_;                     // Velocity of center of mass (implicitly calculated).
+      Vector2 forceAccumulator_;             // Sum of forces acting on the center of mass of RigidBody.
+      Real mass_;                            // Total mass of the object.
+      std::unordered_set<Force*> forces_;    // Collection of forces currently acting on RigidBody.
+      unsigned int num_vertices_;            // Number of vertices that make up the paremter of RigidBody.
+      Real *vertex_array_;                   // Array of Reals representing vertex coordinates for the paremeter of RibidBody.
+			Vector2 **vertices_;	                 // Collection of Vector2 objects representing the vertices that compose the RigidBody.
   };
 }
 

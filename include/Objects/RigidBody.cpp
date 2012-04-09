@@ -1,6 +1,5 @@
 #include "RigidBody.h"
 #include "RBSolver.h"
-#include "MathUtils.h"
 #include <cassert>
 #include <cstring>
 
@@ -8,8 +7,10 @@ namespace Rigid2D
 {
 
   RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-      Real *vertex_array, int num_vertices)
+      const Real *vertex_array, unsigned int num_vertices)
   {
+    assert(vertex_array != NULL);
+
     state_.position = position;
     state_.linearMomentum = velocity * mass;
     mass_ = mass;
@@ -18,12 +19,39 @@ namespace Rigid2D
     memcpy(vertex_array_, vertex_array, 2 * num_vertices * sizeof(Real));
     forceAccumulator_ = Vector2(0, 0);
 
-		vertices = realsToVector2s(num_vertices, vertex_array);
+		vertices_ = realsToVector2s(num_vertices, vertex_array);
+  }
+
+  RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
+      const Vector2 **vertices, unsigned int num_vertices)
+  {
+      assert(vertices != NULL);
+
+      state_.position = position;
+      state_.linearMomentum = velocity * mass;
+      mass_ = mass;
+      num_vertices_ = num_vertices;
+      forceAccumulator_ = Vector2(0, 0);
+      vertex_array_ = NULL;
+
+      vertices_ = new Vector2 *[num_vertices];
+
+      for(unsigned int i = 0; i < num_vertices; ++i){
+        vertices_[i] = new Vector2(vertices[i]->x, vertices[i]->y);
+      }
   }
 
   RigidBody::~RigidBody()
   {
-    delete [] vertex_array_;
+    if (vertex_array_ != NULL)
+      delete [] vertex_array_;
+
+    if (vertices_ != NULL) {
+      for(unsigned int i = 0; i < num_vertices_; ++i){
+        delete vertices_[i];
+      }
+      delete [] vertices_;
+    }
   }
 
   void RigidBody::update()
@@ -131,14 +159,20 @@ namespace Rigid2D
     mass_ = mass;
   }
 
-  int RigidBody::getVertexCount() const
+  unsigned int RigidBody::getNumVertices() const
   {
     return num_vertices_;
   }
 
-  Real* RigidBody::getVertexArray() const
+  Vector2 ** RigidBody::getVertices() const
   {
-    return vertex_array_;
+    Vector2 **result = new Vector2 *[num_vertices_];
+
+    for(unsigned int i = 0; i < num_vertices_; ++i){
+      result[i] = new Vector2(vertices_[i]->x, vertices_[i]->y);
+    }
+
+    return result;
   }
 
   bool RigidBody::pointIsInterior(Real x, Real y)
@@ -148,7 +182,7 @@ namespace Rigid2D
     pt1.x = x;
     pt1.y = y;
 
-    for (int i = 0; i < num_vertices_ - 1; i++)
+    for (unsigned int i = 0; i < num_vertices_ - 1; i++)
     {
       pt2.x = vertex_array_[i*2];
       pt2.y = vertex_array_[i*2 + 1];

@@ -79,7 +79,7 @@ namespace Rigid2D
     return Vector2(Cx, Cy);
   }
 
-  Vector2 ** realsToVector2s(unsigned int num_vertices, Real *vertex_array)
+  Vector2 ** realsToVector2s(unsigned int num_vertices, const Real *vertex_array)
     throw (Rigid2D::Exception, std::bad_alloc)
   {
     assert(vertex_array != NULL);

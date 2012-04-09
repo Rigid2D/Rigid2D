@@ -91,7 +91,11 @@ gtest_main.a : gtest-all.o gtest_main.o
 feq.o : $(COMMON_DIR)feq.cpp $(COMMON_DIR)feq.h
 	$(COMPILE) $(COMMON_DIR)feq.cpp
 
-MathUtils.o : $(COMMON_DIR)MathUtils.cpp $(COMMON_DIR)MathUtils.h
+RigidException.o : $(COMMON_DIR)RigidException.cpp $(COMMON_DIR)RigidException.h
+	$(COMPILE) $(COMMON_DIR)RigidException.cpp
+
+MathUtils.o : $(COMMON_DIR)MathUtils.cpp $(COMMON_DIR)MathUtils.h $(COMMON_DIR)Vector2.h \
+							$(COMMON_DIR)feq.h $(COMMON_DIR)RigidException.h
 	$(COMPILE) $(COMMON_DIR)MathUtils.cpp
 
 RBSolver.o : $(SRC_DIR)RBSolver.h $(SRC_DIR)RBSolver.cpp $(SRC_DIR)RigidBody.h
@@ -106,7 +110,7 @@ RigidBody-UnitTest.o : $(SRC_DIR)RigidBody.h RigidBody-UnitTest.cpp $(GTEST_HEAD
 	$(COMPILE) RigidBody-UnitTest.cpp
 
 RigidBody-UnitTest : RigidBody-UnitTest.o RigidBody.o Force.o RBSolver.o \
-										 feq.o MathUtils.o gtest_main.a
+										 RigidException.o feq.o MathUtils.o gtest_main.a
 	$(LINK)
 
 Force.o : $(SRC_DIR)Force.h $(SRC_DIR)Force.cpp

@@ -6,6 +6,9 @@
 
 using namespace Rigid2D;
 
+//=============================================================================
+// RBState Tests
+//=============================================================================
 class RBStateTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
@@ -126,3 +129,27 @@ TEST_F(RBStateTest, NormalizeOrientAngle){
   EXPECT_FLOAT_EQ(s1->orientAngle, TAU - 0.5);
 }
 
+//=============================================================================
+// RigidBody Tests
+//=============================================================================
+
+TEST(RigidBodyTest, Creation){
+  Vector2 pos(1,1);
+  Vector2 velocity(100,0);
+  Real mass = 20;
+  Real vertex_array[6] = {1,1,5,1,2,4};
+  unsigned int num_vertices = 3;
+  Vector2 **vertices;
+
+  RigidBody rb(pos, velocity, mass, vertex_array, num_vertices);
+  vertices = rb.getVertices();
+
+  EXPECT_TRUE(rb.getPosition() == pos);
+  EXPECT_TRUE(rb.getVelocity() == velocity);
+  EXPECT_TRUE(rb.getMass() == mass);
+  EXPECT_TRUE(rb.getNumVertices() == num_vertices);
+
+  EXPECT_TRUE(*vertices[0] == Vector2(1,1));
+  EXPECT_TRUE(*vertices[1] == Vector2(5,1));
+  EXPECT_TRUE(*vertices[2] == Vector2(2,4));
+}
