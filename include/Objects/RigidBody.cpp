@@ -7,14 +7,14 @@ namespace Rigid2D
 {
 
   RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-      Real *vertex_array, int vertex_count)
+      Real *vertex_array, int num_vertices)
   {
     state_.position = position;
     state_.linearMomentum = velocity * mass;
     mass_ = mass;
-    vertex_count_ = vertex_count;
-    vertex_array_ = new Real[2 * vertex_count];
-    memcpy(vertex_array_, vertex_array, 2 * vertex_count * sizeof(Real));
+    num_vertices_ = num_vertices;
+    vertex_array_ = new Real[2 * num_vertices];
+    memcpy(vertex_array_, vertex_array, 2 * num_vertices * sizeof(Real));
     forceAccumulator_ = Vector2(0, 0);
   }
 
@@ -130,7 +130,7 @@ namespace Rigid2D
 
   int RigidBody::getVertexCount() const
   {
-    return vertex_count_;
+    return num_vertices_;
   }
 
   Real* RigidBody::getVertexArray() const
@@ -145,7 +145,7 @@ namespace Rigid2D
     pt1.x = x;
     pt1.y = y;
 
-    for (int i = 0; i < vertex_count_ - 1; i++)
+    for (int i = 0; i < num_vertices_ - 1; i++)
     {
       pt2.x = vertex_array_[i*2];
       pt2.y = vertex_array_[i*2 + 1];
@@ -155,8 +155,8 @@ namespace Rigid2D
         return false;
     }
     // special check for last edge
-    pt2.x = vertex_array_[2 * vertex_count_ - 2];
-    pt2.y = vertex_array_[2 * vertex_count_ - 1];
+    pt2.x = vertex_array_[2 * num_vertices_ - 2];
+    pt2.y = vertex_array_[2 * num_vertices_ - 1];
     pt3.x = vertex_array_[0];
     pt3.y = vertex_array_[1];
     if (orient2d(pt1, pt2, pt3) != -1)

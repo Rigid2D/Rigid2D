@@ -98,9 +98,9 @@ namespace Rigid2D
       /** Constructor for RigidBody
        *
        * @param vertex_array should be an array of tuples in the form of (x,y). It will get deep-copied
-       * @param vertex_count is the number of tuples (not the number of Reals) */
+       * @param num_vertices is the number of tuples (not the number of Reals) */
       RigidBody(const Vector2 &position, const Vector2 &velocity,
-                Real mass, Real *vertex_array, int vertex_count);
+                Real mass, Real *vertex_array, int num_vertices);
 
 			RigidBody() {}
 
@@ -184,7 +184,7 @@ namespace Rigid2D
       Vector2 forceAccumulator_;             // Sum of forces acting on the center of mass of RigidBody
       Real mass_;                            // Object mass
       std::unordered_set<Force*> forces_;    // All forces currently acting on this RB
-      int vertex_count_;
+      int num_vertices_;
       Real *vertex_array_;
 
   };
