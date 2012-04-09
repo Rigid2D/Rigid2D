@@ -152,3 +152,46 @@ TEST(CentroidTest, Vertice_Count_8){
 
   free(num_vertices, vertices);
 }
+
+//=============================================================================
+// realsToVector2s Tests
+//=============================================================================
+TEST(realsToVector2sTest, Num_Vertices_0_Throws_Error){
+  unsigned int num_vertices = 0;
+  Real vIn[2] = {0,0}; // dummy var
+
+  EXPECT_THROW(realsToVector2s(num_vertices, vIn), InvalidParameterException);
+}
+
+TEST(realsToVector2sTest, Num_Vertices_1){
+  unsigned int num_vertices = 1;
+  Real vIn[2] = {1, 1};
+  Vector2 **vOut = realsToVector2s(num_vertices, vIn);
+
+  EXPECT_TRUE(*vOut[0] == Vector2(1,1));
+
+  free(num_vertices, vOut);
+}
+
+TEST(realsToVector2sTest, Num_Vertices_2){
+  unsigned int num_vertices = 2;
+  Real vIn[4] = {0,1,2,3};
+  Vector2 **vOut = realsToVector2s(num_vertices, vIn);
+
+  EXPECT_TRUE(*vOut[0] == Vector2(0,1));
+  EXPECT_TRUE(*vOut[1] == Vector2(2,3));
+
+  free(num_vertices, vOut);
+}
+
+TEST(realsToVector2sTest, Num_Vertices_3){
+  unsigned int num_vertices = 3;
+  Real vIn[6] = {0,1,2,3,4,5};
+  Vector2 **vOut = realsToVector2s(num_vertices, vIn);
+
+  EXPECT_TRUE(*vOut[0] == Vector2(0,1));
+  EXPECT_TRUE(*vOut[1] == Vector2(2,3));
+  EXPECT_TRUE(*vOut[2] == Vector2(4,5));
+
+  free(num_vertices, vOut);
+}
