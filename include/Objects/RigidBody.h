@@ -7,6 +7,7 @@
 #include "Objects/Force.h"
 #include "Objects/AABB.h"
 #include <unordered_set>
+#include <cmath>
 
 namespace Rigid2D
 {
@@ -14,45 +15,80 @@ namespace Rigid2D
   class RBSolver;
 
   // Stores the state needed for force calculations.
-  struct RBState {
+  struct RBState
+  {
     Vector2 position;
-    Vector2 momentum;
+    Vector2 linearMomentum;
+    Real orientAngle;       // Orientation angle in radians.  This angle
+                            // defaults to zero when creating a RigidBody.
+    Real angularMomentum;
 
     RBState() {}
-    RBState(const Vector2 &pos, const Vector2 &mom) {
-      position = pos;
-      momentum = mom;
-    }
 
-    void operator *= (Real scalar) {
+    RBState(const Vector2 &position, const Vector2 &linearMomentum,
+        const Real &orientAngle, const Real &angularMomentum) :
+      position(position),
+      linearMomentum(linearMomentum),
+      orientAngle(orientAngle),
+      angularMomentum(angularMomentum) { }
+
+    void operator *= (Real scalar)
+    {
       position *= scalar;
-      momentum *= scalar;
+      linearMomentum *= scalar;
+      orientAngle *= scalar;
+      angularMomentum *= scalar;
     }
 
-    void operator /= (Real scalar) {
+    void operator /= (Real scalar)
+    {
       position /= scalar;
-      momentum /= scalar;
+      linearMomentum /= scalar;
+      orientAngle /= scalar;
+      angularMomentum /= scalar;
     }
 
-    RBState operator + (const RBState & s) const {
-      return RBState(position + s.position, momentum + s.momentum);
+    RBState operator + (const RBState & s) const
+    {
+      return RBState(position + s.position,
+                     linearMomentum + s.linearMomentum,
+                     orientAngle + s.orientAngle,
+                     angularMomentum + s.angularMomentum);
     }
 
-    RBState operator - (const RBState & s) const {
-      return RBState(position - s.position, momentum - s.momentum);
+    RBState operator - (const RBState & s) const
+    {
+      return RBState(position - s.position,
+                     linearMomentum - s.linearMomentum,
+                     orientAngle - s.orientAngle,
+                     angularMomentum - s.angularMomentum);
     }
 
-    RBState operator * (const Real scalar) const {
-      return RBState(position * scalar, momentum * scalar);
+    RBState operator * (const Real scalar) const
+    {
+      return RBState(position * scalar,
+                     linearMomentum * scalar,
+                     orientAngle * scalar,
+                     angularMomentum * scalar);
     }
 
-    friend RBState operator * (const Real scalar, const RBState &state) {
+    friend RBState operator * (const Real scalar, const RBState &state)
+    {
       return state * scalar;
     }
 
-    RBState operator / (const Real scalar) const {
+    RBState operator / (const Real scalar) const
+    {
       assert(feq(scalar, 0.0) == false);
-      return RBState(position / scalar, momentum / scalar);
+      return RBState(position / scalar,
+                     linearMomentum / scalar,
+                     orientAngle / scalar,
+                     angularMomentum / scalar);
+    }
+
+    void normalizeOrientAngle()
+    {
+      orientAngle = fmod(orientAngle, TAU);
     }
   };
 
@@ -62,11 +98,19 @@ namespace Rigid2D
   {
     public:
       /** Constructor for RigidBody
-       *
-       * @param vertex_array should be an array of tuples in the form of (x,y). It will get deep-copied
-       * @param vertex_count is the number of tuples (not the number of Reals) */
-      RigidBody(const Vector2 &position, const Vector2 &velocity, 
-                Real mass, Real *vertex_array, unsigned int vertex_count);
+       * @param vertex_array should be an array of vertex coordinates given in counterclockwise order.
+       *        Ex: vertex_array = {x0,y0,x1,y1,...,xn,yn}.
+       * @param num_vertices is number of elements within vertex_array divided by 2. 
+       */
+      RigidBody(const Vector2 &position, const Vector2 &velocity,
+                Real mass, const Real *vertex_array, unsigned int num_vertices);
+
+      // Deep copies vertices. [?]
+      RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
+          const Vector2 *vertices, unsigned int num_vertices);
+
+			RigidBody() {}
+
       ~RigidBody();
 
       /** Computes and sets the state of the object for next frame.
@@ -123,7 +167,7 @@ namespace Rigid2D
 
       Vector2 getPosition() const;
       Vector2 getVelocity() const;
-      Vector2 getMomentum() const;
+      Vector2 getLinearMomentum() const;
       Real getMass() const;
       void getState(RBState & state) const;
 
@@ -141,6 +185,11 @@ namespace Rigid2D
       bool bp_isIntersecting() const;
       bool np_isIntersecting() const;
 
+      unsigned int getNumVertices() const;
+
+      // Deep copy vertices and return copy. [why deep-copy vertices?]
+      Vector2 * getVertices() const;
+
       /* Given a point in graphics coordinate space, this function returns true if
        * the point lies within the convex polygon defined by vertex_array_.*/
       bool pointIsInterior(Real x, Real y);
@@ -153,19 +202,19 @@ namespace Rigid2D
       bool narrowPhase(RigidBody *rb);
 
     protected:
-      RBState state_;               // Position, momentum
-      Vector2 velocity_;            // Velocity of center of mass (implicitly calculated)
-      Vector2 forceAccumulator_;    // Sum of forces acting on the center of mass of RigidBody
-      Real mass_;                   // Object mass
-      std::unordered_set<Force*> forces_;    // all forces being applied to this RB
+      RBState state_;                         // Position, momentum
+      Vector2 velocity_;                      // Velocity of center of mass (implicitly calculated)
+      Vector2 forceAccumulator_;              // Sum of forces acting on the center of mass of RigidBody
+      Real mass_;                             // Object mass
+      std::unordered_set<Force*> forces_;     // all forces being applied to this RB
 
       // Geometry
-      int vertex_count_;
-      Real *vertex_array_;
-      AABB staticBB_;               // local space, does not change
-      AABB worldBB_;                // world space, changes, used for broadPhase
-      bool bp_isIntersecting_;      // is the body colliding in broadPhase
-      bool np_isIntersecting_;      // is the body colliding in narrowPhase
+      unsigned int num_vertices_;             // Number of vertices that make up the paremter of RigidBody.
+			Vector2 *vertices_;	                    // Collection of Vector2 objects representing the vertices that compose the RigidBody.
+      AABB staticBB_;                         // local space, does not change
+      AABB worldBB_;                          // world space, changes, used for broadPhase
+      bool bp_isIntersecting_;                // is the body colliding in broadPhase
+      bool np_isIntersecting_;                // is the body colliding in narrowPhase
   };
 }
 

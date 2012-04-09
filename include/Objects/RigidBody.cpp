@@ -11,22 +11,53 @@ namespace Rigid2D
   RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
       Real *vertex_array, unsigned int vertex_count)
   {
+    assert(vertex_array != NULL);
+
     state_.position = position;
-    state_.momentum = velocity * mass;
+    state_.linearMomentum = velocity * mass;
     mass_ = mass;
-    vertex_count_ = vertex_count;
-    vertex_array_ = new Real[2 * vertex_count];
-    memcpy(vertex_array_, vertex_array, 2 * vertex_count * sizeof(Real));
+    num_vertices_ = num_vertices;
+    vertex_array_ = new Real[2 * num_vertices];
+    memcpy(vertex_array_, vertex_array, 2 * num_vertices * sizeof(Real));
     forceAccumulator_ = Vector2(0, 0);
     bp_isIntersecting_ = false;
 
     // compute staticBB
     staticBB_ = AABB(vertex_array, vertex_count);
+
+		vertices_ = realsToVector2s(num_vertices, vertex_array);
+  }
+
+  RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
+      const Vector2 **vertices, unsigned int num_vertices)
+  {
+      assert(vertices != NULL);
+
+      state_.position = position;
+      state_.linearMomentum = velocity * mass;
+      mass_ = mass;
+      num_vertices_ = num_vertices;
+      forceAccumulator_ = Vector2(0, 0);
+      vertex_array_ = NULL;
+
+      vertices_ = new Vector2 *[num_vertices];
+
+      for(unsigned int i = 0; i < num_vertices; ++i){
+        vertices_[i] = new Vector2(vertices[i]->x, vertices[i]->y);
+      }
   }
 
   RigidBody::~RigidBody()
   {
-    delete vertex_array_;
+    if (vertex_array_ != NULL)
+      delete [] vertex_array_;
+
+    if (vertices_ != NULL) {
+      for(unsigned int i = 0; i < num_vertices_; ++i){
+        delete vertices_[i];
+      }
+      delete [] vertices_;
+    }
   }
 
   void RigidBody::update()
@@ -53,8 +84,8 @@ namespace Rigid2D
 
   void RigidBody::computeStateDeriv(const RBState &state, RBState &dState) const
   {
-    dState.position = state.momentum / mass_;
-    dState.momentum = forceAccumulator_;
+    dState.position = state.linearMomentum / mass_;
+    dState.linearMomentum = forceAccumulator_;
   }
 
   bool RigidBody::checkCollision(RigidBody *rb)
@@ -96,13 +127,12 @@ namespace Rigid2D
 
   Vector2 RigidBody::getVelocity() const
   {
-    std::cout << state_.momentum.x << std::endl;
-    return state_.momentum / mass_;
+    return state_.linearMomentum / mass_;
   }
 
-  Vector2 RigidBody::getMomentum() const
+  Vector2 RigidBody::getLinearMomentum() const
   {
-    return state_.momentum;
+    return state_.linearMomentum;
   }
 
   Real RigidBody::getMass() const
@@ -133,28 +163,34 @@ namespace Rigid2D
 
   void RigidBody::setVelocity(const Vector2 & velocity)
   {
-    state_.momentum = velocity * mass_;
+    state_.linearMomentum = velocity * mass_;
   }
 
   void RigidBody::setVelocity (Real xVel, Real yVel)
   {
-    state_.momentum = Vector2(xVel, yVel) * mass_;
+    state_.linearMomentum = Vector2(xVel, yVel) * mass_;
   }
 
   void RigidBody::setMass(const Real &mass)
   {
-    state_.momentum /= mass_ / mass;
+    state_.linearMomentum /= mass_ / mass;
     mass_ = mass;
   }
 
-  int RigidBody::getVertexCount() const
+  unsigned int RigidBody::getNumVertices() const
   {
-    return vertex_count_;
+    return num_vertices_;
   }
 
-  Real* RigidBody::getVertexArray() const
+  Vector2 ** RigidBody::getVertices() const
   {
-    return vertex_array_;
+    Vector2 **result = new Vector2 *[num_vertices_];
+
+    for(unsigned int i = 0; i < num_vertices_; ++i){
+      result[i] = new Vector2(vertices_[i]->x, vertices_[i]->y);
+    }
+
+    return result;
   }
 
   AABB* RigidBody::getStaticBB() 
@@ -284,21 +320,21 @@ namespace Rigid2D
     pt1.x = x;
     pt1.y = y;
 
-    for (int i = 0; i < vertex_count_ - 1; i++)
+    for (unsigned int i = 0; i < num_vertices_ - 1; i++)
     {
       pt2.x = vertex_array_[i*2];
       pt2.y = vertex_array_[i*2 + 1];
       pt3.x = vertex_array_[i*2 + 2];
       pt3.y = vertex_array_[i*2 + 3];
-      if (or2d(pt1, pt2, pt3) != -1)
+      if (orient2d(pt1, pt2, pt3) != -1)
         return false;
     }
     // special check for last edge
-    pt2.x = vertex_array_[2 * vertex_count_ - 2];
-    pt2.y = vertex_array_[2 * vertex_count_ - 1];
+    pt2.x = vertex_array_[2 * num_vertices_ - 2];
+    pt2.y = vertex_array_[2 * num_vertices_ - 1];
     pt3.x = vertex_array_[0];
     pt3.y = vertex_array_[1];
-    if (or2d(pt1, pt2, pt3) != -1)
+    if (orient2d(pt1, pt2, pt3) != -1)
       return false;
     return true;
   }

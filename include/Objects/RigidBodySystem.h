@@ -2,7 +2,6 @@
 #define RIGID2D_RIGID_BODY_SYSTEM_H
 
 #include "Common/RigidSettings.h"
-#include "Common/OdeSolver.h"
 #include "Objects/RigidBody.h"
 #include <unordered_set>
 

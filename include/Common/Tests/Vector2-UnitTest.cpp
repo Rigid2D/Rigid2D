@@ -1,7 +1,6 @@
 #include "../Vector2.h"
 #include "../feq.h"
 #include "gtest/gtest.h"
-#include <stdio.h>
 
 using namespace Rigid2D;
 

@@ -14,10 +14,10 @@
 //#define DEBUG( x )
 //#endif
 
-//// NULL is not guaranteed to be defined.
-//#ifndef NULL
-//#define NULL 0
-//#endif
+// NULL is not guaranteed to be defined.
+#ifndef NULL
+#define NULL 0
+#endif
 
 
 // Place all global library settings and constants in this file.
@@ -26,7 +26,7 @@ namespace Rigid2D
 	typedef float Real;
 	typedef double PreciseReal;
 
-	const PreciseReal tau = 6.283185307;
+	const Real TAU = 6.283185307;
 
 	// Starting step size for the OdeSolver.
 	const Real StartingStepSize = 0.01;

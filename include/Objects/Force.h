@@ -2,11 +2,11 @@
 #define RIGID2D_FORCE_H
 #include "Common/RigidSettings.h"
 #include "Common/Vector2.h"
-#include "Objects/RigidBody.h" // needed for RBState
 
 namespace Rigid2D {
 
   class RigidBody;
+	struct RBState;
 
   typedef
   void (*ForceFunctionPtr)
