@@ -11,12 +11,12 @@ DemoBase::DemoBase(QWidget *parent)
 {
   setMouseTracking(true);
   setAutoBufferSwap(true);
- 
+
   animationTimer = new QTimer(this);
   connect(animationTimer, SIGNAL(timeout()), this, SLOT(updateGL()));
-  animationTimer->start(0);
+  animationTimer->start(1000/100);     // time per frame
 
-  fpsTimer = new QTime;
+  fpsTimer = new QTime();
   fpsTimer->start();
   frameCount = 0;
 
@@ -46,7 +46,11 @@ void DemoBase::resizeGL(int w, int h)
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluOrtho2D(-50, 50, -50, 50);
+  if (w >= h) {
+    gluOrtho2D(-50 * (GLfloat)w/h, 50 * (GLfloat)w/h, -50, 50);
+  } else {
+    gluOrtho2D(-50, 50, -50 * (GLfloat)h/w, 50 * (GLfloat)h/w);
+  } 
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();

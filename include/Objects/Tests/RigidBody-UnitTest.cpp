@@ -133,13 +133,13 @@ TEST_F(RBStateTest, NormalizeOrientAngle){
 // RigidBody Tests
 //=============================================================================
 
-TEST(RigidBodyTest, Creation){
+TEST(RigidBodyTest, Creation_with_RealArray){
   Vector2 pos(1,1);
   Vector2 velocity(100,0);
   Real mass = 20;
   Real vertex_array[6] = {1,1,5,1,2,4};
   unsigned int num_vertices = 3;
-  Vector2 **vertices;
+  Vector2 const *vertices;
 
   RigidBody rb(pos, velocity, mass, vertex_array, num_vertices);
   vertices = rb.getVertices();
@@ -149,7 +149,35 @@ TEST(RigidBodyTest, Creation){
   EXPECT_TRUE(rb.getMass() == mass);
   EXPECT_TRUE(rb.getNumVertices() == num_vertices);
 
-  EXPECT_TRUE(*vertices[0] == Vector2(1,1));
-  EXPECT_TRUE(*vertices[1] == Vector2(5,1));
-  EXPECT_TRUE(*vertices[2] == Vector2(2,4));
+  EXPECT_TRUE(vertices[0] == Vector2(1,1));
+  EXPECT_TRUE(vertices[1] == Vector2(5,1));
+  EXPECT_TRUE(vertices[2] == Vector2(2,4));
+}
+
+TEST(RigidBodyTest, Creation_with_Vector2Array){
+  Vector2 pos(1,1);
+  Vector2 velocity(100,0);
+  Real mass = 20;
+  unsigned int num_vertices = 3;
+  Vector2 *vertices = new Vector2[num_vertices];
+  Vector2 const * vOut;
+
+  vertices[0] = Vector2(1,1);
+  vertices[1] = Vector2(5,1);
+  vertices[2] = Vector2(2,4);
+
+  RigidBody rb(pos, velocity, mass, vertices, num_vertices);
+
+  vOut = rb.getVertices();
+
+  EXPECT_TRUE(rb.getPosition() == pos);
+  EXPECT_TRUE(rb.getVelocity() == velocity);
+  EXPECT_TRUE(rb.getMass() == mass);
+  EXPECT_TRUE(rb.getNumVertices() == num_vertices);
+
+  EXPECT_TRUE(vOut[0] == Vector2(1,1));
+  EXPECT_TRUE(vOut[1] == Vector2(5,1));
+  EXPECT_TRUE(vOut[2] == Vector2(2,4));
+
+  delete [] vertices;
 }

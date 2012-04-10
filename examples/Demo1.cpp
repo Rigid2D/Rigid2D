@@ -2,6 +2,7 @@
 
 using namespace Rigid2D;
 
+
 Demo1::Demo1(QWidget *parent)
       : DemoBase(parent)
 {
@@ -12,19 +13,24 @@ Demo1::Demo1(QWidget *parent)
   mouseForce = new Force(mouseSpringForce, userData_mouseForce);
 
 	// Init sample rigid body;
-  Real vertex_array[8] = {-5, 5, 5, 5,
-                          5, -5, -5, -5};
-  body = new RigidBody(Vector2(0, 0), Vector2(0,0), 10.0, vertex_array, 4);
-  body->addForce(mouseForce);
+  Real vertex_array[12] = {-5, 5, 
+                          0, 7,
+                          5, 4,
+                          5, -5,
+                          0, -7,
+                          -4, -4};
+  body1 = new RigidBody(Vector2(0, 0), Vector2(0,0), 10.0, vertex_array, 6);
+  body2 = new RigidBody(Vector2(15, 10), Vector2(0,0), 10.0, vertex_array, 4);
 
-	// Add body and force to rigidBodySystem
-	rigidBodySystem->addRigidBody(body);
+	// Add bodies to rigidBodySystem
+	rigidBodySystem->addRigidBody(body1);
+	rigidBodySystem->addRigidBody(body2);
 
   userData_mouseForce[0] = 0;
   userData_mouseForce[1] = 0;
   userData_mouseForce[2] = 5;
   userData_mouseForce[3] = 4;
-
+  rbActedOn = NULL;
 }
 
 
@@ -32,7 +38,8 @@ Demo1::~Demo1()
 {
 	delete rigidBodySystem;
   delete mouseForce;
-	delete body;
+	delete body1;
+  delete body2;
 }
 
 
@@ -44,25 +51,69 @@ void Demo1::paintGL()
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
 
+  // Draw body1
   glPushMatrix();
-  glTranslatef(body->getPosition()[0], body->getPosition()[1], 0);
-  glColor3f (1, 1, 1);
+  AABB *bb = body1->getWorldBB();
+  if (body1->bp_isIntersecting()) {
+    glColor3ub(180,50,50);
+  } else {
+    glColor3ub(50,50,180);
+  }
+  glBegin(GL_QUADS);
+    glVertex2f(bb->minVertex_.x-0.2, bb->minVertex_.y-0.2);
+    glVertex2f(bb->minVertex_.x-0.2, bb->maxVertex_.y+0.2);
+    glVertex2f(bb->maxVertex_.x+0.2, bb->maxVertex_.y+0.2);
+    glVertex2f(bb->maxVertex_.x+0.2, bb->minVertex_.y-0.2);
+  glEnd();
+  glTranslatef(body1->getPosition()[0], body1->getPosition()[1], 0);
+  glColor3ub (255, 255, 255);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glVertexPointer(2, GL_FLOAT, 0, body->getVertexArray());
-  glDrawArrays(GL_POLYGON, 0, body->getVertexCount());
+  const Vector2 *vertices = body1->getVertices();
+  Real num_vertices = body1->getNumVertices();
+  glBegin(GL_POLYGON);
+    for (unsigned i = 0; i < num_vertices; i++) {
+      glVertex2f(vertices[i].x, vertices[i].y);
+    }
+  glEnd();
+  glPopMatrix();
+
+  // Draw body2
+  glPushMatrix();
+  bb = body2->getWorldBB();
+  if (body2->bp_isIntersecting()) {
+    glColor3ub(180,50,50);
+  } else {
+    glColor3ub(50,50,180);
+  }
+  glBegin(GL_QUADS);
+    glVertex2f(bb->minVertex_.x-0.2, bb->minVertex_.y-0.2);
+    glVertex2f(bb->minVertex_.x-0.2, bb->maxVertex_.y+0.2);
+    glVertex2f(bb->maxVertex_.x+0.2, bb->maxVertex_.y+0.2);
+    glVertex2f(bb->maxVertex_.x+0.2, bb->minVertex_.y-0.2);
+  glEnd();
+  glTranslatef(body2->getPosition()[0], body2->getPosition()[1], 0);
+  glColor3ub (255, 255, 255);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  vertices = body2->getVertices();
+  num_vertices = body2->getNumVertices();
+  glBegin(GL_POLYGON);
+    for (unsigned i = 0; i < num_vertices; i++) {
+      glVertex2f(vertices[i].x, vertices[i].y);
+    }
+  glEnd();
   glPopMatrix();
 
   // Draw the spring as a line
-  glBegin(GL_LINE);
-    glColor3ub(50, 200, 50);
-    glVertex2f(userData_mouseForce[0], userData_mouseForce[1]);
-    glVertex2f(body->getPosition()[0], body->getPosition()[1]);
-  glEnd();
+  if (rbActedOn != NULL) {
+    glBegin(GL_LINE);
+      glColor3ub(50, 200, 50);
+      glVertex2f(userData_mouseForce[0], userData_mouseForce[1]);
+      glVertex2f(rbActedOn->getPosition()[0], rbActedOn->getPosition()[1]);
+    glEnd();
+  }
 
   // Update ALL THE THINGS!! (unless paused)
 	if (!paused) {
-    //std::cout.precision(3);
-    //std::cout << "RB{" << body->getPosition()[0] << " " << body->getPosition()[1] << "}\n";
     rigidBodySystem->update();
   }
 }
@@ -87,35 +138,60 @@ void Demo1::mousePressEvent(QMouseEvent *event)
 
   gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
-  //if (body->pointIsInterior(posX, posY))
+  // set one end of mouse spring
+  userData_mouseForce[0] = posX;
+  userData_mouseForce[1] = posY;
+
+  // transform mouse position to match RB
+  GLdouble posRb1X = posX - body1->getPosition()[0];
+  GLdouble posRb1Y = posY - body1->getPosition()[1];
+  GLdouble posRb2X = posX - body2->getPosition()[0];
+  GLdouble posRb2Y = posY - body2->getPosition()[1];
+
+  if (body1->pointIsInterior(posRb1X, posRb1Y))
   {
-    userData_mouseForce[0] = posX;
-    userData_mouseForce[1] = posY;
+    rbActedOn = body1;
+    body1->addForce(mouseForce);
+  } 
+  else if (body2->pointIsInterior(posRb2X, posRb2Y))
+  {
+    rbActedOn = body2;
+    body2->addForce(mouseForce);
+  }
+}
+
+
+void Demo1::mouseReleaseEvent(QMouseEvent *event) 
+{
+  if (rbActedOn != NULL) 
+  {
+    rbActedOn->removeForce(mouseForce);
+    rbActedOn = NULL;
   }
 }
 
 
 void Demo1::mouseMoveEvent(QMouseEvent *event) 
 {
-  makeCurrent();
-  GLint viewport[4];
-  GLdouble modelview[16];
-  GLdouble projection[16];
-  GLfloat winX, winY, winZ;
-  GLdouble posX, posY, posZ;
+  if (rbActedOn != NULL) {
+    makeCurrent();
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLfloat winX, winY, winZ;
+    GLdouble posX, posY, posZ;
 
-  glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-  glGetDoublev( GL_PROJECTION_MATRIX, projection );
-  glGetIntegerv( GL_VIEWPORT, viewport );
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+    glGetDoublev( GL_PROJECTION_MATRIX, projection );
+    glGetIntegerv( GL_VIEWPORT, viewport );
 
-  QPoint pos = this->mapFromGlobal(QCursor::pos());
-  winX = pos.x();
-  winY = viewport[3] - pos.y();
-  glReadPixels( winX, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
+    QPoint pos = this->mapFromGlobal(QCursor::pos());
+    winX = pos.x();
+    winY = viewport[3] - pos.y();
+    glReadPixels( winX, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
 
-  gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+    gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
-  {
     userData_mouseForce[0] = posX;
     userData_mouseForce[1] = posY;
   }

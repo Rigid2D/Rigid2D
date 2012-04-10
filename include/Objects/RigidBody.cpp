@@ -2,12 +2,14 @@
 #include "RBSolver.h"
 #include <cassert>
 #include <cstring>
+#include <iostream>
+#include <limits>       // for infinity
 
 namespace Rigid2D
 {
 
   RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-      const Real *vertex_array, unsigned int num_vertices)
+      Real const *vertex_array, unsigned int num_vertices)
   {
     assert(vertex_array != NULL);
 
@@ -15,43 +17,52 @@ namespace Rigid2D
     state_.linearMomentum = velocity * mass;
     mass_ = mass;
     num_vertices_ = num_vertices;
-    vertex_array_ = new Real[2 * num_vertices];
-    memcpy(vertex_array_, vertex_array, 2 * num_vertices * sizeof(Real));
+		
     forceAccumulator_ = Vector2(0, 0);
 
 		vertices_ = realArrayToVector2Array(num_vertices, vertex_array);
+
+    // compute staticBB
+    staticBB_ = AABB(vertices_, num_vertices);
+    bp_isIntersecting_ = false;
   }
 
   RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-      const Vector2 *vertices, unsigned int num_vertices)
+      Vector2 const *vertices, unsigned int num_vertices)
   {
-      assert(vertices != NULL);
+    assert(vertices != NULL);
 
-      state_.position = position;
-      state_.linearMomentum = velocity * mass;
-      mass_ = mass;
-      num_vertices_ = num_vertices;
-      forceAccumulator_ = Vector2(0, 0);
-      vertex_array_ = NULL;
+    state_.position = position;
+    state_.linearMomentum = velocity * mass;
+    mass_ = mass;
+    num_vertices_ = num_vertices;
 
-      vertices_ = new Vector2 [num_vertices];
+    vertices_ = new Vector2 [num_vertices];
 
-      for(unsigned int i = 0; i < num_vertices; ++i){
-        vertices_[i] = Vector2(vertices[i]->x, vertices[i]->y);
-      }
+    for(unsigned int i = 0; i < num_vertices; ++i){
+      vertices_[i] = Vector2(vertices[i].x, vertices[i].y);
+    }
+
+    forceAccumulator_ = Vector2(0, 0);
+
+    // compute staticBB
+    staticBB_ = AABB(vertices_, num_vertices);
+    bp_isIntersecting_ = false;
   }
 
   RigidBody::~RigidBody()
   {
-    delete [] vertex_array_;
     delete [] vertices_;
   }
 
   void RigidBody::update()
   {
+    bp_isIntersecting_ = false;
     RBState result;
     RBSolver::nextStep(*this, result);
     state_ = result;
+
+    worldBB_ = staticBB_.transform(state_.position, 0);
   }
 
   void RigidBody::computeForces(RBState & state)
@@ -70,6 +81,15 @@ namespace Rigid2D
   {
     dState.position = state.linearMomentum / mass_;
     dState.linearMomentum = forceAccumulator_;
+  }
+
+  bool RigidBody::checkCollision(RigidBody *rb)
+  {
+    if (broadPhase(rb)) {
+       return narrowPhase(rb);
+    } else {
+      return false;
+    }
   }
 
   void RigidBody::addForce(Force *force) 
@@ -157,38 +177,155 @@ namespace Rigid2D
     return num_vertices_;
   }
 
-  Vector2 ** RigidBody::getVertices() const
+  const Vector2 * RigidBody::getVertices() const
   {
-    Vector2 **result = new Vector2 *[num_vertices_];
+    //[?]
+    /*Vector2 *result = new Vector2 *[num_vertices_];
 
     for(unsigned int i = 0; i < num_vertices_; ++i){
       result[i] = new Vector2(vertices_[i]->x, vertices_[i]->y);
     }
+    */
+    return vertices_;
+  }
 
-    return result;
+  AABB* RigidBody::getStaticBB() 
+  {
+    return &staticBB_;
+  }
+
+  AABB* RigidBody::getWorldBB() 
+  {
+    return &worldBB_;
+  }
+
+  bool RigidBody::bp_isIntersecting() const
+  {
+    return bp_isIntersecting_;
+  }
+
+  bool RigidBody::np_isIntersecting() const
+  {
+    return np_isIntersecting_;
+  }
+
+  bool RigidBody::broadPhase(RigidBody *rb)
+  {
+    if (worldBB_.isIntersecting(*(rb->getWorldBB()))) {
+      bp_isIntersecting_ = true;
+      rb->bp_isIntersecting_ = true;
+      return true;
+    }
+
+    return false;
+  }
+
+  bool RigidBody::narrowPhase(RigidBody *rb)
+  {
+    /*
+    // Use the Separation Axis Theorem to find distance between
+    // two polygons. The steps are as follows:
+    // 1) For each edge of both polygons find perpendicular
+    // 2) Project all vertices into this perpendicular axis
+    // 3) If the projected interval of p1 and p2 don't overlap, 
+    // there is no collision, otherwise continue
+    // 4) If for every 'edge-axis' projected intervals overlap,
+    // there is a collision, otherwise there isn't
+
+    // extremum points for the intervals of each RB
+    Real min1, max1, min2, max2;
+
+    Real axis_slope, axis_length;
+    Real deltaX, deltaY, pos;
+
+    // SAT for edges of "this" RB
+    for (int i = 0; i < num_vertices_-1; i++) {
+      deltaX = vertex_array_[i*2 + 2] - vertex_array_[i*2];
+      deltaY = vertex_array_[i*2 + 1] - vertex_array_[i*2 + 3];
+
+      // find perpendicular slope of edge
+      if (deltaY == 0) {
+        if (deltaX == 0) {        // repeating vertex
+          continue;
+        } else {                  // horizontal line
+          axis_slope = std::numeric_limits<Real>::infinity();
+        }
+      } else if (deltaX == 0) {   // vertical line
+        axis_slope = 0;
+      } else {
+        axis_slope = -deltaX/deltaY;
+      }
+
+      axis_length = sqrt(1 + axis_slope * axis_slope);
+
+      // project each vertex of "this" RB
+      for (int j = 0; j < num_vertices_; j++) {
+        if (axis_slope == 0) {
+          pos = vertex_array_[j*2];
+        } else if (axis_slope == std::numeric_limits<Real>::infinity()) {
+          pos = vertex_array_[j*2 + 1];
+        } else {
+          pos = (vertex_array_[j*2] + vertex_array_[j*2 + 1] * axis_slope);
+          pos /= axis_length;
+        }
+
+       if (j == 0) {              // set inital values, can we eliminate this?
+          min1 = pos;
+          max1 = pos;
+        } else {                  // update min/max interval values
+          if (pos > max1) {
+            max1 = pos;
+          } else if (pos < min1) {
+            min1 = pos;
+          }
+        }
+      }
+
+      // project each vertex of other RB
+      for (int j = 0; j < rb->num_vertices_; j++) {
+        if (axis_slope == 0) {
+          pos = rb->vertex_array_[j*2];
+        } else if (axis_slope == std::numeric_limits<Real>::infinity()) {
+          pos = rb->vertex_array_[j*2 + 1];
+        } else {
+          pos = (rb->vertex_array_[j*2] + rb->vertex_array_[j*2 + 1] * axis_slope);
+          pos /= axis_length;
+        }
+
+       if (j == 0) {              // set inital values, can we eliminate this?
+          min2 = pos;
+          max2 = pos;
+        } else {                  // update min/max interval values
+          if (pos > max2) {
+            max2 = pos;
+          } else if (pos < min2) {
+            min2 = pos;
+          }
+        }
+      }
+
+    }
+    */
+    return false;
   }
 
   bool RigidBody::pointIsInterior(Real x, Real y)
   {
-    // Go through all the edges calculating or2d(Mouse, pt1, pt2)
+    // Go through all the edges calculating orient2d(Mouse, pt1, pt2)
     Vector2 pt1, pt2, pt3;
     pt1.x = x;
     pt1.y = y;
 
     for (unsigned int i = 0; i < num_vertices_ - 1; i++)
     {
-      pt2.x = vertex_array_[i*2];
-      pt2.y = vertex_array_[i*2 + 1];
-      pt3.x = vertex_array_[i*2 + 2];
-      pt3.y = vertex_array_[i*2 + 3];
+      pt2 = vertices_[i];
+      pt3 = vertices_[i+1];
       if (orient2d(pt1, pt2, pt3) != -1)
         return false;
     }
     // special check for last edge
-    pt2.x = vertex_array_[2 * num_vertices_ - 2];
-    pt2.y = vertex_array_[2 * num_vertices_ - 1];
-    pt3.x = vertex_array_[0];
-    pt3.y = vertex_array_[1];
+    pt2 = vertices_[num_vertices_ - 1];
+    pt3 = vertices_[0];
     if (orient2d(pt1, pt2, pt3) != -1)
       return false;
     return true;

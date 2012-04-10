@@ -5,6 +5,7 @@
 #include "Common/MathUtils.h"
 #include "Common/Vector2.h"
 #include "Objects/Force.h"
+#include "Objects/AABB.h"
 #include <unordered_set>
 #include <cmath>
 
@@ -97,18 +98,17 @@ namespace Rigid2D
   {
     public:
       /** Constructor for RigidBody
-       *
        * @param vertex_array should be an array of vertex coordinates given in counterclockwise order.
        *        Ex: vertex_array = {x0,y0,x1,y1,...,xn,yn}.
-       * @param num_vertices is the number of vertices.  This should be the
-       * number of elements within vertex_array divided by 2. */
+       *        The array is deep copied.
+       * @param num_vertices is number of elements within vertex_array divided by 2. 
+       */
       RigidBody(const Vector2 &position, const Vector2 &velocity,
-                Real mass, const Real *vertex_array, unsigned int num_vertices);
+                Real mass, Real const *vertex_array, unsigned int num_vertices);
 
-
-      // Deep copies vertices.
+      // Same as above, but takes in a Vector2 array
       RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-          const Vector2 *vertices, unsigned int num_vertices);
+          Vector2 const *vertices, unsigned int num_vertices);
 
 			RigidBody() {}
 
@@ -123,6 +123,7 @@ namespace Rigid2D
       void computeForces(RBState &state);
       void computeStateDeriv(const RBState &state, RBState &dState) const;
 
+      bool checkCollision(RigidBody *rb);
 
       /** Tells RigidBodySystem to apply the given force from here on out.
 			 * If the force was already previously given, it does not apply it a
@@ -178,25 +179,43 @@ namespace Rigid2D
       void setVelocity (Real xVel, Real yVel);
       void setMass(const Real &);
 
+      int getVertexCount() const;
+      Real* getVertexArray() const;
+      AABB* getStaticBB();
+      AABB* getWorldBB();
+      bool bp_isIntersecting() const;
+      bool np_isIntersecting() const;
 
       unsigned int getNumVertices() const;
 
-      // Deep copy vertices and return copy.
-      Vector2 ** getVertices() const;
+      // Deep copy vertices and return copy. [why deep-copy vertices?]
+      const Vector2 * getVertices() const;
 
       /* Given a point in graphics coordinate space, this function returns true if
        * the point lies within the convex polygon defined by vertex_array_.*/
       bool pointIsInterior(Real x, Real y);
 
     protected:
-      RBState state_;                        // Structure to hold state variables for RigidBody.
-      Vector2 velocity_;                     // Velocity of center of mass (implicitly calculated).
-      Vector2 forceAccumulator_;             // Sum of forces acting on the center of mass of RigidBody.
-      Real mass_;                            // Total mass of the object.
-      std::unordered_set<Force*> forces_;    // Collection of forces currently acting on RigidBody.
-      unsigned int num_vertices_;            // Number of vertices that make up the paremter of RigidBody.
-      Real *vertex_array_;                   // Array of Reals representing vertex coordinates for the paremeter of RibidBody.
-			Vector2 *vertices_;	                   // Collection of Vector2 objects representing the vertices that compose the RigidBody.
+      /** Check for BB intersection. Call narrowPhase if true. */
+      bool broadPhase(RigidBody *rb);
+
+      /** Check for exact intersection. Called after broadPhase returns true. */
+      bool narrowPhase(RigidBody *rb);
+
+    protected:
+      RBState state_;                         // Position, momentum
+      Vector2 velocity_;                      // Velocity of center of mass (implicitly calculated)
+      Vector2 forceAccumulator_;              // Sum of forces acting on the center of mass of RigidBody
+      Real mass_;                             // Object mass
+      std::unordered_set<Force*> forces_;     // all forces being applied to this RB
+
+      // Geometry
+      unsigned int num_vertices_;             // Number of vertices that make up the paremter of RigidBody.
+			Vector2 *vertices_;	                    // Collection of Vector2 objects representing the vertices that compose the RigidBody.
+      AABB staticBB_;                         // local space, does not change
+      AABB worldBB_;                          // world space, changes, used for broadPhase
+      bool bp_isIntersecting_;                // is the body colliding in broadPhase
+      bool np_isIntersecting_;                // is the body colliding in narrowPhase
   };
 }
 

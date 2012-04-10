@@ -101,16 +101,21 @@ MathUtils.o : $(COMMON_DIR)MathUtils.cpp $(COMMON_DIR)MathUtils.h $(COMMON_DIR)V
 RBSolver.o : $(SRC_DIR)RBSolver.h $(SRC_DIR)RBSolver.cpp $(SRC_DIR)RigidBody.h
 	$(COMPILE) $(SRC_DIR)RBSolver.cpp
 
+AABB.o : $(SRC_DIR)AABB.cpp $(SRC_DIR)AABB.h $(COMMON_DIR)Vector2.h \
+				 $(COMMON_DIR)RigidSettings.h
+	$(COMPILE) $(SRC_DIR)AABB.cpp
+
 RigidBody.o : $(SRC_DIR)RigidBody.h $(SRC_DIR)RigidBody.cpp \
 							$(COMMON_DIR)RigidSettings.h $(COMMON_DIR)MathUtils.h \
-							$(SRC_DIR)Force.h $(COMMON_DIR)Vector2.h $(SRC_DIR)RBSolver.h
+							$(SRC_DIR)Force.h $(COMMON_DIR)Vector2.h $(SRC_DIR)RBSolver.h \
+							$(SRC_DIR)AABB.h
 	$(COMPILE) $(SRC_DIR)RigidBody.cpp
 
 RigidBody-UnitTest.o : $(SRC_DIR)RigidBody.h RigidBody-UnitTest.cpp $(GTEST_HEADERS)
 	$(COMPILE) RigidBody-UnitTest.cpp
 
 RigidBody-UnitTest : RigidBody-UnitTest.o RigidBody.o Force.o RBSolver.o \
-										 RigidException.o feq.o MathUtils.o gtest_main.a
+										 RigidException.o feq.o MathUtils.o AABB.o gtest_main.a
 	$(LINK)
 
 Force.o : $(SRC_DIR)Force.h $(SRC_DIR)Force.cpp
