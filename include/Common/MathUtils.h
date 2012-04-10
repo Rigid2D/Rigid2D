@@ -5,11 +5,6 @@
 #include "Vector2.h"
 #include "RigidException.h"
 
-// Class for common math functions.
-// Functions:
-// *or2d - finds the orientation of a triangle given three points
-// *det3 - determinant of a 3x3 matrix
-
 namespace Rigid2D
 {
   // Given points A, B, and C, if orient2d(A,B,C) > 0, C lies to the left of the
@@ -19,7 +14,11 @@ namespace Rigid2D
   // points are collinear.
   int orient2d(Vector2 & pt1, Vector2 & pt2, Vector2 & pt3);
 
-  // Computes the determinant of a 3x3 matrix given by arguments.
+  // Computes the determinant of a 3x3 matrix given by arguments.  The arguments
+  // should correspond to the following matrix entries:
+  // a0 a1 a2
+  // b0 b1 b2
+  // c0 c1 c2
   Real det3(Real a0, Real a1, Real a2, Real b0, Real b1, Real b2, Real c0, Real c1, Real c2);
 
   // Returns the signed area of the polygon represented by <vertices>.  Vertices
