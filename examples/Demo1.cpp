@@ -19,8 +19,10 @@ Demo1::Demo1(QWidget *parent)
                           5, -5,
                           0, -7,
                           -4, -4};
-  body1 = new RigidBody(Vector2(0, 0), Vector2(0,0), 10.0, vertex_array, 6);
-  body2 = new RigidBody(Vector2(15, 10), Vector2(0,0), 10.0, vertex_array, 4);
+  Real mass = 10;
+
+  body1 = new RigidBody(Vector2(0, 0), Vector2(0,0), mass, vertex_array, 6);
+  body2 = new RigidBody(Vector2(15, 10), Vector2(0,0), mass, vertex_array, 4);
 
 	// Add bodies to rigidBodySystem
 	rigidBodySystem->addRigidBody(body1);
@@ -28,8 +30,8 @@ Demo1::Demo1(QWidget *parent)
 
   userData_mouseForce[0] = 0;
   userData_mouseForce[1] = 0;
-  userData_mouseForce[2] = 5;
-  userData_mouseForce[3] = 4;
+  userData_mouseForce[2] = 1000;  // Spring constant ks
+  userData_mouseForce[3] = 100;  // Damping constant kd
   rbActedOn = NULL;
 }
 
