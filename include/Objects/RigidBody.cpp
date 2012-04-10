@@ -19,11 +19,11 @@ namespace Rigid2D
     memcpy(vertex_array_, vertex_array, 2 * num_vertices * sizeof(Real));
     forceAccumulator_ = Vector2(0, 0);
 
-		vertices_ = realsToVector2s(num_vertices, vertex_array);
+		vertices_ = realArrayToVector2Array(num_vertices, vertex_array);
   }
 
   RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-      const Vector2 **vertices, unsigned int num_vertices)
+      const Vector2 *vertices, unsigned int num_vertices)
   {
       assert(vertices != NULL);
 
@@ -34,24 +34,17 @@ namespace Rigid2D
       forceAccumulator_ = Vector2(0, 0);
       vertex_array_ = NULL;
 
-      vertices_ = new Vector2 *[num_vertices];
+      vertices_ = new Vector2 [num_vertices];
 
       for(unsigned int i = 0; i < num_vertices; ++i){
-        vertices_[i] = new Vector2(vertices[i]->x, vertices[i]->y);
+        vertices_[i] = Vector2(vertices[i]->x, vertices[i]->y);
       }
   }
 
   RigidBody::~RigidBody()
   {
-    if (vertex_array_ != NULL)
-      delete [] vertex_array_;
-
-    if (vertices_ != NULL) {
-      for(unsigned int i = 0; i < num_vertices_; ++i){
-        delete vertices_[i];
-      }
-      delete [] vertices_;
-    }
+    delete [] vertex_array_;
+    delete [] vertices_;
   }
 
   void RigidBody::update()

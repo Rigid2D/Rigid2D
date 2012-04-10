@@ -108,7 +108,7 @@ namespace Rigid2D
 
       // Deep copies vertices.
       RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-          const Vector2 **vertices, unsigned int num_vertices);
+          const Vector2 *vertices, unsigned int num_vertices);
 
 			RigidBody() {}
 
@@ -196,7 +196,7 @@ namespace Rigid2D
       std::unordered_set<Force*> forces_;    // Collection of forces currently acting on RigidBody.
       unsigned int num_vertices_;            // Number of vertices that make up the paremter of RigidBody.
       Real *vertex_array_;                   // Array of Reals representing vertex coordinates for the paremeter of RibidBody.
-			Vector2 **vertices_;	                 // Collection of Vector2 objects representing the vertices that compose the RigidBody.
+			Vector2 *vertices_;	                   // Collection of Vector2 objects representing the vertices that compose the RigidBody.
   };
 }
 
