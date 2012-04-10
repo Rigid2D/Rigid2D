@@ -68,7 +68,7 @@ void Demo1::paintGL()
   glTranslatef(body1->getPosition()[0], body1->getPosition()[1], 0);
   glColor3ub (255, 255, 255);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  Vector2 *vertices = body1->getVertices();
+  const Vector2 *vertices = body1->getVertices();
   Real num_vertices = body1->getNumVertices();
   glBegin(GL_POLYGON);
     for (unsigned i = 0; i < num_vertices; i++) {
