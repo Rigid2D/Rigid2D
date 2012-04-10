@@ -10,7 +10,7 @@ namespace Rigid2D
   {
     public:
       AABB() {};
-      AABB(Real *vertex_arr, unsigned int num_vertices);
+      AABB(const Vector2 *vertex_arr, unsigned int num_vertices);
       AABB transform(Vector2 translation, Real rotation) const;
       bool isIntersecting(AABB &other) const;
 

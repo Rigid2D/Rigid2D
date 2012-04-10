@@ -100,12 +100,13 @@ namespace Rigid2D
       /** Constructor for RigidBody
        * @param vertex_array should be an array of vertex coordinates given in counterclockwise order.
        *        Ex: vertex_array = {x0,y0,x1,y1,...,xn,yn}.
+       *        The array is deep copied.
        * @param num_vertices is number of elements within vertex_array divided by 2. 
        */
       RigidBody(const Vector2 &position, const Vector2 &velocity,
                 Real mass, const Real *vertex_array, unsigned int num_vertices);
 
-      // Deep copies vertices. [?]
+      // Same as above, but takes in a Vector2 array
       RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
           const Vector2 *vertices, unsigned int num_vertices);
 

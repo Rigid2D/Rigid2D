@@ -68,8 +68,13 @@ void Demo1::paintGL()
   glTranslatef(body1->getPosition()[0], body1->getPosition()[1], 0);
   glColor3ub (255, 255, 255);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glVertexPointer(2, GL_FLOAT, 0, body1->getVertexArray());
-  glDrawArrays(GL_POLYGON, 0, body1->getVertexCount());
+  Vector2 *vertices = body1->getVertices();
+  Real num_vertices = body1->getNumVertices();
+  glBegin(GL_POLYGON);
+    for (unsigned i = 0; i < num_vertices; i++) {
+      glVertex2f(vertices[i].x, vertices[i].y);
+    }
+  glEnd();
   glPopMatrix();
 
   // Draw body2
@@ -89,8 +94,13 @@ void Demo1::paintGL()
   glTranslatef(body2->getPosition()[0], body2->getPosition()[1], 0);
   glColor3ub (255, 255, 255);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glVertexPointer(2, GL_FLOAT, 0, body2->getVertexArray());
-  glDrawArrays(GL_POLYGON, 0, body2->getVertexCount());
+  vertices = body2->getVertices();
+  num_vertices = body2->getNumVertices();
+  glBegin(GL_POLYGON);
+    for (unsigned i = 0; i < num_vertices; i++) {
+      glVertex2f(vertices[i].x, vertices[i].y);
+    }
+  glEnd();
   glPopMatrix();
 
   // Draw the spring as a line
