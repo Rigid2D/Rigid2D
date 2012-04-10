@@ -25,14 +25,14 @@ namespace Rigid2D
   }
 
 
-	Real signedArea (unsigned int num_vertices, Vector2 *vertices)
+	Real signedArea (unsigned int num_vertices, Vector2 const *vertices)
 	{
     if (num_vertices < 2)
       return 0.0F;
 
     assert(vertices != NULL);
 
-    Vector2 *v = vertices;
+    Vector2 const *v = vertices;
     unsigned int n = num_vertices;
     Real result = 0;
 
@@ -46,7 +46,7 @@ namespace Rigid2D
     return (0.5 * result);
 	}
 
-  Vector2 centroid (unsigned int num_vertices, Vector2 *vertices) throw (Rigid2D::Exception)
+  Vector2 centroid (unsigned int num_vertices, Vector2 const *vertices) throw (Rigid2D::Exception)
   {
     assert(vertices != NULL);
 
@@ -55,7 +55,7 @@ namespace Rigid2D
           "num_vertices cannot be 0");
     }
 
-    Vector2 *v = vertices;
+    Vector2 const *v = vertices;
     Real Cx = 0;
     Real Cy = 0;
     Real A;
@@ -79,7 +79,7 @@ namespace Rigid2D
     return Vector2(Cx, Cy);
   }
 
-  Vector2 * realArrayToVector2Array(unsigned int num_vertices, const Real *vertex_array)
+  Vector2 * realArrayToVector2Array (unsigned int num_vertices, Real const *vertex_array)
     throw (Rigid2D::Exception, std::bad_alloc)
   {
     assert(vertex_array != NULL);

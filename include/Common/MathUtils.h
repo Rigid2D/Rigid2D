@@ -27,7 +27,7 @@ namespace Rigid2D
   // is simple (non-intersecting sides), with the vertices numbered in a
   // counterclockwise direction, the signed area is the area.
   // If num_vertices is less than 2, then signedArea returns zero.
-	Real signedArea (unsigned int num_vertices, Vector2 *vertices);
+	Real signedArea (unsigned int num_vertices, Vector2 const *vertices);
 
 	// Returns the centroid, represented as a Vector2, of the polygon
 	// whos vertices are given by the parameter <vertices>.
@@ -35,14 +35,16 @@ namespace Rigid2D
   // polygon's perimeter, either in clockwise or counterclockwise order.
   // Assumes num_vertices > 2.  If num_vertices <= 2, method throws an
   // InvalidParameterException.
-  Vector2 centroid (unsigned int num_vertices, Vector2 *vertices) throw (Rigid2D::Exception);
+  Vector2 centroid (unsigned int num_vertices, Vector2 const *vertices) throw (Rigid2D::Exception);
+
+  Real moi_triangle (Vector2 const * vertices);
 
   // Every two Reals in vertex_array are used in order to create a new Vector2
   // object, where no element in vertex_array is ever used twice.  A pointer to
   // array of Vector2 objects is then returned.
   // Assumes num_vertices > 0.  If num_vertices = 0, method will throw an
   // InvalidParameterException error.
-  Vector2 * realArrayToVector2Array(unsigned int num_vertices, const Real *vertex_array) throw (Rigid2D::Exception, std::bad_alloc);
+  Vector2 * realArrayToVector2Array (unsigned int num_vertices, Real const *vertex_array) throw (Rigid2D::Exception, std::bad_alloc);
 }
 
 #endif
