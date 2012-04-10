@@ -181,7 +181,7 @@ namespace Rigid2D
     return num_vertices_;
   }
 
-  Vector2 * RigidBody::getVertices() const
+  const Vector2 * RigidBody::getVertices() const
   {
     //[?]
     /*Vector2 *result = new Vector2 *[num_vertices_];

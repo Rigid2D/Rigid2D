@@ -189,7 +189,7 @@ namespace Rigid2D
       unsigned int getNumVertices() const;
 
       // Deep copy vertices and return copy. [why deep-copy vertices?]
-      Vector2 * getVertices() const;
+      const Vector2 * getVertices() const;
 
       /* Given a point in graphics coordinate space, this function returns true if
        * the point lies within the convex polygon defined by vertex_array_.*/
