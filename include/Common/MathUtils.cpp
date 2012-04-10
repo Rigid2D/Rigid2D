@@ -79,7 +79,7 @@ namespace Rigid2D
     return Vector2(Cx, Cy);
   }
 
-  Vector2 ** realsToVector2s(unsigned int num_vertices, const Real *vertex_array)
+  Vector2 * realArrayToVector2Array(unsigned int num_vertices, const Real *vertex_array)
     throw (Rigid2D::Exception, std::bad_alloc)
   {
     assert(vertex_array != NULL);
@@ -89,15 +89,15 @@ namespace Rigid2D
           "num_vertices cannot be less than 1");
     }
 
-    Vector2 **vOut = new Vector2 * [num_vertices];
+    Vector2 *result = new Vector2 [num_vertices];
 
     // Every two Reals in vertex_array makes a Vector2, where no element in vertex_array is ever
     // used twice.
     for(unsigned int i = 0; i < num_vertices; ++i){
-      vOut[i] = new Vector2(vertex_array[2*i], vertex_array[2*i+1]);
+      result[i] = Vector2(vertex_array[2*i], vertex_array[2*i+1]);
     }
 
-    return vOut;
+    return result;
   }
 
 }

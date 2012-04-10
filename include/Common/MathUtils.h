@@ -37,12 +37,12 @@ namespace Rigid2D
   // InvalidParameterException.
   Vector2 centroid (unsigned int num_vertices, Vector2 **vertices) throw (Rigid2D::Exception);
 
-  // For each pair of Reals within vertex_array, a new Vector2 object is created
-  // to hold their values.  A pointer to an array of pointers to all Vector2
-  // objects created is then returned.
+  // Every two Reals in vertex_array are used in order to create a new Vector2
+  // object, where no element in vertex_array is ever used twice.  A pointer to
+  // array of Vector2 objects is then returned.
   // Assumes num_vertices > 0.  If num_vertices = 0, method will throw an
   // InvalidParameterException error.
-  Vector2 ** realsToVector2s(unsigned int num_vertices, const Real *vertex_array) throw (Rigid2D::Exception, std::bad_alloc);
+  Vector2 * realArrayToVector2Array(unsigned int num_vertices, const Real *vertex_array) throw (Rigid2D::Exception, std::bad_alloc);
 }
 
 #endif
