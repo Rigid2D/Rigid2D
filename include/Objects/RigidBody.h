@@ -210,6 +210,10 @@ namespace Rigid2D
 
       Real computeMomentOfInertia();
 
+    private:
+      void initialize (const Vector2 & position, const Vector2 & velocity, Real
+          mass, Vector2 const *vertices, unsigned int num_vertices);
+
     protected:
       RBState state_;                         // Position, momentum
       Vector2 velocity_;                      // Velocity of center of mass (implicitly calculated)

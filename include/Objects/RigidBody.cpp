@@ -13,31 +13,26 @@ namespace Rigid2D
       Real const *vertex_array, unsigned int num_vertices)
   {
     assert(vertex_array != NULL);
-
-    if (num_vertices < 3) {
-      throw InvalidParameterException(__LINE__, __FUNCTION__, __FILE__,
-          "num_vertices cannot be less than 3");
-    }
-
-    state_.position = position;
-    state_.linearMomentum = velocity * mass;
-    mass_ = mass;
-    num_vertices_ = num_vertices;
-		
-    forceAccumulator_ = Vector2(0, 0);
-
 		vertices_ = realArrayToVector2Array(num_vertices, vertex_array);
-
-    // compute staticBB
-    staticBB_ = AABB(vertices_, num_vertices);
-    bp_isIntersecting_ = false;
+    initialize(position, velocity, mass, vertices_, num_vertices);
   }
 
   RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
       Vector2 const *vertices, unsigned int num_vertices)
   {
     assert(vertices != NULL);
+    vertices_ = new Vector2 [num_vertices];
 
+    for(unsigned int i = 0; i < num_vertices; ++i){
+      vertices_[i] = Vector2(vertices[i].x, vertices[i].y);
+    }
+
+    initialize(position, velocity, mass, vertices_, num_vertices);
+  }
+
+  void RigidBody::initialize (const Vector2 & position, const Vector2 & velocity,
+      Real mass, Vector2 const *vertices, unsigned int num_vertices)
+  {
     if (num_vertices < 3) {
       throw InvalidParameterException(__LINE__, __FUNCTION__, __FILE__,
           "num_vertices cannot be less than 3");
@@ -47,13 +42,6 @@ namespace Rigid2D
     state_.linearMomentum = velocity * mass;
     mass_ = mass;
     num_vertices_ = num_vertices;
-
-    vertices_ = new Vector2 [num_vertices];
-
-    for(unsigned int i = 0; i < num_vertices; ++i){
-      vertices_[i] = Vector2(vertices[i].x, vertices[i].y);
-    }
-
     forceAccumulator_ = Vector2(0, 0);
 
     // compute staticBB
@@ -313,10 +301,48 @@ namespace Rigid2D
     return false;
   }
 
-  Real computeMomentOfInertia() {
+  Real RigidBody::computeMomentOfInertia () {
     Real result = 0;
+    Real A;                         // Area of polygon representing RigidBody.
+    Vector2 C;                      // Centroid of RigidBody.
+    Vector2 C_i;                    // Centroid of ith triangle.
+    Vector2 tmp[3];                 // Stores specific elements of vertices_.
+    Vector2 *v = vertices_;         // Alias.
+    unsigned int n = num_vertices_; // Alias.
 
+    C = centroid(n, vertices_);
+    A = signedArea(n, vertices_);
 
+    assert(A > 0);
+
+    // If n = 3, the shape is a triangle.
+    if (n == 3) { }
+
+    // Break up polygon representing RigidBody into n triangles.
+    // Compute moment of inertia about each triangle.
+    // Sum up using parallel axis theorem.
+
+    // Do calculation with all but the last triangle using vertices 1 to n - 1.
+    for(unsigned int i = 0; i <= n - 2; ++i) {
+      tmp[0] = v[i];
+      tmp[1] = v[i+1];
+      tmp[2] = C;
+
+      C_i = centroid(3, tmp);
+      result += signedArea(3, tmp) * amoi_triangle(tmp[0], tmp[1], tmp[2]);
+      result += Vector2::getLengthSquared (C - C_i);
+    }
+
+    // Now add in last triangle, which uses vertices n and 1.
+    tmp[0] = v[n-1];
+    tmp[1] = v[0];
+    tmp[2] = C;
+
+    C_i = centroid(3, tmp);
+    result += signedArea(3, tmp) * amoi_triangle(tmp[0], tmp[1], tmp[2]);
+    result += Vector2::getLengthSquared (C - C_i);
+
+    return result * mass_ / A;
   }
 
   bool RigidBody::pointIsInterior(Real x, Real y)
