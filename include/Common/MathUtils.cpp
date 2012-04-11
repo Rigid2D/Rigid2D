@@ -115,8 +115,8 @@ namespace Rigid2D
       tmp[2] = C;
 
       C_i = centroid(3, tmp);
-      result += signedArea(3, tmp) * amoi_triangle(tmp[0], tmp[1], tmp[2]);
-      result += Vector2::getLengthSquared (C - C_i);
+      result += signedArea(3, tmp) * (amoi_triangle(tmp[0], tmp[1], tmp[2]) +
+          Vector2::getLengthSquared (C - C_i));
     }
 
     // Now add in last triangle, which uses vertices n and 1.
@@ -125,8 +125,8 @@ namespace Rigid2D
     tmp[2] = C;
 
     C_i = centroid(3, tmp);
-    result += signedArea(3, tmp) * amoi_triangle(tmp[0], tmp[1], tmp[2]);
-    result += Vector2::getLengthSquared (C - C_i);
+    result += signedArea(3, tmp) * (amoi_triangle(tmp[0], tmp[1], tmp[2]) +
+        Vector2::getLengthSquared (C - C_i));
 
     return result * mass / A;
   }
