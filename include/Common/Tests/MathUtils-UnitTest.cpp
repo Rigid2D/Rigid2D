@@ -72,6 +72,20 @@ TEST(SignedAreaTest, Vertice_Count_4){
   delete [] vertices;
 }
 
+TEST(SignedAreaTest, Square_2x2){
+  unsigned int num_vertices = 4;
+  Vector2 *vertices = new Vector2 [num_vertices];
+
+  vertices[0] = Vector2(0,0);
+  vertices[1] = Vector2(2,0);
+  vertices[2] = Vector2(2,2);
+  vertices[3] = Vector2(0,2);
+
+  EXPECT_FLOAT_EQ(signedArea(num_vertices, vertices), 4.0);
+
+  delete [] vertices;
+}
+
 //=============================================================================
 // Centroid Tests
 //=============================================================================
@@ -186,4 +200,91 @@ TEST(realArrayToVector2ArrayTest, Num_Vertices_3){
   EXPECT_TRUE(vOut[2] == Vector2(4,5));
 
   delete [] vOut;
+}
+
+//=============================================================================
+// amoi_triangle Tests
+//=============================================================================
+TEST(amoi_triangleTest, SpecialTriangle_3_4_5){
+	Vector2 v0(0,0);
+	Vector2 v1(4,0);
+	Vector2 v2(0,3);
+
+	EXPECT_FLOAT_EQ(amoi_triangle(v0, v1, v2),
+			(3.0*3.0 + 4.0*4.0 + 5.0*5.0) / 36.0);
+}
+
+TEST(amoi_triangleTest, SpecialTriangle_5_12_13){
+	Vector2 v0(0,0);
+	Vector2 v1(5,0);
+	Vector2 v2(0,12);
+
+	EXPECT_FLOAT_EQ(amoi_triangle(v0, v1, v2),
+			(5.0*5.0 + 12.0*12.0 + 13.0*13.0) / 36.0);
+}
+
+TEST(amoi_triangleTest, IsoscelesTrianlge_13_13_10){
+	Vector2 v0(0,0);
+	Vector2 v1(10,0);
+	Vector2 v2(5,12);
+
+	EXPECT_FLOAT_EQ(amoi_triangle(v0, v1, v2),
+			(10.0*10.0 + 13.0*13.0 + 13.0*13.0) / 36.0);
+}
+
+//=============================================================================
+// momentOfInertia Tests
+//=============================================================================
+TEST(momentOfInertiaTest, Triangle_3_4_5){
+  Real mass = 1;
+  unsigned int num_vertices = 3;
+  Vector2 *vertices = new Vector2[num_vertices];
+
+  // 3-4-5 triangle
+  vertices[0] = Vector2(0,0);
+  vertices[1] = Vector2(3,0);
+  vertices[2] = Vector2(0,4);
+
+  Real result = momentOfInertia(num_vertices, vertices, mass);
+  EXPECT_FLOAT_EQ(result, (3.0*3.0 + 4.0*4.0 + 5.0*5.0) / 36.0);
+
+  delete [] vertices;
+}
+
+TEST(momentOfInertiaTest, Square_2x2){
+  Real mass = 1;
+  unsigned int num_vertices = 4;
+  Vector2 *vertices = new Vector2[num_vertices];
+
+  // 2x2 square
+  vertices[0] = Vector2(0,0);
+  vertices[1] = Vector2(2,0);
+  vertices[2] = Vector2(2,2);
+  vertices[3] = Vector2(0,2);
+
+  Real result = momentOfInertia(num_vertices, vertices, mass);
+
+	// 2(m*a^2)/3 with a = 1, m = 1.
+  EXPECT_FLOAT_EQ(result, 2.0/3.0);
+
+  delete [] vertices;
+}
+
+TEST(momentOfInertiaTest, Rectangle_2x6){
+  Real mass = 1;
+  unsigned int num_vertices = 4;
+  Vector2 *vertices = new Vector2[num_vertices];
+
+  // 2x6 rectangle
+  vertices[0] = Vector2(0,0);
+  vertices[1] = Vector2(2,0);
+  vertices[2] = Vector2(2,6);
+  vertices[3] = Vector2(0,6);
+
+  Real result = momentOfInertia(num_vertices, vertices, mass);
+
+	// m*(a^2 + b^2)/3 with 2a = 6, 2b = 2, m = 1.
+  EXPECT_FLOAT_EQ(result, 10.0/3.0);
+
+  delete [] vertices;
 }

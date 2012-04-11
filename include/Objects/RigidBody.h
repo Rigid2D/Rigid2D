@@ -208,8 +208,6 @@ namespace Rigid2D
       /** Check for exact intersection. Called after broadPhase returns true. */
       bool narrowPhase(RigidBody *rb);
 
-      Real computeMomentOfInertia();
-
     private:
       void initialize (const Vector2 & position, const Vector2 & velocity, Real
           mass, Vector2 const *vertices, unsigned int num_vertices);

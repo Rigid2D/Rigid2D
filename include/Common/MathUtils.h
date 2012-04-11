@@ -37,7 +37,17 @@ namespace Rigid2D
   // InvalidParameterException.
   Vector2 centroid (unsigned int num_vertices, Vector2 const *vertices) throw (Rigid2D::Exception);
 
-  Real moi_triangle (Vector2 const * vertices);
+  // Returns the area moment of inertia (amoi) of the triangle whos vertices are
+  // the three Vector2 arguments given.
+  // The area moment of inertia is about the axis perpendicular to the plane of
+  // the triangle and through its centroid.
+  Real amoi_triangle(Vector2 const & v0, Vector2 const & v1, Vector2 const & v2);
+
+  // Returns the moment of inertia of a polygon represented by vertices given.
+  // Vertices should be given in counter-clockwise order.
+  // The moment of inertia is about the axis perpendicular to the plane of
+  // the polygon and through its centroid.
+  Real momentOfInertia (unsigned int num_vertices, Vector2 const *vertices, Real mass);
 
   // Every two Reals in vertex_array are used in order to create a new Vector2
   // object, where no element in vertex_array is ever used twice.  A pointer to

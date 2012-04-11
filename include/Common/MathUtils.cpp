@@ -52,7 +52,7 @@ namespace Rigid2D
 
     if (num_vertices < 3) {
       throw InvalidParameterException(__LINE__, __FUNCTION__, __FILE__,
-          "num_vertices cannot be 0");
+          "num_vertices cannot be less than 3");
     }
 
     Vector2 const *v = vertices;
@@ -77,6 +77,58 @@ namespace Rigid2D
     Cy /= 6*A;
 
     return Vector2(Cx, Cy);
+  }
+
+  Real amoi_triangle (Vector2 const & v0, Vector2 const & v1, Vector2 const & v2) {
+    Real a_squared = Vector2::getLengthSquared(v0-v2);
+    Real b_squared = Vector2::getLengthSquared(v2-v1);
+    Real c_squared = Vector2::getLengthSquared(v1-v0);
+
+    return (a_squared + b_squared + c_squared) / 36;
+  }
+
+  Real momentOfInertia (unsigned int num_vertices, Vector2 const *vertices, Real mass) {
+    Real result = 0;
+    Real A;                         // Area of polygon representing.
+    Vector2 C;                      // Centroid of polygon.
+    Vector2 C_i;                    // Centroid of ith triangle.
+    Vector2 tmp[3];                 // Stores specific elements of vertices_.
+    Vector2 const *v = vertices;    // Alias.
+    unsigned int n = num_vertices;  // Alias.
+
+    C = centroid(n, v);
+    A = signedArea(n, v);
+
+    // If n = 3, the shape is a triangle.
+    if (n == 3) {
+      return mass * amoi_triangle(v[0], v[1], v[2]);
+    }
+
+    // Break up polygon into n triangles.
+    // Compute moment of inertia about each triangle.
+    // Sum up using parallel axis theorem.
+
+    // Do calculation with all but the last triangle using vertices 1 to n - 1.
+    for(unsigned int i = 0; i <= n - 2; ++i) {
+      tmp[0] = v[i];
+      tmp[1] = v[i+1];
+      tmp[2] = C;
+
+      C_i = centroid(3, tmp);
+      result += signedArea(3, tmp) * amoi_triangle(tmp[0], tmp[1], tmp[2]);
+      result += Vector2::getLengthSquared (C - C_i);
+    }
+
+    // Now add in last triangle, which uses vertices n and 1.
+    tmp[0] = v[n-1];
+    tmp[1] = v[0];
+    tmp[2] = C;
+
+    C_i = centroid(3, tmp);
+    result += signedArea(3, tmp) * amoi_triangle(tmp[0], tmp[1], tmp[2]);
+    result += Vector2::getLengthSquared (C - C_i);
+
+    return result * mass / A;
   }
 
   Vector2 * realArrayToVector2Array (unsigned int num_vertices, Real const *vertex_array)

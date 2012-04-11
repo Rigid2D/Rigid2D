@@ -151,3 +151,18 @@ TEST(Vector2MethodTest, normalize) {
   EXPECT_FLOAT_EQ(v.y, 4.0 / 5);
 }
 
+TEST(Vector2MethodTest, static_getLengthSquared1) {
+  Vector2 v1(3, 4);
+  Vector2 v2(1, 1);
+
+  EXPECT_FLOAT_EQ(Vector2::getLengthSquared(v1-v2), 13.0);
+}
+
+TEST(Vector2MethodTest, static_getLengthSquared2) {
+  Vector2 v1(2, 3);
+  Vector2 v2(1, 1);
+
+  EXPECT_FLOAT_EQ(Vector2::getLengthSquared(v1+v2), 25.0);
+}
+
+

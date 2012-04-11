@@ -92,6 +92,10 @@ namespace Rigid2D {
         return *(&x+i);
       }
 
+      static Real getLengthSquared (Vector2 const &v) {
+        return v.x * v.x + v.y * v.y;
+      }
+
       Real getLengthSquared() const {
         return x * x + y * y;
       }
