@@ -1,5 +1,6 @@
 #include "RigidBody.h"
 #include "RBSolver.h"
+#include "Common/MathUtils.h"
 #include <cassert>
 #include <cstring>
 #include <iostream>
@@ -12,6 +13,11 @@ namespace Rigid2D
       Real const *vertex_array, unsigned int num_vertices)
   {
     assert(vertex_array != NULL);
+
+    if (num_vertices < 3) {
+      throw InvalidParameterException(__LINE__, __FUNCTION__, __FILE__,
+          "num_vertices cannot be less than 3");
+    }
 
     state_.position = position;
     state_.linearMomentum = velocity * mass;
@@ -31,6 +37,11 @@ namespace Rigid2D
       Vector2 const *vertices, unsigned int num_vertices)
   {
     assert(vertices != NULL);
+
+    if (num_vertices < 3) {
+      throw InvalidParameterException(__LINE__, __FUNCTION__, __FILE__,
+          "num_vertices cannot be less than 3");
+    }
 
     state_.position = position;
     state_.linearMomentum = velocity * mass;
@@ -177,15 +188,8 @@ namespace Rigid2D
     return num_vertices_;
   }
 
-  const Vector2 * RigidBody::getVertices() const
+  Vector2 const * RigidBody::getVertices() const
   {
-    //[?]
-    /*Vector2 *result = new Vector2 *[num_vertices_];
-
-    for(unsigned int i = 0; i < num_vertices_; ++i){
-      result[i] = new Vector2(vertices_[i]->x, vertices_[i]->y);
-    }
-    */
     return vertices_;
   }
 
@@ -307,6 +311,12 @@ namespace Rigid2D
     }
     */
     return false;
+  }
+
+  Real computeMomentOfInertia() {
+    Real result = 0;
+
+
   }
 
   bool RigidBody::pointIsInterior(Real x, Real y)

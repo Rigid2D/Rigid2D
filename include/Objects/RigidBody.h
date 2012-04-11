@@ -101,7 +101,9 @@ namespace Rigid2D
        * @param vertex_array should be an array of vertex coordinates given in counterclockwise order.
        *        Ex: vertex_array = {x0,y0,x1,y1,...,xn,yn}.
        *        The array is deep copied.
-       * @param num_vertices is number of elements within vertex_array divided by 2. 
+       * @param num_vertices is number of elements within vertex_array divided
+       * by 2.  num_vertices must be equal to or greater than 3, otherwise
+       * method will throw an InvalidParameterException.
        */
       RigidBody(const Vector2 &position, const Vector2 &velocity,
                 Real mass, Real const *vertex_array, unsigned int num_vertices);
@@ -170,6 +172,11 @@ namespace Rigid2D
       Vector2 getVelocity() const;
       Vector2 getLinearMomentum() const;
       Real getMass() const;
+
+      /// Returns moment of inertia about axis through centroid and
+      /// perpendicular to the plane of the RigidBody.
+      Real getMomentOfInertia() const;
+
       void getState(RBState & state) const;
 
 			void setState(RBState & state);
@@ -188,8 +195,7 @@ namespace Rigid2D
 
       unsigned int getNumVertices() const;
 
-      // Deep copy vertices and return copy. [why deep-copy vertices?]
-      const Vector2 * getVertices() const;
+      Vector2 const * getVertices() const;
 
       /* Given a point in graphics coordinate space, this function returns true if
        * the point lies within the convex polygon defined by vertex_array_.*/
@@ -202,11 +208,16 @@ namespace Rigid2D
       /** Check for exact intersection. Called after broadPhase returns true. */
       bool narrowPhase(RigidBody *rb);
 
+      Real computeMomentOfInertia();
+
     protected:
       RBState state_;                         // Position, momentum
       Vector2 velocity_;                      // Velocity of center of mass (implicitly calculated)
       Vector2 forceAccumulator_;              // Sum of forces acting on the center of mass of RigidBody
       Real mass_;                             // Object mass
+      Real moi_;                              // Moment of inertia about axis perpendicular to plane of
+                                              // body and through its center.
+
       std::unordered_set<Force*> forces_;     // all forces being applied to this RB
 
       // Geometry
