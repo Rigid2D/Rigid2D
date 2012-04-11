@@ -288,3 +288,22 @@ TEST(momentOfInertiaTest, Rectangle_2x6){
 
   delete [] vertices;
 }
+
+TEST(momentOfInertiaTest, Rectangle_2x6_heavy){
+  Real mass = 100;
+  unsigned int num_vertices = 4;
+  Vector2 *vertices = new Vector2[num_vertices];
+
+  // 2x6 rectangle
+  vertices[0] = Vector2(0,0);
+  vertices[1] = Vector2(2,0);
+  vertices[2] = Vector2(2,6);
+  vertices[3] = Vector2(0,6);
+
+  Real result = momentOfInertia(num_vertices, vertices, mass);
+
+	// m*(a^2 + b^2)/3 with 2a = 6, 2b = 2, m = 100.
+  EXPECT_FLOAT_EQ(result, 100.0*10.0/3.0);
+
+  delete [] vertices;
+}
