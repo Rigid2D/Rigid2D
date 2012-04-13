@@ -13,12 +13,12 @@ Demo1::Demo1(QWidget *parent)
   mouseForce = new Force(mouseSpringForce, userData_mouseForce);
 
 	// Init sample rigid body;
-  Real vertex_array[12] = {-7, 0,
+  Real vertex_array[12] = {-5, 5,
+                           -4,-4,
+                            0,-7,
                             5,-5,
                             5, 4,
-                            0, 7,
-                           -5, 5,
-                           -4,-4};
+                            0, 7};
 
 
 
