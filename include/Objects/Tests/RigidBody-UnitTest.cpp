@@ -153,6 +153,7 @@ TEST(RigidBodyTest, Creation_with_RealArray){
   EXPECT_TRUE(rb.getLinearMomentum() == mass * velocity);
   EXPECT_FLOAT_EQ(rb.getMass(), mass);
   EXPECT_FLOAT_EQ(rb.getOrientation(), orientation);
+  EXPECT_FLOAT_EQ(rb.getAngularMomentum(), 0.0);
   EXPECT_FLOAT_EQ(rb.getMomentOfInertia(), mass*(3.0*3.0 + 4.0*4.0 + 5.0*5.0) / 36.0);
 
   EXPECT_TRUE(vertices[0] == Vector2(0,0));
@@ -185,6 +186,8 @@ TEST(RigidBodyTest, Creation_with_Vector2Array){
   EXPECT_TRUE(rb.getLinearMomentum() == mass * velocity);
   EXPECT_FLOAT_EQ(rb.getMass(), mass);
   EXPECT_FLOAT_EQ(rb.getOrientation(), orientation);
+  EXPECT_FLOAT_EQ(rb.getOrientation(), orientation);
+  EXPECT_FLOAT_EQ(rb.getAngularMomentum(), 0.0);
   EXPECT_FLOAT_EQ(rb.getMomentOfInertia(), mass*(3.0*3.0 + 4.0*4.0 + 5.0*5.0) / 36.0);
 
   EXPECT_TRUE(vOut[0] == Vector2(0,0));

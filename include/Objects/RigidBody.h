@@ -178,6 +178,7 @@ namespace Rigid2D
       Vector2 getPosition() const;
       Vector2 getVelocity() const;
       Vector2 getLinearMomentum() const;
+      Real getAngularMomentum() const;
       Real getMass() const;
       Angle getOrientation() const;
 

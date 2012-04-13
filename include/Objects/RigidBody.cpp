@@ -151,6 +151,11 @@ namespace Rigid2D
     return state_.linearMomentum;
   }
 
+  Real RigidBody::getAngularMomentum() const
+  {
+    return state_.angularMomentum;
+  }
+
   Real RigidBody::getMass() const
   {
     return mass_;
