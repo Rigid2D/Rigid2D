@@ -40,8 +40,8 @@ Demo1::Demo1(QWidget *parent)
 
   userData_mouseForce[0] = 0;
   userData_mouseForce[1] = 0;
-  userData_mouseForce[2] = 1000;  // Spring constant ks
-  userData_mouseForce[3] = 100;  // Damping constant kd
+  userData_mouseForce[2] = 100;  // Spring constant ks
+  userData_mouseForce[3] = 10;  // Damping constant kd
   rbActedOn = NULL;
 }
 

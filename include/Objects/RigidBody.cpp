@@ -356,13 +356,13 @@ namespace Rigid2D
     {
       pt2 = vertices_[i];
       pt3 = vertices_[i+1];
-      if (orient2d(pt1, pt2, pt3) != -1)
+      if (orient2d(pt1, pt2, pt3) != 1)
         return false;
     }
     // special check for last edge
     pt2 = vertices_[num_vertices_ - 1];
     pt3 = vertices_[0];
-    if (orient2d(pt1, pt2, pt3) != -1)
+    if (orient2d(pt1, pt2, pt3) != 1)
       return false;
     return true;
   }
