@@ -19,8 +19,7 @@ namespace Rigid2D
   {
     Vector2 position;
     Vector2 linearMomentum;
-    Angle orientation;           // Orientation angle in radians.  This angle
-                               // defaults to zero when creating a RigidBody.
+    Angle orientation;         // radians.
     Real angularMomentum;
 
     RBState() {}

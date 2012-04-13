@@ -59,6 +59,7 @@ namespace Rigid2D
     state_.position = position;
     state_.linearMomentum = velocity * mass;
     state_.orientation = orientation;
+    state_.angularMomentum = 0.0;
 
     mass_ = mass;
     num_vertices_ = num_vertices;
