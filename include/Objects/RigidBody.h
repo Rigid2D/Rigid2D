@@ -228,10 +228,12 @@ namespace Rigid2D
     protected:
       RBState state_;                         // Position, momentum
       Vector2 velocity_;                      // Velocity of center of mass (implicitly calculated)
-      Vector2 forceAccumulator_;              // Sum of forces acting on the center of mass of RigidBody
       Real mass_;                             // Object mass
       Real moi_;                              // Moment of inertia about axis perpendicular to plane of
                                               // body and through its center.
+
+      Vector2 forceAccumulator_;              // Sum of forces acting on the center of mass of RigidBody
+      Real torqueAccumulator_;                // Sum of torques on body, about center of mass.
 
       std::unordered_set<Force*> forces_;     // all forces being applied to this RB
 

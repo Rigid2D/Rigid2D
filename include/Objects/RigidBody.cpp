@@ -100,8 +100,12 @@ namespace Rigid2D
 
   void RigidBody::computeStateDeriv(const RBState &state, RBState &dState) const
   {
+    assert(moi_ != 0);
+
     dState.position = state.linearMomentum / mass_;
     dState.linearMomentum = forceAccumulator_;
+    dState.orientation = state.angularMomentum / moi_;
+    dState.angularMomentum = torqueAccumulator_;
   }
 
   bool RigidBody::checkCollision(RigidBody *rb)
