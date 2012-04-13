@@ -25,6 +25,7 @@ namespace Rigid2D
 {	
 	typedef float Real;
 	typedef double PreciseReal;
+  typedef float Angle;
 
 	const Real TAU = 6.283185307;
 

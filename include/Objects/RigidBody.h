@@ -19,24 +19,24 @@ namespace Rigid2D
   {
     Vector2 position;
     Vector2 linearMomentum;
-    Real orientionAngle;       // Orientation angle in radians.  This angle
-                            // defaults to zero when creating a RigidBody.
+    Angle orientation;           // Orientation angle in radians.  This angle
+                               // defaults to zero when creating a RigidBody.
     Real angularMomentum;
 
     RBState() {}
 
     RBState(const Vector2 &position, const Vector2 &linearMomentum,
-        const Real &orientionAngle, const Real &angularMomentum) :
+        const Real &orientation, const Real &angularMomentum) :
       position(position),
       linearMomentum(linearMomentum),
-      orientionAngle(orientionAngle),
+      orientation(orientation),
       angularMomentum(angularMomentum) { }
 
     void operator *= (Real scalar)
     {
       position *= scalar;
       linearMomentum *= scalar;
-      orientionAngle *= scalar;
+      orientation *= scalar;
       angularMomentum *= scalar;
     }
 
@@ -44,7 +44,7 @@ namespace Rigid2D
     {
       position /= scalar;
       linearMomentum /= scalar;
-      orientionAngle /= scalar;
+      orientation /= scalar;
       angularMomentum /= scalar;
     }
 
@@ -52,7 +52,7 @@ namespace Rigid2D
     {
       return RBState(position + s.position,
                      linearMomentum + s.linearMomentum,
-                     orientionAngle + s.orientionAngle,
+                     orientation + s.orientation,
                      angularMomentum + s.angularMomentum);
     }
 
@@ -60,7 +60,7 @@ namespace Rigid2D
     {
       return RBState(position - s.position,
                      linearMomentum - s.linearMomentum,
-                     orientionAngle - s.orientionAngle,
+                     orientation - s.orientation,
                      angularMomentum - s.angularMomentum);
     }
 
@@ -68,7 +68,7 @@ namespace Rigid2D
     {
       return RBState(position * scalar,
                      linearMomentum * scalar,
-                     orientionAngle * scalar,
+                     orientation * scalar,
                      angularMomentum * scalar);
     }
 
@@ -82,13 +82,13 @@ namespace Rigid2D
       assert(feq(scalar, 0.0) == false);
       return RBState(position / scalar,
                      linearMomentum / scalar,
-                     orientionAngle / scalar,
+                     orientation / scalar,
                      angularMomentum / scalar);
     }
 
     void normalizeOrientAngle()
     {
-      orientionAngle = fmod(orientionAngle, TAU);
+      orientation = fmod(orientation, TAU);
     }
   };
 
@@ -105,12 +105,20 @@ namespace Rigid2D
        * by 2.  num_vertices must be equal to or greater than 3, otherwise
        * method will throw an InvalidParameterException.
        */
-      RigidBody(const Vector2 &position, const Vector2 &velocity,
-                Real mass, Real const *vertex_array, unsigned int num_vertices);
+      RigidBody(unsigned int num_vertices,
+                Real const *vertex_array,
+                Vector2 const &position,
+                Real mass,
+                Vector2 const &velocity = Vector2(0,0),
+                Angle orientation = 0.0);
 
       // Same as above, but takes in a Vector2 array
-      RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-          Vector2 const *vertices, unsigned int num_vertices);
+      RigidBody(unsigned int num_vertices,
+                Vector2 const *vertices,
+                Vector2 const &position,
+                Real mass,
+                Vector2 const &velocity = Vector2(0,0),
+                Angle orientation = 0.0);
 
 			RigidBody() {}
 
@@ -172,6 +180,7 @@ namespace Rigid2D
       Vector2 getVelocity() const;
       Vector2 getLinearMomentum() const;
       Real getMass() const;
+      Angle getOrientation() const;
 
       /// Returns moment of inertia about axis through centroid and
       /// perpendicular to the plane of the RigidBody.
@@ -209,8 +218,12 @@ namespace Rigid2D
       bool narrowPhase(RigidBody *rb);
 
     private:
-      void initialize (const Vector2 & position, const Vector2 & velocity, Real
-          mass, Vector2 const *vertices, unsigned int num_vertices);
+      void initialize(unsigned int num_vertices,
+                      Vector2 const *vertices,
+                      Vector2 const &position,
+                      Real mass,
+                      Vector2 const &velocity,
+                      Angle orientation);
 
     protected:
       RBState state_;                         // Position, momentum

@@ -9,16 +9,24 @@
 namespace Rigid2D
 {
 
-  RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-      Real const *vertex_array, unsigned int num_vertices)
+  RigidBody::RigidBody(unsigned int num_vertices,
+                       Real const *vertex_array,
+                       Vector2 const &position,
+                       Real mass,
+                       Vector2 const &velocity,
+                       Angle orientation)
   {
     assert(vertex_array != NULL);
 		vertices_ = realArrayToVector2Array(num_vertices, vertex_array);
-    initialize(position, velocity, mass, vertices_, num_vertices);
+    initialize(num_vertices, vertices_, position, mass, velocity, orientation);
   }
 
-  RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-      Vector2 const *vertices, unsigned int num_vertices)
+  RigidBody::RigidBody(unsigned int num_vertices,
+                       Vector2 const *vertices,
+                       Vector2 const &position,
+                       Real mass,
+                       Vector2 const &velocity,
+                       Angle orientation)
   {
     assert(vertices != NULL);
     vertices_ = new Vector2 [num_vertices];
@@ -27,11 +35,15 @@ namespace Rigid2D
       vertices_[i] = Vector2(vertices[i].x, vertices[i].y);
     }
 
-    initialize(position, velocity, mass, vertices_, num_vertices);
+    initialize(num_vertices, vertices, position, mass, velocity, orientation);
   }
 
-  void RigidBody::initialize (const Vector2 & position, const Vector2 & velocity,
-      Real mass, Vector2 const *vertices, unsigned int num_vertices)
+  void RigidBody::initialize(unsigned int num_vertices,
+                             Vector2 const *vertices,
+                             Vector2 const &position,
+                             Real mass,
+                             Vector2 const &velocity,
+                             Angle orientation)
   {
     // Need at least 3 vertices to make a convex polygon.
     if (num_vertices < 3) {
@@ -46,6 +58,8 @@ namespace Rigid2D
 
     state_.position = position;
     state_.linearMomentum = velocity * mass;
+    state_.orientation = orientation;
+
     mass_ = mass;
     num_vertices_ = num_vertices;
     forceAccumulator_ = Vector2(0, 0);
@@ -139,6 +153,11 @@ namespace Rigid2D
   Real RigidBody::getMass() const
   {
     return mass_;
+  }
+
+  Angle RigidBody::getOrientation() const
+  {
+    return state_.orientation;
   }
 
   Real RigidBody::getMomentOfInertia() const
