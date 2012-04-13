@@ -16,8 +16,9 @@ namespace Rigid2D {
 
      struct RBState * state,         // RB state vector (position, momentum, ...)
 
-     Vector2 * dst,                  // Destination for storing force
-                                     // components.
+     Vector2 * forceDst,             // Destination for storing computed force.
+
+     Real * torque,                  // Destination for storing computed torque.
 
      void * userData);               // User specific data which can be
                                      // used in computing forces.
@@ -35,7 +36,7 @@ namespace Rigid2D {
       // @state is the array containing position, momentum, etc.
       // @results a two dimensional array containing the resultant 
       // force.x and force.y.
-      void computeForce(RigidBody * const rb, struct RBState *state, Vector2 *result);
+      void computeForce(RigidBody * const rb, struct RBState *state, Vector2 * forceDst, Real * torqueDst);
 
       // Set funct as the new ForceFunctionPtr
       void setForceFunction(ForceFunctionPtr funct);

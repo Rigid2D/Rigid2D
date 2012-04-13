@@ -89,12 +89,16 @@ namespace Rigid2D
   void RigidBody::computeForces(RBState & state)
   {
     forceAccumulator_ = Vector2(0, 0);
+    torqueAccumulator_ = 0.0;
     std::unordered_set<Force*>::iterator it;
     Vector2 forceResult;
+    Real torqueResult;
+
     for (it = forces_.begin(); it != forces_.end(); ++it) 
     {
-      (*it)->computeForce(this, &state, &forceResult);
+      (*it)->computeForce(this, &state, &forceResult, &torqueResult);
       forceAccumulator_ += forceResult;
+      torqueAccumulator_ += torqueResult;
     }
   }
 

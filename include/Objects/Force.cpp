@@ -14,9 +14,9 @@ namespace Rigid2D {
 
   Force::~Force() {}
 
-  void Force::computeForce(RigidBody * const rb, RBState *state, Vector2 *result)
+  void Force::computeForce(RigidBody * const rb, RBState *state, Vector2 * forceDst, Real * torqueDst)
   {
-    forceFunction_(rb, state, result, userData_);
+    forceFunction_(rb, state, forceDst, torqueDst, userData_);
   }
 
   void Force::setForceFunction(ForceFunctionPtr funct)
