@@ -137,9 +137,11 @@ TEST(RigidBodyTest, Creation_with_RealArray){
   Vector2 pos(1,1);
   Vector2 velocity(100,0);
   Real mass = 20;
-  Real vertex_array[6] = {1,1,5,1,2,4};
   unsigned int num_vertices = 3;
   Vector2 const *vertices;
+
+  // 3-4-5 triangle with one vertex at origin
+  Real vertex_array[6] = {0,0, 3,0, 0,4};
 
   RigidBody rb(pos, velocity, mass, vertex_array, num_vertices);
   vertices = rb.getVertices();
@@ -149,9 +151,9 @@ TEST(RigidBodyTest, Creation_with_RealArray){
   EXPECT_TRUE(rb.getMass() == mass);
   EXPECT_TRUE(rb.getNumVertices() == num_vertices);
 
-  EXPECT_TRUE(vertices[0] == Vector2(1,1));
-  EXPECT_TRUE(vertices[1] == Vector2(5,1));
-  EXPECT_TRUE(vertices[2] == Vector2(2,4));
+  EXPECT_TRUE(vertices[0] == Vector2(0,0));
+  EXPECT_TRUE(vertices[1] == Vector2(3,0));
+  EXPECT_TRUE(vertices[2] == Vector2(0,4));
 }
 
 TEST(RigidBodyTest, Creation_with_Vector2Array){

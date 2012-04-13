@@ -19,24 +19,24 @@ namespace Rigid2D
   {
     Vector2 position;
     Vector2 linearMomentum;
-    Real orientAngle;       // Orientation angle in radians.  This angle
+    Real orientionAngle;       // Orientation angle in radians.  This angle
                             // defaults to zero when creating a RigidBody.
     Real angularMomentum;
 
     RBState() {}
 
     RBState(const Vector2 &position, const Vector2 &linearMomentum,
-        const Real &orientAngle, const Real &angularMomentum) :
+        const Real &orientionAngle, const Real &angularMomentum) :
       position(position),
       linearMomentum(linearMomentum),
-      orientAngle(orientAngle),
+      orientionAngle(orientionAngle),
       angularMomentum(angularMomentum) { }
 
     void operator *= (Real scalar)
     {
       position *= scalar;
       linearMomentum *= scalar;
-      orientAngle *= scalar;
+      orientionAngle *= scalar;
       angularMomentum *= scalar;
     }
 
@@ -44,7 +44,7 @@ namespace Rigid2D
     {
       position /= scalar;
       linearMomentum /= scalar;
-      orientAngle /= scalar;
+      orientionAngle /= scalar;
       angularMomentum /= scalar;
     }
 
@@ -52,7 +52,7 @@ namespace Rigid2D
     {
       return RBState(position + s.position,
                      linearMomentum + s.linearMomentum,
-                     orientAngle + s.orientAngle,
+                     orientionAngle + s.orientionAngle,
                      angularMomentum + s.angularMomentum);
     }
 
@@ -60,7 +60,7 @@ namespace Rigid2D
     {
       return RBState(position - s.position,
                      linearMomentum - s.linearMomentum,
-                     orientAngle - s.orientAngle,
+                     orientionAngle - s.orientionAngle,
                      angularMomentum - s.angularMomentum);
     }
 
@@ -68,7 +68,7 @@ namespace Rigid2D
     {
       return RBState(position * scalar,
                      linearMomentum * scalar,
-                     orientAngle * scalar,
+                     orientionAngle * scalar,
                      angularMomentum * scalar);
     }
 
@@ -82,13 +82,13 @@ namespace Rigid2D
       assert(feq(scalar, 0.0) == false);
       return RBState(position / scalar,
                      linearMomentum / scalar,
-                     orientAngle / scalar,
+                     orientionAngle / scalar,
                      angularMomentum / scalar);
     }
 
     void normalizeOrientAngle()
     {
-      orientAngle = fmod(orientAngle, TAU);
+      orientionAngle = fmod(orientionAngle, TAU);
     }
   };
 
