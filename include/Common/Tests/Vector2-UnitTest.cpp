@@ -165,4 +165,64 @@ TEST(Vector2MethodTest, static_getLengthSquared2) {
   EXPECT_FLOAT_EQ(Vector2::getLengthSquared(v1+v2), 25.0);
 }
 
+//==============================================================================
+// cross Tests
+//==============================================================================
+TEST(Vector2MethodTest, cross_zero1) {
+  Vector2 v1(1, 1);
+  Vector2 v2(2, 2);
+
+  EXPECT_FLOAT_EQ(v1.cross(v2), 0.0);
+}
+
+TEST(Vector2MethodTest, cross_zero2) {
+  Vector2 v1(1, 1);
+  Vector2 v2(2, 2);
+
+  // v2 calls cross()
+  EXPECT_FLOAT_EQ(v2.cross(v1), 0.0);
+}
+
+TEST(Vector2MethodTest, cross_zero3) {
+  Vector2 v1(-1, 1);
+  Vector2 v2(2, -2);
+
+  EXPECT_FLOAT_EQ(v1.cross(v2), 0.0);
+}
+
+TEST(Vector2MethodTest, cross_zero4) {
+  Vector2 v1(-1, 1);
+  Vector2 v2(2, -2);
+
+  // v2 calls cross()
+  EXPECT_FLOAT_EQ(v2.cross(v1), 0.0);
+}
+
+TEST(Vector2MethodTest, cross_positive1) {
+  Vector2 v1(1, 1);
+  Vector2 v2(2, 3);
+
+  EXPECT_FLOAT_EQ(v1.cross(v2), 1.0);
+}
+
+TEST(Vector2MethodTest, cross_positive2) {
+  Vector2 v1(5, 3);
+  Vector2 v2(3, 2);
+
+  EXPECT_FLOAT_EQ(v1.cross(v2), 1.0);
+}
+
+TEST(Vector2MethodTest, cross_negative1) {
+  Vector2 v1(5, 3);
+  Vector2 v2(3, 1);
+
+  EXPECT_FLOAT_EQ(v1.cross(v2), -4.0);
+}
+
+TEST(Vector2MethodTest, cross_negative2) {
+  Vector2 v1(1, 2);
+  Vector2 v2(3, -1);
+
+  EXPECT_FLOAT_EQ(v1.cross(v2), -7.0);
+}
 

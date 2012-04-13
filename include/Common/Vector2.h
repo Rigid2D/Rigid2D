@@ -108,6 +108,11 @@ namespace Rigid2D {
         return x * vec.x + y * vec.y;
       }
 
+      // Returns z-component of cross product.
+      Real cross(const Vector2 & v) const {
+        return x*v.y - y*v.x;
+      }
+
       void normalize() {
         Real length = getLength();
         assert(feq(length, 0.0) == false);
