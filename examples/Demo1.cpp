@@ -13,16 +13,26 @@ Demo1::Demo1(QWidget *parent)
   mouseForce = new Force(mouseSpringForce, userData_mouseForce);
 
 	// Init sample rigid body;
-  Real vertex_array[12] = {-5, 5, 
-                          0, 7,
-                          5, 4,
-                          5, -5,
-                          0, -7,
-                          -4, -4};
+  Real vertex_array[12] = {-7, 0,
+                            5,-5,
+                            5, 4,
+                            0, 7,
+                           -5, 5,
+                           -4,-4};
+
+
+
   Real mass = 10;
 
-  body1 = new RigidBody(Vector2(0, 0), Vector2(0,0), mass, vertex_array, 6);
-  body2 = new RigidBody(Vector2(15, 10), Vector2(0,0), mass, vertex_array, 4);
+  body1 = new RigidBody(6,                // number of vertices
+                        vertex_array,
+                        Vector2(0, 0),    // position
+                        mass);
+
+  body2 = new RigidBody(4,                // number of vertices
+                        vertex_array,
+                        Vector2(15, 10),  // position
+                        mass);
 
 	// Add bodies to rigidBodySystem
 	rigidBodySystem->addRigidBody(body1);

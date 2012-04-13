@@ -22,9 +22,10 @@
  * kd: damping constant
  *
 */
-void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * dst, void * userData){
+void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * forceDst, Real * torqueDst, void * userData){
   assert(rigidBody != NULL);
-  assert(dst != NULL);
+  assert(forceDst != NULL);
+  assert(torqueDst != NULL);
   assert(userData != NULL);
 
   Vector2 mousePos ( ((Real*)userData)[0], ((Real*)userData)[1] );  // Store mouse coordinants
@@ -32,13 +33,15 @@ void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * ds
   Real ks = ((Real*)userData)[2];                                   // Spring constant
   Real kd = ((Real*)userData)[3];                                   // Damping constant
 
+  // Compute Force actuing on center of mass:
+
   // l; Distance between the RigidBody's center of mass, and mouse coordinates
   Vector2 deltaPosition(centerOfMassPos.x - mousePos.x,
       centerOfMassPos.y - mousePos.y);
 
   if (feq(deltaPosition.getLength(), 0.0)){
-    dst->x = 0.0;
-    dst->y = 0.0;
+    forceDst->x = 0.0;
+    forceDst->y = 0.0;
   }
   else {
     // l_dot; Assume mouse is not moving, and only factor-in velocity of RigidBody's center of mass.
@@ -48,7 +51,13 @@ void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * ds
     Real kdFactor = deltaVelocity.dot(deltaPosition) / deltaPosition.getLengthSquared();
 
     // Store computed force values
-    dst->x = (ks + kd*kdFactor)*(-deltaPosition.x);  // x component of force
-    dst->y = (ks + kd*kdFactor)*(-deltaPosition.y);  // y component of force
+    forceDst->x = (ks + kd*kdFactor)*(-deltaPosition.x);  // x component of force
+    forceDst->y = (ks + kd*kdFactor)*(-deltaPosition.y);  // y component of force
+
+    // Compute Torque:
+    *torqueDst = (mousePos - centerOfMassPos).cross(*forceDst);
   }
+
+
+
 }
