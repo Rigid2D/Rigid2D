@@ -208,7 +208,7 @@ namespace Rigid2D
       Vector2 const * getVertices() const;
 
       /* Given a point in **world coordinate space**, this function returns true if
-       * the point lies within the convex polygon d\efined by vertex_array_.*/
+       * the point lies within the convex polygon defined by vertex_array_.*/
       bool pointIsInterior(Real x, Real y);
 
     protected:

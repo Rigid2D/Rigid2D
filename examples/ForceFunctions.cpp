@@ -30,14 +30,15 @@ void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * fo
 
   Vector2 mousePos ( ((Real*)userData)[0], ((Real*)userData)[1] );  // Store mouse coordinants
   Vector2 centerOfMassPos = state->position;                        // Center of mass for RigidBody
-  Real ks = ((Real*)userData)[2];                                   // Spring constant
-  Real kd = ((Real*)userData)[3];                                   // Damping constant
+  Vector2 mouseClickPos(((Real*)userData)[2], ((Real*)userData)[3]);    // Where the spring is attached to on RB
+  Real ks = ((Real*)userData)[4];                                   // Spring constant
+  Real kd = ((Real*)userData)[5];                                   // Damping constant
 
-  // Compute Force actuing on center of mass:
+  // Compute Force acting on center of mass:
 
   // l; Distance between the RigidBody's center of mass, and mouse coordinates
-  Vector2 deltaPosition(centerOfMassPos.x - mousePos.x,
-      centerOfMassPos.y - mousePos.y);
+  Vector2 deltaPosition(mouseClickPos.x - mousePos.x,
+      mouseClickPos.y - mousePos.y);
 
   if (feq(deltaPosition.getLength(), 0.0)){
     forceDst->x = 0.0;
@@ -55,7 +56,7 @@ void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * fo
     forceDst->y = (ks + kd*kdFactor)*(-deltaPosition.y);  // y component of force
 
     // Compute Torque:
-    *torqueDst = (mousePos - centerOfMassPos).cross(*forceDst);
+    *torqueDst = (mouseClickPos - centerOfMassPos).cross(*forceDst);
   }
 
 
