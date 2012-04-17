@@ -20,8 +20,6 @@ Demo1::Demo1(QWidget *parent)
                             5, 4,
                             0, 7};
 
-
-
   Real mass = 10;
 
   body1 = new RigidBody(6,                // number of vertices
@@ -34,14 +32,16 @@ Demo1::Demo1(QWidget *parent)
                         Vector2(15, 10),  // position
                         mass);
 
+  body1->setOrientation(1);
+
 	// Add bodies to rigidBodySystem
 	rigidBodySystem->addRigidBody(body1);
 	rigidBodySystem->addRigidBody(body2);
 
   userData_mouseForce[0] = 0;
   userData_mouseForce[1] = 0;
-  userData_mouseForce[2] = 100;  // Spring constant ks
-  userData_mouseForce[3] = 10;  // Damping constant kd
+  userData_mouseForce[2] = 10;  // Spring constant ks
+  userData_mouseForce[3] = 5;   // Damping constant kd
   rbActedOn = NULL;
 }
 
@@ -66,11 +66,13 @@ void Demo1::paintGL()
   // Draw body1
   glPushMatrix();
   AABB *bb = body1->getWorldBB();
+  AABB *bb2 = body1->getStaticBB();
   if (body1->bp_isIntersecting()) {
     glColor3ub(180,50,50);
   } else {
     glColor3ub(50,50,180);
   }
+  //body1->setOrientation(body1->getOrientation() + 0.01);
   glBegin(GL_QUADS);
     glVertex2f(bb->minVertex_.x-0.2, bb->minVertex_.y-0.2);
     glVertex2f(bb->minVertex_.x-0.2, bb->maxVertex_.y+0.2);
@@ -78,6 +80,13 @@ void Demo1::paintGL()
     glVertex2f(bb->maxVertex_.x+0.2, bb->minVertex_.y-0.2);
   glEnd();
   glTranslatef(body1->getPosition()[0], body1->getPosition()[1], 0);
+  /*glBegin(GL_QUADS);
+    glVertex2f(bb2->minVertex_.x-0.2, bb2->minVertex_.y-0.2);
+    glVertex2f(bb2->minVertex_.x-0.2, bb2->maxVertex_.y+0.2);
+    glVertex2f(bb2->maxVertex_.x+0.2, bb2->maxVertex_.y+0.2);
+    glVertex2f(bb2->maxVertex_.x+0.2, bb2->minVertex_.y-0.2);
+  glEnd();*/
+  glRotatef(180/PI * body1->getOrientation(), 0, 0, 1);
   glColor3ub (255, 255, 255);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   const Vector2 *vertices = body1->getVertices();
@@ -92,6 +101,7 @@ void Demo1::paintGL()
   // Draw body2
   glPushMatrix();
   bb = body2->getWorldBB();
+  bb2 = body2->getStaticBB();
   if (body2->bp_isIntersecting()) {
     glColor3ub(180,50,50);
   } else {
@@ -104,6 +114,14 @@ void Demo1::paintGL()
     glVertex2f(bb->maxVertex_.x+0.2, bb->minVertex_.y-0.2);
   glEnd();
   glTranslatef(body2->getPosition()[0], body2->getPosition()[1], 0);
+  /*glBegin(GL_QUADS);
+    glVertex2f(bb2->minVertex_.x-0.2, bb2->minVertex_.y-0.2);
+    glVertex2f(bb2->minVertex_.x-0.2, bb2->maxVertex_.y+0.2);
+    glVertex2f(bb2->maxVertex_.x+0.2, bb2->maxVertex_.y+0.2);
+    glVertex2f(bb2->maxVertex_.x+0.2, bb2->minVertex_.y-0.2);
+  glEnd();*/
+//  body2->setOrientation(body2->getOrientation() + 0.01);
+  glRotatef(180/PI * body2->getOrientation(), 0, 0, 1);
   glColor3ub (255, 255, 255);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   vertices = body2->getVertices();
@@ -154,18 +172,12 @@ void Demo1::mousePressEvent(QMouseEvent *event)
   userData_mouseForce[0] = posX;
   userData_mouseForce[1] = posY;
 
-  // transform mouse position to match RB
-  GLdouble posRb1X = posX - body1->getPosition()[0];
-  GLdouble posRb1Y = posY - body1->getPosition()[1];
-  GLdouble posRb2X = posX - body2->getPosition()[0];
-  GLdouble posRb2Y = posY - body2->getPosition()[1];
-
-  if (body1->pointIsInterior(posRb1X, posRb1Y))
+  if (body1->pointIsInterior(posX, posY))
   {
     rbActedOn = body1;
     body1->addForce(mouseForce);
   } 
-  else if (body2->pointIsInterior(posRb2X, posRb2Y))
+  else if (body2->pointIsInterior(posX, posY))
   {
     rbActedOn = body2;
     body2->addForce(mouseForce);

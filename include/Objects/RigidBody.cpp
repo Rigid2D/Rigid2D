@@ -83,7 +83,7 @@ namespace Rigid2D
     RBSolver::nextStep(*this, result);
     state_ = result;
 
-    worldBB_ = staticBB_.transform(state_.position, 0);
+    worldBB_ = staticBB_.transform(state_.position, state_.orientation);
   }
 
   void RigidBody::computeForces(RBState & state)
@@ -209,7 +209,12 @@ namespace Rigid2D
     state_.linearMomentum = Vector2(xVel, yVel) * mass_;
   }
 
-  void RigidBody::setMass(const Real &mass)
+  void RigidBody::setOrientation(const Real orientation)
+  {
+    state_.orientation = orientation;
+  }
+
+  void RigidBody::setMass(const Real mass)
   {
     state_.linearMomentum /= mass_ / mass;
     mass_ = mass;
@@ -347,6 +352,19 @@ namespace Rigid2D
 
   bool RigidBody::pointIsInterior(Real x, Real y)
   {
+    // Transform input from World to Local coordinate space
+    x -= state_.position.x;
+    y -= state_.position.y;
+
+    Real xtemp, ytemp, cos_theta, sin_theta;
+    cos_theta = cos(-state_.orientation);
+    sin_theta = sin(-state_.orientation);
+
+    xtemp = cos_theta*x - sin_theta*y;
+    ytemp = sin_theta*x + cos_theta*y;
+    x = xtemp;
+    y = ytemp;
+
     // Go through all the edges calculating orient2d(Mouse, pt1, pt2)
     Vector2 pt1, pt2, pt3;
     pt1.x = x;

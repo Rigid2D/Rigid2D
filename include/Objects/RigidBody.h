@@ -193,7 +193,8 @@ namespace Rigid2D
       void setPosition (Real xPos, Real yPos);
       void setVelocity (const Vector2 & velocity);
       void setVelocity (Real xVel, Real yVel);
-      void setMass(const Real &);
+      void setOrientation (const Real orientation);
+      void setMass (const Real mass);
 
       int getVertexCount() const;
       Real* getVertexArray() const;
@@ -206,8 +207,8 @@ namespace Rigid2D
 
       Vector2 const * getVertices() const;
 
-      /* Given a point in graphics coordinate space, this function returns true if
-       * the point lies within the convex polygon defined by vertex_array_.*/
+      /* Given a point in **world coordinate space**, this function returns true if
+       * the point lies within the convex polygon d\efined by vertex_array_.*/
       bool pointIsInterior(Real x, Real y);
 
     protected:

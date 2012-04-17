@@ -31,25 +31,22 @@ namespace Rigid2D
   AABB AABB::transform(Vector2 translation, Real rotation) const
   {
     // Array that stores 4 vertices, starting with bottom-left going ccw
-    Vector2 vertex_arr[4];
+    Vector2 vertex_arr[4], temp;
     vertex_arr[0] = minVertex_;
-    vertex_arr[1] = Vector2(minVertex_.x, maxVertex_.y);
+    vertex_arr[1] = Vector2(maxVertex_.x, minVertex_.y);
     vertex_arr[2] = maxVertex_;
-    vertex_arr[3] = Vector2(maxVertex_.x, minVertex_.y);
+    vertex_arr[3] = Vector2(minVertex_.x, maxVertex_.y);
 
-    // Apply rotation
+    // Apply transform
     Real cos_theta = cos(rotation);
     Real sin_theta = sin(rotation);
 
     for (int i = 0; i < 4; i++) {
-      vertex_arr[i].x = vertex_arr[i].x * cos_theta - vertex_arr[i].y * sin_theta;
-      vertex_arr[i].y = vertex_arr[i].x * sin_theta + vertex_arr[i].y * cos_theta;
-    }
-
-    // Apply translation
-    for (int j = 0; j < 4; j++) {
-      vertex_arr[j].x += translation.x;
-      vertex_arr[j].y += translation.y;
+      temp.x = vertex_arr[i].x * cos_theta - vertex_arr[i].y * sin_theta;
+      temp.y = vertex_arr[i].x * sin_theta + vertex_arr[i].y * cos_theta;
+      temp.x += translation.x;
+      temp.y += translation.y;
+      vertex_arr[i] = temp;
     }
 
     return AABB(vertex_arr, 4);

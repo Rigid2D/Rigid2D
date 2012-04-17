@@ -19,7 +19,6 @@
 #define NULL 0
 #endif
 
-
 // Place all global library settings and constants in this file.
 namespace Rigid2D 
 {	
@@ -27,6 +26,7 @@ namespace Rigid2D
 	typedef double PreciseReal;
   typedef float Angle;
 
+  const Real PI = 3.14159265;
 	const Real TAU = 6.283185307;
 
 	// Starting step size for the OdeSolver.
