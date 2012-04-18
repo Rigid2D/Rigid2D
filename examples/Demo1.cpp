@@ -32,16 +32,14 @@ Demo1::Demo1(QWidget *parent)
                         Vector2(15, 10),  // position
                         mass);
 
-  body1->setOrientation(1);
-
 	// Add bodies to rigidBodySystem
 	rigidBodySystem->addRigidBody(body1);
 	rigidBodySystem->addRigidBody(body2);
 
   userData_mouseForce[0] = 0;
   userData_mouseForce[1] = 0;
-  userData_mouseForce[2] = 10;  // Spring constant ks
-  userData_mouseForce[3] = 5;   // Damping constant kd
+  userData_mouseForce[4] = 10;  // Spring constant ks
+  userData_mouseForce[5] = 5;   // Damping constant kd
   rbActedOn = NULL;
 }
 
@@ -137,19 +135,26 @@ void Demo1::paintGL()
   if (rbActedOn != NULL) {
     glBegin(GL_LINE);
       glColor3ub(50, 200, 50);
+      glVertex2f(userData_mouseForce[2], userData_mouseForce[3]);
       glVertex2f(userData_mouseForce[0], userData_mouseForce[1]);
-      glVertex2f(rbActedOn->getPosition()[0], rbActedOn->getPosition()[1]);
     glEnd();
   }
 
   // Update ALL THE THINGS!! (unless paused)
 	if (!paused) {
+    // update mouseClicked position
+    if (rbActedOn != NULL) {
+      Vector2 pt = rbActedOn->worldToLocalTransform(Vector2(userData_mouseForce[2], userData_mouseForce[3]));
+      pt += rbActedOn->getPosition();
+      userData_mouseForce[2] = pt.x;
+      userData_mouseForce[3] = pt.y;
+    }
     rigidBodySystem->update();
   }
 }
 
 
-void Demo1::mousePressEvent(QMouseEvent *event) 
+void Demo1::mousePressEvent(QMouseEvent *event)
 {
   makeCurrent();
   GLint viewport[4];
@@ -171,23 +176,28 @@ void Demo1::mousePressEvent(QMouseEvent *event)
   // set one end of mouse spring
   userData_mouseForce[0] = posX;
   userData_mouseForce[1] = posY;
+  userData_mouseForce[2] = posX;
+  userData_mouseForce[3] = posY;
 
   if (body1->pointIsInterior(posX, posY))
   {
     rbActedOn = body1;
     body1->addForce(mouseForce);
-  } 
+    Vector2 transformedPoint = body1->worldToLocalTransform(Vector2(posX, posY));
+  }
   else if (body2->pointIsInterior(posX, posY))
   {
     rbActedOn = body2;
     body2->addForce(mouseForce);
+  } else {
+    rbActedOn = NULL;
   }
 }
 
 
-void Demo1::mouseReleaseEvent(QMouseEvent *event) 
+void Demo1::mouseReleaseEvent(QMouseEvent *event)
 {
-  if (rbActedOn != NULL) 
+  if (rbActedOn != NULL)
   {
     rbActedOn->removeForce(mouseForce);
     rbActedOn = NULL;
@@ -195,7 +205,7 @@ void Demo1::mouseReleaseEvent(QMouseEvent *event)
 }
 
 
-void Demo1::mouseMoveEvent(QMouseEvent *event) 
+void Demo1::mouseMoveEvent(QMouseEvent *event)
 {
   if (rbActedOn != NULL) {
     makeCurrent();

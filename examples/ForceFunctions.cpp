@@ -36,7 +36,7 @@ void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * fo
 
   // Compute Force acting on center of mass:
 
-  // l; Distance between the RigidBody's center of mass, and mouse coordinates
+  // l; Distance between clicked position and current mouse position 
   Vector2 deltaPosition(mouseClickPos.x - mousePos.x,
       mouseClickPos.y - mousePos.y);
 
@@ -58,7 +58,6 @@ void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * fo
     // Compute Torque:
     *torqueDst = (mouseClickPos - centerOfMassPos).cross(*forceDst);
   }
-
 
 
 }

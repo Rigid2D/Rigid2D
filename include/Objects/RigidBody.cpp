@@ -60,6 +60,7 @@ namespace Rigid2D
     state_.linearMomentum = velocity * mass;
     state_.orientation = orientation;
     state_.angularMomentum = 0.0;
+    prevState_ = state_;
 
     mass_ = mass;
     num_vertices_ = num_vertices;
@@ -81,6 +82,7 @@ namespace Rigid2D
     bp_isIntersecting_ = false;
     RBState result;
     RBSolver::nextStep(*this, result);
+    prevState_ = state_;
     state_ = result;
 
     worldBB_ = staticBB_.transform(state_.position, state_.orientation);
@@ -248,6 +250,20 @@ namespace Rigid2D
   bool RigidBody::np_isIntersecting() const
   {
     return np_isIntersecting_;
+  }
+
+  Vector2 RigidBody::worldToLocalTransform(const Vector2 & point) const
+  {
+    Vector2 temp, result;
+    temp = point - prevState_.position;
+    result = temp;
+
+    Real cos_theta = cos(state_.orientation - prevState_.orientation);
+    Real sin_theta = sin(state_.orientation - prevState_.orientation);
+
+    result.x = cos_theta * temp.x - sin_theta * temp.y;
+    result.y = sin_theta * temp.x + cos_theta * temp.y;
+    return result;
   }
 
   bool RigidBody::broadPhase(RigidBody *rb)

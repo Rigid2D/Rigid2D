@@ -85,6 +85,14 @@ namespace Rigid2D
                      angularMomentum / scalar);
     }
 
+    void operator = (const RBState & other)
+    {
+      position = other.position;
+      linearMomentum = other.linearMomentum;
+      angularMomentum = other.angularMomentum;
+      orientation = other.orientation;
+    }
+
     void normalizeOrientAngle()
     {
       orientation = fmod(orientation, TAU);
@@ -202,6 +210,7 @@ namespace Rigid2D
       AABB* getWorldBB();
       bool bp_isIntersecting() const;
       bool np_isIntersecting() const;
+      Vector2 worldToLocalTransform(const Vector2 & point) const;
 
       unsigned int getNumVertices() const;
 
@@ -228,6 +237,7 @@ namespace Rigid2D
 
     protected:
       RBState state_;                         // Position, momentum
+      RBState prevState_;                     // The state last frame
       Vector2 velocity_;                      // Velocity of center of mass (implicitly calculated)
       Real mass_;                             // Object mass
       Real moi_;                              // Moment of inertia about axis perpendicular to plane of
