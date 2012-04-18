@@ -92,6 +92,10 @@ namespace Rigid2D {
         return *(&x+i);
       }
 
+      static Real getLengthSquared (Vector2 const &v) {
+        return v.x * v.x + v.y * v.y;
+      }
+
       Real getLengthSquared() const {
         return x * x + y * y;
       }
@@ -102,6 +106,11 @@ namespace Rigid2D {
 
       Real dot(const Vector2 & vec) const {
         return x * vec.x + y * vec.y;
+      }
+
+      // Returns z-component of cross product.
+      Real cross(const Vector2 & v) const {
+        return x*v.y - y*v.x;
       }
 
       void normalize() {

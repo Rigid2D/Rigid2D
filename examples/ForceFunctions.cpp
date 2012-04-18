@@ -22,29 +22,45 @@
  * kd: damping constant
  *
 */
-void mouseSpringForce(RigidBody * const rigidBody, Vector2 * dst, void * userData){
+void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * forceDst, Real * torqueDst, void * userData){
   assert(rigidBody != NULL);
-  assert(dst != NULL);
+  assert(forceDst != NULL);
+  assert(torqueDst != NULL);
   assert(userData != NULL);
 
-  Vector2 mousePos ( ((Real*)userData)[0], ((Real*)userData)[1] );         // Store mouse coordinants
-  Vector2 centerOfMassPos = rigidBody->getPosition(); // Center of mass of RigidBody
-  Real ks = ((Real*)userData)[2];                        // Spring constant
-  Real kd = ((Real*)userData)[3];                        // Damping constant
+  Vector2 mousePos ( ((Real*)userData)[0], ((Real*)userData)[1] );  // Store mouse coordinants
+  Vector2 centerOfMassPos = state->position;                        // Center of mass for RigidBody
+  Vector2 mouseClickPos(((Real*)userData)[2], ((Real*)userData)[3]);    // Where the spring is attached to on RB
+  Real ks = ((Real*)userData)[4];                                   // Spring constant
+  Real kd = ((Real*)userData)[5];                                   // Damping constant
 
-  // l; Distance between the RigidBody's center of mass, and mouse coordinates
-  Vector2 deltaPosition(centerOfMassPos.x - mousePos.x,
-      centerOfMassPos.y - mousePos.y);
+  // Compute Force acting on center of mass:
 
-  // l_dot; Assume mouse is not moving, and only factor-in velocity of RigidBody's center of mass.
-  Vector2 deltaVelocity(rigidBody->getVelocity());
+  // l; Distance between clicked position and current mouse position 
+  Vector2 deltaPosition(mouseClickPos.x - mousePos.x,
+      mouseClickPos.y - mousePos.y);
 
-  // <l_dot, l> / norm(l)^2
-  // l: deltaPosition
-  // l_dot: deltaVelocity
-  Real kdFactor = deltaVelocity.dot(deltaPosition) / deltaPosition.getLengthSquared();
+  if (feq(deltaPosition.getLength(), 0.0)){
+    forceDst->x = 0.0;
+    forceDst->y = 0.0;
+  }
+  else {
+    // l_dot; Assume mouse is not moving, and only factor-in velocity of RigidBody's center of mass.
+    Vector2 deltaVelocity(state->linearMomentum / rigidBody->getMass());
 
-  // Store computed force values
-  dst->x = (ks + kd*kdFactor)*(-deltaPosition.x);  // x component of force
-  dst->y = (ks + kd*kdFactor)*(-deltaPosition.y);  // y component of force
+    // kdFactor = (l_dot * l)/ norm(l)^2
+    Real kdFactor = deltaVelocity.dot(deltaPosition) / deltaPosition.getLengthSquared();
+
+    // Store computed force values
+    forceDst->x = (ks + kd*kdFactor)*(-deltaPosition.x);  // x component of force
+    forceDst->y = (ks + kd*kdFactor)*(-deltaPosition.y);  // y component of force
+
+    // Compute Torque:
+    *torqueDst = (mouseClickPos - centerOfMassPos).cross(*forceDst);
+  }
 }
+
+void gravity(RigidBody * const rigidBody, RBState * state, Vector2 * forceDst, Real *, void *){
+  forceDst->y = rigidBody->getMass()*(-9.81);
+}
+

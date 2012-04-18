@@ -17,7 +17,7 @@
 GTEST_DIR = ../../../gtest
 
 # Where to find source code relative to this file.
-COMMON_DIR = ../
+SRC_DIR = ../
 
 # Where to find test code relative to this file
 TEST_DIR =
@@ -25,15 +25,15 @@ TEST_DIR =
 # Root of Rigid2D folder
 ROOT_DIR = ../../../
 
-INCLUDE_DIR = $(ROOT_DIR)include/
+INCLUDE_DIR = ../../
 
 # Flags passed to the preprocessor.
 CPPFLAGS += -I$(ROOT_DIR)gtest/include \
 						-I$(INCLUDE_DIR) \
-						-I$(COMMON_DIR) \
+						-I$(SRC_DIR) \
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra
+CXXFLAGS += -ggdb -g -Wall -Wextra -std=c++0x
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
@@ -41,8 +41,7 @@ TESTS = Matrix2-UnitTest \
 				RigidException-UnitTest \
         Vector3-UnitTest \
         Vector2-UnitTest \
-				OdeRungeKutta4-UnitTest \
-				RungeKutta4RigidBodySolver
+				MathUtils-UnitTest \
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -90,70 +89,53 @@ gtest_main.a : gtest-all.o gtest_main.o
 # gtest_main.a, depending on whether it defines its own main()
 # function.
 
-feq.o : $(COMMON_DIR)feq.cpp $(COMMON_DIR)feq.h
-	$(COMPILE) $(COMMON_DIR)feq.cpp
+feq.o : $(SRC_DIR)feq.cpp $(SRC_DIR)feq.h
+	$(COMPILE) $(SRC_DIR)feq.cpp
 
-Matrix2.h : $(COMMON_DIR)RigidSettings.h $(COMMON_DIR)feq.h
+Matrix2.h : $(SRC_DIR)RigidSettings.h $(SRC_DIR)feq.h
 
-Matrix2.o : $(COMMON_DIR)Matrix2.cpp $(COMMON_DIR)Matrix2.h $(GTEST_HEADERS)
-	$(COMPILE) $(COMMON_DIR)Matrix2.cpp
+Matrix2.o : $(SRC_DIR)Matrix2.cpp $(SRC_DIR)Matrix2.h 
+	$(COMPILE) $(SRC_DIR)Matrix2.cpp
 
-Matrix2-UnitTest.o : $(TEST_DIR)Matrix2-UnitTest.cpp $(COMMON_DIR)Matrix2.h $(GTEST_HEADERS)
+Matrix2-UnitTest.o : $(TEST_DIR)Matrix2-UnitTest.cpp $(SRC_DIR)Matrix2.h $(GTEST_HEADERS)
 	$(COMPILE) $(TEST_DIR)Matrix2-UnitTest.cpp
 
 Matrix2-UnitTest : Matrix2.o Matrix2-UnitTest.o feq.o gtest_main.a
 	$(LINK)
 
-RigidException.o : $(COMMON_DIR)RigidException.cpp $(COMMON_DIR)RigidException.h $(GTEST_HEADERS)
-	$(COMPILE) $(COMMON_DIR)RigidException.cpp
+RigidException.o : $(SRC_DIR)RigidException.cpp $(SRC_DIR)RigidException.h
+	$(COMPILE) $(SRC_DIR)RigidException.cpp
 
 RigidException-UnitTest.o : $(TEST_DIR)RigidException-UnitTest.cpp \
-                     $(COMMON_DIR)RigidException.h $(GTEST_HEADERS)
+                     $(SRC_DIR)RigidException.h $(GTEST_HEADERS)
 	$(COMPILE) $(TEST_DIR)RigidException-UnitTest.cpp
 
 RigidException-UnitTest : RigidException-UnitTest.o RigidException.o gtest_main.a
 	$(LINK)
 
-Vector3.h : $(COMMON_DIR)RigidSettings.h $(COMMON_DIR)feq.h
+Vector3.h : $(SRC_DIR)RigidSettings.h $(SRC_DIR)feq.h
 
-Vector3-UnitTest.o : $(TEST_DIR)Vector3-UnitTest.cpp $(COMMON_DIR)Vector3.h $(GTEST_HEADERS)
+Vector3-UnitTest.o : $(TEST_DIR)Vector3-UnitTest.cpp $(SRC_DIR)Vector3.h $(GTEST_HEADERS)
 	$(COMPILE) $(TEST_DIR)Vector3-UnitTest.cpp
 
 Vector3-UnitTest : Vector3-UnitTest.o feq.o gtest_main.a
 	$(LINK)
 
-Vector2.h : $(COMMON_DIR)RigidSettings.h $(COMMON_DIR)feq.h
+Vector2.h : $(SRC_DIR)RigidSettings.h $(SRC_DIR)feq.h
 
-Vector2-UnitTest.o : $(TEST_DIR)Vector2-UnitTest.cpp $(COMMON_DIR)Vector2.h $(GTEST_HEADERS)
+Vector2-UnitTest.o : $(TEST_DIR)Vector2-UnitTest.cpp $(SRC_DIR)Vector2.h $(GTEST_HEADERS)
 	$(COMPILE) $(TEST_DIR)Vector2-UnitTest.cpp
 
 Vector2-UnitTest : Vector2-UnitTest.o feq.o gtest_main.a
 	$(LINK)
 
-OdeRungeKutta4.o : $(COMMON_DIR)OdeRungeKutta4.h $(COMMON_DIR)OdeRungeKutta4.cpp \
-									 $(COMMON_DIR)OdeSolver.h $(COMMON_DIR)RigidSettings.h \
-									 $(COMMON_DIR)RigidException.h
-	$(COMPILE) $(COMMON_DIR)OdeRungeKutta4.cpp
+MathUtils.o : $(SRC_DIR)MathUtils.cpp $(SRC_DIR)MathUtils.h $(SRC_DIR)Vector2.h \
+							$(SRC_DIR)feq.h $(SRC_DIR)RigidException.h
+	$(COMPILE) $(SRC_DIR)MathUtils.cpp
 
-ForceFunctions.h : $(COMMON_DIR)RigidSettings.h
+MathUtils-UnitTest.o : MathUtils-UnitTest.cpp $(SRC_DIR)MathUtils.h $(GTEST_HEADERS)
+	$(COMPILE) MathUtils-UnitTest.cpp
 
-ForceFunctions.o : ForceFunctions.cpp ForceFunctions.h
-	$(COMPILE) ForceFunctions.cpp
-
-OdeRungeKutta4-UnitTest.o : OdeRungeKutta4-UnitTest.cpp $(COMMON_DIR)OdeRungeKutta4.h \
-													 	$(COMMON_DIR)OdeSolver.h ForceFunctions.h $(GTEST_HEADERS)
-	$(COMPILE) OdeRungeKutta4-UnitTest.cpp
-
-OdeRungeKutta4-UnitTest : OdeRungeKutta4-UnitTest.o OdeRungeKutta4.o \
-													RigidException.o ForceFunctions.o gtest_main.a
+MathUtils-UnitTest : MathUtils-UnitTest.o MathUtils.o feq.o RigidException.o gtest_main.a
 	$(LINK)
 
-RungeKutta4RigidBodySolver.o : $(COMMON_DIR)RungeKutta4RigidBodySolver.cpp $(COMMON_DIR)RungeKutta4RigidBodySolver.h
-	$(COMPILE) $(COMMON_DIR)RungeKutta4RigidBodySolver.cpp
-
-RungeKutta4RigidBodySolver-UnitTest.o : $(COMMON_DIR)RungeKutta4RigidBodySolver.cpp $(COMMON_DIR)RungeKutta4RigidBodySolver.h
-	$(COMPILE) RungeKutta4RigidBodySolver-UnitTest.cpp
-
-RungeKutta4RigidBodySolver-UnitTest : RungeKutta4RigidBodySolver-UnitTest.o \
-																			RungeKutta4RigidBodySolver.o gtest_main.a
-	$(LINK)

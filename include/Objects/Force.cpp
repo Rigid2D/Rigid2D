@@ -4,55 +4,38 @@ using namespace std;
 
 namespace Rigid2D {
 
-  Force::Force(ForceFunctionPtr forceFunction, RigidBody **rigidBodyArray,
-      unsigned int numBodies, void * userData)
-    : numBodies_(numBodies),
-      userData_(userData),
+  Force::Force(ForceFunctionPtr forceFunction, void *userData)
+    : userData_(userData),
       enabled_(true),
       forceFunction_(forceFunction)
   {
-    addRigidBodies(rigidBodyArray, numBodies);
-
-    forceVector_.x = 0.0;
-    forceVector_.y = 0.0;
+    // nothing to be done
   }
 
-  void Force::applyForce(){
-    unordered_set<RigidBody*>::iterator it;
-    for (it = rigidBodies_.begin(); it != rigidBodies_.end(); ++it) 
-    {
-      forceFunction_(*it, &forceVector_, userData_);
-      (*it)->addToForceAccum(forceVector_);
-    }
-  }
+  Force::~Force() {}
 
-  void Force::addRigidBody(RigidBody *rigidBody)
+  void Force::computeForce(RigidBody * const rb, RBState *state, Vector2 * forceDst, Real * torqueDst)
   {
-    rigidBodies_.insert(rigidBody);
+    forceFunction_(rb, state, forceDst, torqueDst, userData_);
   }
 
-  void Force::addRigidBodies(RigidBody **rigidBodyArray, unsigned count)
+  void Force::setForceFunction(ForceFunctionPtr funct)
   {
-    for (unsigned i = 0; i < count; i++) {
-      rigidBodies_.insert(rigidBodyArray[i]);
-    }
+    forceFunction_ = funct;
   }
 
-  void Force::removeRigidBody(RigidBody *rigidBody)
+  bool Force::isEnabled()
   {
-    rigidBodies_.erase(rigidBody);
+    return enabled_;
   }
 
-  void Force::removeRigidBodies(RigidBody **rigidBodyArray, unsigned count)
+  void Force::setEnabled(bool trueOrFalse)
   {
-    for (unsigned int i = 0; i < count; i++) {
-      rigidBodies_.erase(rigidBodyArray[i]);
-    }
+    enabled_ = trueOrFalse;
   }
 
-  void Force::clearRigidBodies()
+  void Force::setUserData(void * userData)
   {
-    rigidBodies_.clear();
+    userData_ = userData;
   }
-
 }
