@@ -85,6 +85,10 @@ namespace Rigid2D
     prevState_ = state_;
     state_ = result;
 
+    // Add in damping to stop Rigid Bodies in motion
+    state_.angularMomentum *= (1 - 0.005);
+    state_.linearMomentum *= (1 - 0.005);
+
     worldBB_ = staticBB_.transform(state_.position, state_.orientation);
   }
 
@@ -98,6 +102,10 @@ namespace Rigid2D
 
     for (it = forces_.begin(); it != forces_.end(); ++it) 
     {
+      forceResult.x = 0.0;
+      forceResult.y = 0.0;
+      torqueResult = 0.0;
+
       (*it)->computeForce(this, &state, &forceResult, &torqueResult);
       forceAccumulator_ += forceResult;
       torqueAccumulator_ += torqueResult;

@@ -58,6 +58,9 @@ void mouseSpringForce(RigidBody * const rigidBody, RBState * state, Vector2 * fo
     // Compute Torque:
     *torqueDst = (mouseClickPos - centerOfMassPos).cross(*forceDst);
   }
-
-
 }
+
+void gravity(RigidBody * const rigidBody, RBState * state, Vector2 * forceDst, Real *, void *){
+  forceDst->y = rigidBody->getMass()*(-9.81);
+}
+

@@ -210,6 +210,8 @@ namespace Rigid2D
       AABB* getWorldBB();
       bool bp_isIntersecting() const;
       bool np_isIntersecting() const;
+
+      /* Transform point in previous frame world space to current frame local space. */
       Vector2 worldToLocalTransform(const Vector2 & point) const;
 
       unsigned int getNumVertices() const;

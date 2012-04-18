@@ -32,13 +32,17 @@ Demo1::Demo1(QWidget *parent)
                         Vector2(15, 10),  // position
                         mass);
 
+  gravityForce = new Force(gravity);
+  body1->addForce(gravityForce);
+  body2->addForce(gravityForce);
+
 	// Add bodies to rigidBodySystem
 	rigidBodySystem->addRigidBody(body1);
 	rigidBodySystem->addRigidBody(body2);
 
   userData_mouseForce[0] = 0;
   userData_mouseForce[1] = 0;
-  userData_mouseForce[4] = 10;  // Spring constant ks
+  userData_mouseForce[4] = 100;  // Spring constant ks
   userData_mouseForce[5] = 5;   // Damping constant kd
   rbActedOn = NULL;
 }
