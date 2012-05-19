@@ -11,7 +11,6 @@ INCLUDEPATH += ../include
 QT += opengl
 HEADERS = DemoBase.h \
           Demo1.h \
-          Demo_ManyBodies.h \
           ForceFunctions.h \
           DemosFramework.h \
           ../include/Rigid2D.h \
@@ -20,13 +19,12 @@ SOURCES = examples.cpp \
           DemosFramework.cpp \
           DemoBase.cpp \
           Demo1.cpp \
-          Demo_ManyBodies.cpp \
           ForceFunctions.cpp \
           ../include/Objects/RBSolver.cpp \
           ../include/Objects/RigidBody.cpp \
           ../include/Objects/RigidBodySystem.cpp \
           ../include/Objects/Force.cpp \
-          ../include/Objects/AABB.cpp \
+          ../include/Collision/BroadPhase/AABB.cpp \
           ../include/Common/RigidException.cpp \
           ../include/Common/MathUtils.cpp \
           ../include/Common/feq.cpp \
