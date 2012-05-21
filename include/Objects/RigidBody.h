@@ -19,7 +19,7 @@ namespace Rigid2D
   {
     Vector2 position;
     Vector2 linearMomentum;
-    Angle orientation;         // radians.
+    Angle orientation;         // radians
     Real angularMomentum;
 
     RBState() {}
@@ -31,72 +31,15 @@ namespace Rigid2D
       orientation(orientation),
       angularMomentum(angularMomentum) { }
 
-    void operator *= (Real scalar)
-    {
-      position *= scalar;
-      linearMomentum *= scalar;
-      orientation *= scalar;
-      angularMomentum *= scalar;
-    }
-
-    void operator /= (Real scalar)
-    {
-      position /= scalar;
-      linearMomentum /= scalar;
-      orientation /= scalar;
-      angularMomentum /= scalar;
-    }
-
-    RBState operator + (const RBState & s) const
-    {
-      return RBState(position + s.position,
-                     linearMomentum + s.linearMomentum,
-                     orientation + s.orientation,
-                     angularMomentum + s.angularMomentum);
-    }
-
-    RBState operator - (const RBState & s) const
-    {
-      return RBState(position - s.position,
-                     linearMomentum - s.linearMomentum,
-                     orientation - s.orientation,
-                     angularMomentum - s.angularMomentum);
-    }
-
-    RBState operator * (const Real scalar) const
-    {
-      return RBState(position * scalar,
-                     linearMomentum * scalar,
-                     orientation * scalar,
-                     angularMomentum * scalar);
-    }
-
-    friend RBState operator * (const Real scalar, const RBState &state)
-    {
-      return state * scalar;
-    }
-
-    RBState operator / (const Real scalar) const
-    {
-      assert(feq(scalar, 0.0) == false);
-      return RBState(position / scalar,
-                     linearMomentum / scalar,
-                     orientation / scalar,
-                     angularMomentum / scalar);
-    }
-
-    void operator = (const RBState & other)
-    {
-      position = other.position;
-      linearMomentum = other.linearMomentum;
-      angularMomentum = other.angularMomentum;
-      orientation = other.orientation;
-    }
-
-    void normalizeOrientAngle()
-    {
-      orientation = fmod(orientation, TAU);
-    }
+    void operator *= (Real scalar);
+    void operator /= (Real scalar);
+    RBState operator + (const RBState & s) const;
+    RBState operator - (const RBState & s) const;
+    RBState operator * (const Real scalar) const;
+    friend RBState operator * (const Real scalar, const RBState &state);
+    RBState operator / (const Real scalar) const;
+    void operator = (const RBState & other);
+    void normalizeOrientAngle();
   };
 
 
