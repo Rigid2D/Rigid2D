@@ -42,7 +42,6 @@ CXXFLAGS += -g -Wall -Wextra -std=c++0x
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
 TESTS = RigidBody-UnitTest \
-				Force-UnitTest
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -92,32 +91,36 @@ gtest_main.a : gtest-all.o gtest_main.o
 feq.o : $(COMMON_DIR)feq.cpp $(COMMON_DIR)feq.h
 	$(COMPILE) $(COMMON_DIR)feq.cpp
 
-MathUtils.o : $(COMMON_DIR)MathUtils.cpp $(COMMON_DIR)MathUtils.h
+RigidException.o : $(COMMON_DIR)RigidException.cpp $(COMMON_DIR)RigidException.h
+	$(COMPILE) $(COMMON_DIR)RigidException.cpp
+
+MathUtils.o : $(COMMON_DIR)MathUtils.cpp $(COMMON_DIR)MathUtils.h $(COMMON_DIR)Vector2.h \
+							$(COMMON_DIR)feq.h $(COMMON_DIR)RigidException.h
 	$(COMPILE) $(COMMON_DIR)MathUtils.cpp
+
+RBSolver.o : $(SRC_DIR)RBSolver.h $(SRC_DIR)RBSolver.cpp $(SRC_DIR)RigidBody.h
+	$(COMPILE) $(SRC_DIR)RBSolver.cpp
+
+AABB.o : $(SRC_DIR)AABB.cpp $(SRC_DIR)AABB.h $(COMMON_DIR)Vector2.h \
+				 $(COMMON_DIR)RigidSettings.h
+	$(COMPILE) $(SRC_DIR)AABB.cpp
 
 RigidBody.o : $(SRC_DIR)RigidBody.h $(SRC_DIR)RigidBody.cpp \
 							$(COMMON_DIR)RigidSettings.h $(COMMON_DIR)MathUtils.h \
-							$(COMMON_DIR)Vector2.h
+							$(SRC_DIR)Force.h $(COMMON_DIR)Vector2.h $(SRC_DIR)RBSolver.h \
+							$(SRC_DIR)AABB.h
 	$(COMPILE) $(SRC_DIR)RigidBody.cpp
 
 RigidBody-UnitTest.o : $(SRC_DIR)RigidBody.h RigidBody-UnitTest.cpp $(GTEST_HEADERS)
 	$(COMPILE) RigidBody-UnitTest.cpp
 
-RigidBody-UnitTest : RigidBody-UnitTest.o RigidBody.o \
-										 feq.o MathUtils.o gtest_main.a
+RigidBody-UnitTest : RigidBody-UnitTest.o RigidBody.o Force.o RBSolver.o \
+										 RigidException.o feq.o MathUtils.o AABB.o gtest_main.a
 	$(LINK)
 
-Force.o : $(SRC_DIR)Force.h $(SRC_DIR)Force.cpp $(SRC_DIR)RigidBody.h
+Force.o : $(SRC_DIR)Force.h $(SRC_DIR)Force.cpp
 	$(COMPILE) $(SRC_DIR)Force.cpp
 
-Force-UnitTest.o : $(SRC_DIR)Force.h $(SRC_DIR)Force.cpp $(GTEST_HEADERS)
-	$(COMPILE) Force-UnitTest.cpp
-
-Force-UnitTest : Force.o Force-UnitTest.o RigidBody.o MathUtils.o feq.o gtest_main.a
-	$(LINK)
-
 RigidBodySystem.o : $(SRC_DIR)RigidBodySystem.h $(SRC_DIR)RigidBodySystem.cpp  \
-										$(COMMON_DIR)OdeSolver.h $(SRC_DIR)RigidBody.h $(SRC_DIR)Force.h \
-										$(COMMON_DIR)RungeKutta4RigidBodySolver.h $(COMMON_DIR)RigidException.h
+										$(SRC_DIR)RigidBody.h $(COMMON_DIR)RigidException.h
 	$(COMPILE) $(SRC_DIR)RigidBodySystem.cpp
-

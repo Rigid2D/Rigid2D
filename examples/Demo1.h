@@ -18,15 +18,18 @@ class Demo1 : public DemoBase
 
   protected:
     Rigid2D::RigidBodySystem *rigidBodySystem;
-    Rigid2D::RigidBody *body;
-    Rigid2D::Force *mouseForce;
+    Rigid2D::RigidBody *body1, *body2;
 
     // mouse coordinates for the mouse force object (x, y) 
     // and spring constants (strength, damp)
-    Rigid2D::Real userData_mouseForce[4];
+    Rigid2D::Force *mouseForce;
+    Rigid2D::Force *gravityForce;
+    Rigid2D::Real userData_mouseForce[6];
+    Rigid2D::RigidBody *rbActedOn;
 
   protected:
     void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
 };

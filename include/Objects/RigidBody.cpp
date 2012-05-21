@@ -1,53 +1,201 @@
 #include "RigidBody.h"
 #include "RBSolver.h"
+#include "Common/MathUtils.h"
 #include <cassert>
 #include <cstring>
-
 #include <iostream>
+#include <limits>       // for infinity
 
 namespace Rigid2D
 {
-
-  RigidBody::RigidBody(const Vector2 & position, const Vector2 & velocity, Real mass,
-      Real *vertex_array, int vertex_count)
+  void RBState::operator *= (Real scalar)
   {
+      position *= scalar;
+      linearMomentum *= scalar;
+      orientation *= scalar;
+      angularMomentum *= scalar;
+  }
+
+  void RBState::operator /= (Real scalar)
+  {
+    position /= scalar;
+    linearMomentum /= scalar;
+    orientation /= scalar;
+    angularMomentum /= scalar;
+  }
+
+  RBState RBState::operator + (const RBState & s) const
+  {
+    return RBState(position + s.position,
+                   linearMomentum + s.linearMomentum,
+                   orientation + s.orientation,
+                   angularMomentum + s.angularMomentum);
+  }
+
+  RBState RBState::operator - (const RBState & s) const
+  {
+    return RBState(position - s.position,
+                   linearMomentum - s.linearMomentum,
+                   orientation - s.orientation,
+                   angularMomentum - s.angularMomentum);
+  }
+
+  RBState RBState::operator * (const Real scalar) const
+  {
+    return RBState(position * scalar,
+                   linearMomentum * scalar,
+                   orientation * scalar,
+                   angularMomentum * scalar);
+  }
+
+  RBState operator * (const Real scalar, const RBState &state)
+  {
+    return state * scalar;
+  }
+
+  RBState RBState::operator / (const Real scalar) const
+  {
+    assert(feq(scalar, 0.0) == false);
+    return RBState(position / scalar,
+                   linearMomentum / scalar,
+                   orientation / scalar,
+                   angularMomentum / scalar);
+  }
+
+  void RBState::operator = (const RBState & other)
+  {
+    position = other.position;
+    linearMomentum = other.linearMomentum;
+    angularMomentum = other.angularMomentum;
+    orientation = other.orientation;
+  }
+
+  void RBState::normalizeOrientAngle()
+  {
+    orientation = fmod(orientation, TAU);
+  }
+
+
+  RigidBody::RigidBody(unsigned int num_vertices,
+                       Real const *vertex_array,
+                       Vector2 const &position,
+                       Real mass,
+                       Vector2 const &velocity,
+                       Angle orientation)
+  {
+    assert(vertex_array != NULL);
+		vertices_ = realArrayToVector2Array(num_vertices, vertex_array);
+    initialize(num_vertices, vertices_, position, mass, velocity, orientation);
+  }
+
+  RigidBody::RigidBody(unsigned int num_vertices,
+                       Vector2 const *vertices,
+                       Vector2 const &position,
+                       Real mass,
+                       Vector2 const &velocity,
+                       Angle orientation)
+  {
+    assert(vertices != NULL);
+    vertices_ = new Vector2 [num_vertices];
+
+    for(unsigned int i = 0; i < num_vertices; ++i){
+      vertices_[i] = Vector2(vertices[i].x, vertices[i].y);
+    }
+
+    initialize(num_vertices, vertices, position, mass, velocity, orientation);
+  }
+
+  void RigidBody::initialize(unsigned int num_vertices,
+                             Vector2 const *vertices,
+                             Vector2 const &position,
+                             Real mass,
+                             Vector2 const &velocity,
+                             Angle orientation)
+  {
+    // Need at least 3 vertices to make a convex polygon.
+    if (num_vertices < 3) {
+      throw InvalidParameterException(__LINE__, __FUNCTION__, __FILE__,
+          "num_vertices cannot be less than 3");
+    }
+
+    if (signedArea(num_vertices, vertices) < 0) {
+      throw InvalidParameterException(__LINE__, __FUNCTION__, __FILE__,
+          "vertices must be given in counter-clockwise order so that signed-area of vertices is positive.");
+    }
+
     state_.position = position;
-    state_.momentum = velocity * mass;
+    state_.linearMomentum = velocity * mass;
+    state_.orientation = orientation;
+    state_.angularMomentum = 0.0;
+    prevState_ = state_;
+
     mass_ = mass;
-    vertex_count_ = vertex_count;
-    vertex_array_ = new Real[2 * vertex_count];
-    memcpy(vertex_array_, vertex_array, 2 * vertex_count * sizeof(Real));
+    num_vertices_ = num_vertices;
     forceAccumulator_ = Vector2(0, 0);
+    moi_ = momentOfInertia(num_vertices, vertices, mass);
+
+    // compute staticBB
+    staticBB_ = AABB(vertices_, num_vertices);
+    bp_isIntersecting_ = false;
   }
 
   RigidBody::~RigidBody()
   {
-    delete vertex_array_;
+    delete [] vertices_;
   }
 
   void RigidBody::update()
   {
+    bp_isIntersecting_ = false;
     RBState result;
     RBSolver::nextStep(*this, result);
+    prevState_ = state_;
     state_ = result;
+
+    // Add in damping to stop Rigid Bodies in motion
+    state_.angularMomentum *= (1 - 0.005);
+    state_.linearMomentum *= (1 - 0.005);
+
+    worldBB_ = staticBB_.transform(state_.position, state_.orientation);
   }
 
   void RigidBody::computeForces(RBState & state)
   {
     forceAccumulator_ = Vector2(0, 0);
+    torqueAccumulator_ = 0.0;
     std::unordered_set<Force*>::iterator it;
     Vector2 forceResult;
+    Real torqueResult;
+
     for (it = forces_.begin(); it != forces_.end(); ++it) 
     {
-      (*it)->computeForce(this, &state, &forceResult);
+      forceResult.x = 0.0;
+      forceResult.y = 0.0;
+      torqueResult = 0.0;
+
+      (*it)->computeForce(this, &state, &forceResult, &torqueResult);
       forceAccumulator_ += forceResult;
+      torqueAccumulator_ += torqueResult;
     }
   }
 
   void RigidBody::computeStateDeriv(const RBState &state, RBState &dState) const
   {
-    dState.position = state.momentum / mass_;
-    dState.momentum = forceAccumulator_;
+    assert(moi_ != 0);
+
+    dState.position = state.linearMomentum / mass_;
+    dState.linearMomentum = forceAccumulator_;
+    dState.orientation = state.angularMomentum / moi_;
+    dState.angularMomentum = torqueAccumulator_;
+  }
+
+  bool RigidBody::checkCollision(RigidBody *rb)
+  {
+    if (broadPhase(rb)) {
+       return narrowPhase(rb);
+    } else {
+      return false;
+    }
   }
 
   void RigidBody::addForce(Force *force) 
@@ -80,13 +228,17 @@ namespace Rigid2D
 
   Vector2 RigidBody::getVelocity() const
   {
-    std::cout << state_.momentum.x << std::endl;
-    return state_.momentum / mass_;
+    return state_.linearMomentum / mass_;
   }
 
-  Vector2 RigidBody::getMomentum() const
+  Vector2 RigidBody::getLinearMomentum() const
   {
-    return state_.momentum;
+    return state_.linearMomentum;
+  }
+
+  Real RigidBody::getAngularMomentum() const
+  {
+    return state_.angularMomentum;
   }
 
   Real RigidBody::getMass() const
@@ -94,6 +246,15 @@ namespace Rigid2D
     return mass_;
   }
 
+  Angle RigidBody::getOrientation() const
+  {
+    return state_.orientation;
+  }
+
+  Real RigidBody::getMomentOfInertia() const
+  {
+    return moi_;
+  }
   void RigidBody::getState(RBState & dest) const
   {
     dest = state_;
@@ -117,52 +278,199 @@ namespace Rigid2D
 
   void RigidBody::setVelocity(const Vector2 & velocity)
   {
-    state_.momentum = velocity * mass_;
+    state_.linearMomentum = velocity * mass_;
   }
 
   void RigidBody::setVelocity (Real xVel, Real yVel)
   {
-    state_.momentum = Vector2(xVel, yVel) * mass_;
+    state_.linearMomentum = Vector2(xVel, yVel) * mass_;
   }
 
-  void RigidBody::setMass(const Real &mass)
+  void RigidBody::setOrientation(const Real orientation)
   {
-    state_.momentum /= mass_ / mass;
+    state_.orientation = orientation;
+  }
+
+  void RigidBody::setMass(const Real mass)
+  {
+    state_.linearMomentum /= mass_ / mass;
     mass_ = mass;
   }
 
-  int RigidBody::getVertexCount() const
+  unsigned int RigidBody::getNumVertices() const
   {
-    return vertex_count_;
+    return num_vertices_;
   }
 
-  Real* RigidBody::getVertexArray() const
+  Vector2 const * RigidBody::getVertices() const
   {
-    return vertex_array_;
+    return vertices_;
+  }
+
+  AABB* RigidBody::getStaticBB() 
+  {
+    return &staticBB_;
+  }
+
+  AABB* RigidBody::getWorldBB() 
+  {
+    return &worldBB_;
+  }
+
+  bool RigidBody::bp_isIntersecting() const
+  {
+    return bp_isIntersecting_;
+  }
+
+  bool RigidBody::np_isIntersecting() const
+  {
+    return np_isIntersecting_;
+  }
+
+  Vector2 RigidBody::worldToLocalTransform(const Vector2 & point) const
+  {
+    Vector2 temp, result;
+    temp = point - prevState_.position;
+    result = temp;
+
+    Real cos_theta = cos(state_.orientation - prevState_.orientation);
+    Real sin_theta = sin(state_.orientation - prevState_.orientation);
+
+    result.x = cos_theta * temp.x - sin_theta * temp.y;
+    result.y = sin_theta * temp.x + cos_theta * temp.y;
+    return result;
+  }
+
+  bool RigidBody::broadPhase(RigidBody *rb)
+  {
+    if (worldBB_.isIntersecting(*(rb->getWorldBB()))) {
+      bp_isIntersecting_ = true;
+      rb->bp_isIntersecting_ = true;
+      return true;
+    }
+
+    return false;
+  }
+
+  bool RigidBody::narrowPhase(RigidBody *rb)
+  {
+    /*
+    // Use the Separation Axis Theorem to find distance between
+    // two polygons. The steps are as follows:
+    // 1) For each edge of both polygons find perpendicular
+    // 2) Project all vertices into this perpendicular axis
+    // 3) If the projected interval of p1 and p2 don't overlap, 
+    // there is no collision, otherwise continue
+    // 4) If for every 'edge-axis' projected intervals overlap,
+    // there is a collision, otherwise there isn't
+
+    // extremum points for the intervals of each RB
+    Real min1, max1, min2, max2;
+
+    Real axis_slope, axis_length;
+    Real deltaX, deltaY, pos;
+
+    // SAT for edges of "this" RB
+    for (int i = 0; i < num_vertices_-1; i++) {
+      deltaX = vertex_array_[i*2 + 2] - vertex_array_[i*2];
+      deltaY = vertex_array_[i*2 + 1] - vertex_array_[i*2 + 3];
+
+      // find perpendicular slope of edge
+      if (deltaY == 0) {
+        if (deltaX == 0) {        // repeating vertex
+          continue;
+        } else {                  // horizontal line
+          axis_slope = std::numeric_limits<Real>::infinity();
+        }
+      } else if (deltaX == 0) {   // vertical line
+        axis_slope = 0;
+      } else {
+        axis_slope = -deltaX/deltaY;
+      }
+
+      axis_length = sqrt(1 + axis_slope * axis_slope);
+
+      // project each vertex of "this" RB
+      for (int j = 0; j < num_vertices_; j++) {
+        if (axis_slope == 0) {
+          pos = vertex_array_[j*2];
+        } else if (axis_slope == std::numeric_limits<Real>::infinity()) {
+          pos = vertex_array_[j*2 + 1];
+        } else {
+          pos = (vertex_array_[j*2] + vertex_array_[j*2 + 1] * axis_slope);
+          pos /= axis_length;
+        }
+
+       if (j == 0) {              // set inital values, can we eliminate this?
+          min1 = pos;
+          max1 = pos;
+        } else {                  // update min/max interval values
+          if (pos > max1) {
+            max1 = pos;
+          } else if (pos < min1) {
+            min1 = pos;
+          }
+        }
+      }
+
+      // project each vertex of other RB
+      for (int j = 0; j < rb->num_vertices_; j++) {
+        if (axis_slope == 0) {
+          pos = rb->vertex_array_[j*2];
+        } else if (axis_slope == std::numeric_limits<Real>::infinity()) {
+          pos = rb->vertex_array_[j*2 + 1];
+        } else {
+          pos = (rb->vertex_array_[j*2] + rb->vertex_array_[j*2 + 1] * axis_slope);
+          pos /= axis_length;
+        }
+
+       if (j == 0) {              // set inital values, can we eliminate this?
+          min2 = pos;
+          max2 = pos;
+        } else {                  // update min/max interval values
+          if (pos > max2) {
+            max2 = pos;
+          } else if (pos < min2) {
+            min2 = pos;
+          }
+        }
+      }
+
+    }*/
+    return false;
   }
 
   bool RigidBody::pointIsInterior(Real x, Real y)
   {
-    // Go through all the edges calculating or2d(Mouse, pt1, pt2)
+    // Transform input from World to Local coordinate space
+    x -= state_.position.x;
+    y -= state_.position.y;
+
+    Real xtemp, ytemp, cos_theta, sin_theta;
+    cos_theta = cos(-state_.orientation);
+    sin_theta = sin(-state_.orientation);
+
+    xtemp = cos_theta*x - sin_theta*y;
+    ytemp = sin_theta*x + cos_theta*y;
+    x = xtemp;
+    y = ytemp;
+
+    // Go through all the edges calculating orient2d(Mouse, pt1, pt2)
     Vector2 pt1, pt2, pt3;
     pt1.x = x;
     pt1.y = y;
 
-    for (int i = 0; i < vertex_count_ - 1; i++)
+    for (unsigned int i = 0; i < num_vertices_ - 1; i++)
     {
-      pt2.x = vertex_array_[i*2];
-      pt2.y = vertex_array_[i*2 + 1];
-      pt3.x = vertex_array_[i*2 + 2];
-      pt3.y = vertex_array_[i*2 + 3];
-      if (or2d(pt1, pt2, pt3) != -1)
+      pt2 = vertices_[i];
+      pt3 = vertices_[i+1];
+      if (orient2d(pt1, pt2, pt3) != 1)
         return false;
     }
     // special check for last edge
-    pt2.x = vertex_array_[2 * vertex_count_ - 2];
-    pt2.y = vertex_array_[2 * vertex_count_ - 1];
-    pt3.x = vertex_array_[0];
-    pt3.y = vertex_array_[1];
-    if (or2d(pt1, pt2, pt3) != -1)
+    pt2 = vertices_[num_vertices_ - 1];
+    pt3 = vertices_[0];
+    if (orient2d(pt1, pt2, pt3) != 1)
       return false;
     return true;
   }
