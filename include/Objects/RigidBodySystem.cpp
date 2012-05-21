@@ -55,6 +55,9 @@ namespace Rigid2D {
     }
   }
 
+	// Perform collision detection between all pairs of rigid bodies without
+	// duplicating work.  Given n Rigid Bodies, we call RigidBody::checkCollision()
+	// "n choose 2" times.
   void RigidBodySystem::checkCollision()
   {
     unordered_set<RigidBody*>::iterator it1;

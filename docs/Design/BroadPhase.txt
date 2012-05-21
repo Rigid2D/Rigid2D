@@ -1,0 +1,7 @@
+BroadPhase will be used to quickly determine which pairs of RigidBodies
+are definitely not intersecting.
+
+BroadPhase::detect(RigidBody *rb1, RigidBody *rb2){
+  // Transform rb2->AABB into the local coordinate space of rb1.
+
+}

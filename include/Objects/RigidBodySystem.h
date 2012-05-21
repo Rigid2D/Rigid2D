@@ -59,7 +59,7 @@ namespace Rigid2D
        */
       void removeRigidBodies (RigidBody **rigidBodyArray, unsigned int numBodies);
 
-      // tells an RB if it's colliding with another RB
+			/// Perform collision detection between all pairs of rigid bodies.
       void checkCollision();
 
     private:
