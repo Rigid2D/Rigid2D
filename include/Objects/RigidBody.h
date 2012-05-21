@@ -251,7 +251,7 @@ namespace Rigid2D
       std::unordered_set<Force*> forces_;     // all forces being applied to this RB
 
       // Geometry
-      unsigned int num_vertices_;             // Number of vertices that make up the paremter of RigidBody.
+      unsigned int num_vertices_;             // Number of vertices that make up the perimeter of RigidBody.
 			Vector2 *vertices_;	                    // Collection of Vector2 objects representing the vertices that compose the RigidBody.
       AABB staticBB_;                         // local space, does not change
       AABB worldBB_;                          // world space, changes, used for broadPhase

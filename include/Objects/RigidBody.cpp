@@ -85,7 +85,7 @@ namespace Rigid2D
     prevState_ = state_;
     state_ = result;
 
-    // Add in damping to stop Rigid Bodies in motion
+    // Add in dampening to stop Rigid Bodies in motion
     state_.angularMomentum *= (1 - 0.005);
     state_.linearMomentum *= (1 - 0.005);
 
