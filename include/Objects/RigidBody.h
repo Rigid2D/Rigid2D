@@ -238,7 +238,7 @@ namespace Rigid2D
                       Angle orientation);
 
     protected:
-      RBState state_;                         // Position, momentum
+      RBState state_;
       RBState prevState_;                     // The state last frame
       Vector2 velocity_;                      // Velocity of center of mass (implicitly calculated)
       Real mass_;                             // Object mass

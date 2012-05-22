@@ -64,7 +64,7 @@ namespace Rigid2D
 
     private:
       std::unordered_set<RigidBody*> rigidBodies_;   // Collection of all tracked rigid bodies
-      Real time_;  // Simulation clock
+      Real time_;                                    // Simulation clock
 	};
 
 }
