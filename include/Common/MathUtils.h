@@ -8,7 +8,7 @@
 namespace Rigid2D
 {
   // Given points A, B, and C, if orient2d(A,B,C) > 0, C lies to the left of the
-  // directed lien AB, and the triangle ABC is oriented counterclockwise.  If
+  // directed line AB, and the triangle ABC is oriented counterclockwise.  If
   // orient2d(A,B,C) < 0, C lies to the right of the directed line AB, and the
   // triangle ABC is oriented clockwise.  When orient2d(A,B,C) = 0, the three
   // points are collinear.
