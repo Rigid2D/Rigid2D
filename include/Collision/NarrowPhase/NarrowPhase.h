@@ -12,12 +12,12 @@ namespace Rigid2D {
       RigidBody *b;	            // Incident body that body a is colliding with.
       Vector2 msv; 	            // Minimum separation vector, for translating a out of b.
 
-      // Each Rigid Body contains a vertice list, and the following indices
-      // allow us to keep track of specific vertices involved in the contact,
+      // Each Rigid Body contains a vertex list, and the following indices
+      // allow us to keep track of specific vertices involved in the contact
       // at various points in time.
-      unsigned int va_index;    // Vertice index for vertex of a that is contained in b.
-      unsigned int vb1_index; 	// Vertice index for first vertex that composes contact edge of b.
-      unsigned int vb2_index; 	// Vertice index for second vertex that composes contact edge of b.
+      unsigned int va_index;    // Vertex index for vertex of a that is contained in b.
+      unsigned int vb1_index; 	// Vertex index for first vertex that composes contact edge of b.
+      unsigned int vb2_index; 	// Vertex index for second vertex that composes contact edge of b.
 
       // TODO: implement constructor, accessors, and mutators.
   };
