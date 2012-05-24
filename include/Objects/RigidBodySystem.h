@@ -13,7 +13,10 @@ namespace Rigid2D
       RigidBodySystem();
       ~RigidBodySystem();
 
-      /** Calls each RigidBody's update method */
+      /** Calls each RigidBody's update method.  Each Rigid Body is moved
+       * sequentially one at a time.  This speeds up the simulation at the cost
+       * of some small physical inaccuracies.
+       */
       void update();
 
       /**
