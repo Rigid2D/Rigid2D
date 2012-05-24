@@ -147,6 +147,7 @@ namespace Rigid2D
   void RigidBody::update()
   {
     bp_isIntersecting_ = false;
+    np_isIntersecting_ = false;
     RBState result;
     RBSolver::nextStep(*this, result);
     prevState_ = state_;
@@ -352,10 +353,61 @@ namespace Rigid2D
     return false;
   }
 
-  bool RigidBody::narrowPhase(RigidBody *rb)
+  Real RigidBody::findSlope(const Vector2 & v1, const Vector2 & v2) const
   {
-    /*
-    // Use the Separation Axis Theorem to find distance between
+    Real deltaX = v2.x - v1.x;
+    Real deltaY = v2.y - v1.y;
+
+    // find perpendicular slope of edge
+    if (feq(deltaY, 0) && feq(deltaX, 0)) {   // repeating vertex
+      return 0/0; // TODO should throw invalid parameter exception
+    } else if (feq(deltaY, 0)) {              // horizontal line
+      return std::numeric_limits<Real>::infinity();
+    } else if (feq(deltaX, 0)) {              // vertical line
+      return 0;
+    } else {
+      return -deltaX/deltaY;
+    }
+  }
+
+  Real RigidBody::projectPointOnSlope(const Vector2 & point, Real slope) const
+  {
+    Real position;
+    if (feq(slope, 0)) {
+      position = point.x;
+    } else if (slope == std::numeric_limits<Real>::infinity()) {
+      position = point.y;
+    } else {
+      position = (point.x + point.y / slope);
+      //?position /= axis_length;
+    }
+    return position;
+  }
+
+  Vector2 RigidBody::findProjectionInterval(Real slope) const
+  {
+    Vector2 interval;     // stores left and right most projected positions
+    Real position;
+
+    // project each vertex on given slope
+    for (unsigned j = 0; j < num_vertices_; j++) {
+      position = projectPointOnSlope(vertices_[j], slope);
+      if (j == 0) {              // set inital values, can we eliminate this?
+        interval[0] = position;
+        interval[1] = position;
+      } else {                  // update min/max interval values
+        if (position < interval[0]) {
+          interval[0] = position;
+        } else if (position > interval[1]) {
+          interval[1] = position;
+        }
+      }
+    }
+    return interval;
+  }
+
+  bool RigidBody::narrowPhase(RigidBody *rb, bool firstRB)
+  {
     // two polygons. The steps are as follows:
     // 1) For each edge of both polygons find perpendicular
     // 2) Project all vertices into this perpendicular axis
@@ -364,81 +416,39 @@ namespace Rigid2D
     // 4) If for every 'edge-axis' projected intervals overlap,
     // there is a collision, otherwise there isn't
 
-    // extremum points for the intervals of each RB
-    Real min1, max1, min2, max2;
+    // extrema points for the projected intervals of each RB
+    Vector2 intervalRB1, intervalRB2;
 
     Real axis_slope, axis_length;
-    Real deltaX, deltaY, pos;
 
-    // SAT for edges of "this" RB
-    for (int i = 0; i < num_vertices_-1; i++) {
-      deltaX = vertex_array_[i*2 + 2] - vertex_array_[i*2];
-      deltaY = vertex_array_[i*2 + 1] - vertex_array_[i*2 + 3];
+    // SAT for edges of this RB
+    for (int i = 0; i < num_vertices_; i++) {
+      axis_slope = atan(findSlope(vertices_[i], vertices_[(i+1) % num_vertices_]));
+      axis_slope += state_.orientation;
+      axis_slope = tan(axis_slope);
+      printf("edge:slope  %d   %f\n", i, axis_slope);
+      //?axis_length = sqrt(1 + axis_slope * axis_slope);
 
-      // find perpendicular slope of edge
-      if (deltaY == 0) {
-        if (deltaX == 0) {        // repeating vertex
-          continue;
-        } else {                  // horizontal line
-          axis_slope = std::numeric_limits<Real>::infinity();
-        }
-      } else if (deltaX == 0) {   // vertical line
-        axis_slope = 0;
-      } else {
-        axis_slope = -deltaX/deltaY;
+      intervalRB1 = findProjectionInterval(axis_slope);
+      intervalRB2 = rb->findProjectionInterval(axis_slope);
+      // if no intersection, we are done
+      if (intervalRB1[1] < intervalRB2[0] ||
+          intervalRB1[0] > intervalRB2[1]) {
+        return false;
       }
+      // store min intersection for MSV?
+      //
+    }
 
-      axis_length = sqrt(1 + axis_slope * axis_slope);
-
-      // project each vertex of "this" RB
-      for (int j = 0; j < num_vertices_; j++) {
-        if (axis_slope == 0) {
-          pos = vertex_array_[j*2];
-        } else if (axis_slope == std::numeric_limits<Real>::infinity()) {
-          pos = vertex_array_[j*2 + 1];
-        } else {
-          pos = (vertex_array_[j*2] + vertex_array_[j*2 + 1] * axis_slope);
-          pos /= axis_length;
-        }
-
-       if (j == 0) {              // set inital values, can we eliminate this?
-          min1 = pos;
-          max1 = pos;
-        } else {                  // update min/max interval values
-          if (pos > max1) {
-            max1 = pos;
-          } else if (pos < min1) {
-            min1 = pos;
-          }
-        }
-      }
-
-      // project each vertex of other RB
-      for (int j = 0; j < rb->num_vertices_; j++) {
-        if (axis_slope == 0) {
-          pos = rb->vertex_array_[j*2];
-        } else if (axis_slope == std::numeric_limits<Real>::infinity()) {
-          pos = rb->vertex_array_[j*2 + 1];
-        } else {
-          pos = (rb->vertex_array_[j*2] + rb->vertex_array_[j*2 + 1] * axis_slope);
-          pos /= axis_length;
-        }
-
-       if (j == 0) {              // set inital values, can we eliminate this?
-          min2 = pos;
-          max2 = pos;
-        } else {                  // update min/max interval values
-          if (pos > max2) {
-            max2 = pos;
-          } else if (pos < min2) {
-            min2 = pos;
-          }
-        }
-      }
-
-    }*/
-    return false;
+    if (firstRB) {
+      return rb->narrowPhase(this, false);
+    } else {
+      np_isIntersecting_ = true;
+      rb->np_isIntersecting_ = true;
+      return true;
+    }
   }
+
 
   bool RigidBody::pointIsInterior(Real x, Real y)
   {

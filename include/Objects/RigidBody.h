@@ -170,7 +170,7 @@ namespace Rigid2D
       bool broadPhase(RigidBody *rb);
 
       /** Check for exact intersection. Called after broadPhase returns true. */
-      bool narrowPhase(RigidBody *rb);
+      bool narrowPhase(RigidBody *rb, bool firstRB = true);
 
     private:
       void initialize(unsigned int num_vertices,
@@ -179,6 +179,10 @@ namespace Rigid2D
                       Real mass,
                       Vector2 const &velocity,
                       Angle orientation);
+
+    Real findSlope(const Vector2 & v1, const Vector2 & v2) const;
+    Real projectPointOnSlope(const Vector2 & point, Real slope) const;
+    Vector2 findProjectionInterval(Real slope) const;
 
     protected:
       RBState state_;                         // Position, momentum
