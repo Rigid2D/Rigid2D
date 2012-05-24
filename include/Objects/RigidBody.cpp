@@ -123,6 +123,7 @@ namespace Rigid2D
           "vertices must be given in counter-clockwise order so that signed-area of vertices is positive.");
     }
 
+    transformed_vertices_ = new Vector2 [num_vertices];
     state_.position = position;
     state_.linearMomentum = velocity * mass;
     state_.orientation = orientation;
@@ -342,6 +343,28 @@ namespace Rigid2D
     return result;
   }
 
+  Vector2 RigidBody::localToWorldTransform(const Vector2 & point) const
+  {
+    // TODO: compare to worldtolocal
+    Vector2 result;
+    result = point;
+
+    Real cos_theta = cos(state_.orientation);
+    Real sin_theta = sin(state_.orientation);
+
+    result.x = cos_theta * point.x - sin_theta * point.y;
+    result.y = sin_theta * point.x + cos_theta * point.y;
+
+    result += state_.position;
+    return result;
+  }
+
+  void RigidBody::updateTransformedVertices() const {
+    for (unsigned i = 0; i < num_vertices_; i++) {
+      transformed_vertices_[i] = localToWorldTransform(vertices_[i]);
+    }
+  }
+
   bool RigidBody::broadPhase(RigidBody *rb)
   {
     if (worldBB_.isIntersecting(*(rb->getWorldBB()))) {
@@ -349,54 +372,23 @@ namespace Rigid2D
       rb->bp_isIntersecting_ = true;
       return true;
     }
-
     return false;
   }
 
-  Real RigidBody::findSlope(const Vector2 & v1, const Vector2 & v2) const
-  {
-    Real deltaX = v2.x - v1.x;
-    Real deltaY = v2.y - v1.y;
-
-    // find perpendicular slope of edge
-    if (feq(deltaY, 0) && feq(deltaX, 0)) {   // repeating vertex
-      return 0/0; // TODO should throw invalid parameter exception
-    } else if (feq(deltaY, 0)) {              // horizontal line
-      return std::numeric_limits<Real>::infinity();
-    } else if (feq(deltaX, 0)) {              // vertical line
-      return 0;
-    } else {
-      return -deltaX/deltaY;
-    }
-  }
-
-  Real RigidBody::projectPointOnSlope(const Vector2 & point, Real slope) const
-  {
-    Real position;
-    if (feq(slope, 0)) {
-      position = point.x;
-    } else if (slope == std::numeric_limits<Real>::infinity()) {
-      position = point.y;
-    } else {
-      position = (point.x + point.y / slope);
-      //?position /= axis_length;
-    }
-    return position;
-  }
-
-  Vector2 RigidBody::findProjectionInterval(Real slope) const
+  Vector2 RigidBody::findProjectionInterval(const Vector2 & normal) const
   {
     Vector2 interval;     // stores left and right most projected positions
     Real position;
 
     // project each vertex on given slope
     for (unsigned j = 0; j < num_vertices_; j++) {
-      position = projectPointOnSlope(vertices_[j], slope);
+      position = normal.dot(transformed_vertices_[j]);
       if (j == 0) {              // set inital values, can we eliminate this?
         interval[0] = position;
         interval[1] = position;
       } else {                  // update min/max interval values
         if (position < interval[0]) {
+          printf("%f\n", position);
           interval[0] = position;
         } else if (position > interval[1]) {
           interval[1] = position;
@@ -408,32 +400,28 @@ namespace Rigid2D
 
   bool RigidBody::narrowPhase(RigidBody *rb, bool firstRB)
   {
-    // two polygons. The steps are as follows:
-    // 1) For each edge of both polygons find perpendicular
-    // 2) Project all vertices into this perpendicular axis
-    // 3) If the projected interval of p1 and p2 don't overlap, 
-    // there is no collision, otherwise continue
-    // 4) If for every 'edge-axis' projected intervals overlap,
-    // there is a collision, otherwise there isn't
+    // TODO: add comment
 
     // extrema points for the projected intervals of each RB
     Vector2 intervalRB1, intervalRB2;
 
-    Real axis_slope, axis_length;
+    if (firstRB) {
+      updateTransformedVertices();
+      rb->updateTransformedVertices();
+    }
 
     // SAT for edges of this RB
     for (int i = 0; i < num_vertices_; i++) {
-      axis_slope = atan(findSlope(vertices_[i], vertices_[(i+1) % num_vertices_]));
-      axis_slope += state_.orientation;
-      axis_slope = tan(axis_slope);
-      printf("edge:slope  %d   %f\n", i, axis_slope);
-      //?axis_length = sqrt(1 + axis_slope * axis_slope);
+      Vector2 normal = (transformed_vertices_[(i+1) % num_vertices_] - transformed_vertices_[i]).perp();
+      normal.normalize();
 
-      intervalRB1 = findProjectionInterval(axis_slope);
-      intervalRB2 = rb->findProjectionInterval(axis_slope);
+      intervalRB1 = findProjectionInterval(normal);
+      intervalRB2 = rb->findProjectionInterval(normal);
+      printf("%f   %f\n", intervalRB1[0], intervalRB2[1]);
       // if no intersection, we are done
       if (intervalRB1[1] < intervalRB2[0] ||
           intervalRB1[0] > intervalRB2[1]) {
+        printf("FALSE\n");
         return false;
       }
       // store min intersection for MSV?

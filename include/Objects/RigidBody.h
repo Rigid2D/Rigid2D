@@ -157,6 +157,10 @@ namespace Rigid2D
       /* Transform point in previous frame world space to current frame local space. */
       Vector2 worldToLocalTransform(const Vector2 & point) const;
 
+      Vector2 localToWorldTransform(const Vector2 & point) const;
+  
+      void updateTransformedVertices() const;
+
       unsigned int getNumVertices() const;
 
       Vector2 const * getVertices() const;
@@ -180,9 +184,7 @@ namespace Rigid2D
                       Vector2 const &velocity,
                       Angle orientation);
 
-    Real findSlope(const Vector2 & v1, const Vector2 & v2) const;
-    Real projectPointOnSlope(const Vector2 & point, Real slope) const;
-    Vector2 findProjectionInterval(Real slope) const;
+    Vector2 findProjectionInterval(const Vector2 & slope) const;
 
     protected:
       RBState state_;                         // Position, momentum
@@ -200,6 +202,7 @@ namespace Rigid2D
       // Geometry
       unsigned int num_vertices_;             // Number of vertices that make up the paremter of RigidBody.
 			Vector2 *vertices_;	                    // Collection of Vector2 objects representing the vertices that compose the RigidBody.
+      Vector2 *transformed_vertices_;         // All the vertices in world space; updated on request
       AABB staticBB_;                         // local space, does not change
       AABB worldBB_;                          // world space, changes, used for broadPhase
       bool bp_isIntersecting_;                // is the body colliding in broadPhase

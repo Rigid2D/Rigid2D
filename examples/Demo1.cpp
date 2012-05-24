@@ -97,7 +97,7 @@ void Demo1::paintGL()
   glPushMatrix();
   bb = body2->getWorldBB();
   bb2 = body2->getStaticBB();
-  if (body2->bp_isIntersecting()) {
+  if (body2->np_isIntersecting()) {
     glColor3ub(180,50,50);
   } else {
     glColor3ub(50,50,180);
