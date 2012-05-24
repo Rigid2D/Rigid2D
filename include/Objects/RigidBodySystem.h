@@ -13,7 +13,10 @@ namespace Rigid2D
       RigidBodySystem();
       ~RigidBodySystem();
 
-      /** Calls each RigidBody's update method */
+      /** Calls each RigidBody's update method.  Each Rigid Body is moved
+       * sequentially one at a time.  This speeds up the simulation at the cost
+       * of some small physical inaccuracies.
+       */
       void update();
 
       /**
@@ -59,12 +62,12 @@ namespace Rigid2D
        */
       void removeRigidBodies (RigidBody **rigidBodyArray, unsigned int numBodies);
 
-      // tells an RB if it's colliding with another RB
+			/// Perform collision detection between all pairs of rigid bodies.
       void checkCollision();
 
     private:
       std::unordered_set<RigidBody*> rigidBodies_;   // Collection of all tracked rigid bodies
-      Real time_;  // Simulation clock
+      Real time_;                                    // Simulation clock
 	};
 
 }

@@ -154,7 +154,7 @@ namespace Rigid2D
     prevState_ = state_;
     state_ = result;
 
-    // Add in damping to stop Rigid Bodies in motion
+    // Add in dampening to stop Rigid Bodies in motion
     state_.angularMomentum *= (1 - 0.005);
     state_.linearMomentum *= (1 - 0.005);
 
@@ -481,7 +481,9 @@ namespace Rigid2D
     x = xtemp;
     y = ytemp;
 
-    // Go through all the edges calculating orient2d(Mouse, pt1, pt2)
+    // Go through all the edges calculating orient2d(pt1, pt2, pt3), where pt1
+    // is the point composed of arguments x and y, and the points pt2 and pt3
+    // cycle through all vertices of calling object.
     Vector2 pt1, pt2, pt3;
     pt1.x = x;
     pt1.y = y;

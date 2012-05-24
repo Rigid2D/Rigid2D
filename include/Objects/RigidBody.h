@@ -5,7 +5,7 @@
 #include "Common/MathUtils.h"
 #include "Common/Vector2.h"
 #include "Objects/Force.h"
-#include "Objects/AABB.h"
+#include "Collision/BroadPhase/AABB.h"
 #include <unordered_set>
 #include <cmath>
 
@@ -187,7 +187,7 @@ namespace Rigid2D
     Vector2 findProjectionInterval(const Vector2 & slope) const;
 
     protected:
-      RBState state_;                         // Position, momentum
+      RBState state_;
       RBState prevState_;                     // The state last frame
       Vector2 velocity_;                      // Velocity of center of mass (implicitly calculated)
       Real mass_;                             // Object mass
@@ -200,7 +200,7 @@ namespace Rigid2D
       std::unordered_set<Force*> forces_;     // all forces being applied to this RB
 
       // Geometry
-      unsigned int num_vertices_;             // Number of vertices that make up the paremter of RigidBody.
+      unsigned int num_vertices_;             // Number of vertices that make up the perimeter of RigidBody.
 			Vector2 *vertices_;	                    // Collection of Vector2 objects representing the vertices that compose the RigidBody.
       Vector2 *transformed_vertices_;         // All the vertices in world space; updated on request
       AABB staticBB_;                         // local space, does not change
