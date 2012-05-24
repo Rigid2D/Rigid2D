@@ -399,10 +399,13 @@ namespace Rigid2D
 
   bool RigidBody::narrowPhase(RigidBody *rb, bool firstRB)
   {
-    // TODO: add comment
+    // TODO: add explanation
 
     // extrema points for the projected intervals of each RB
     Vector2 intervalRB1, intervalRB2;
+    Vector2 min_interval;         // ends up being direction of MTV
+    Real min_overlap = 10000000;  // ends up being magnitude of MTV
+                                  // TODO: choose a sexier value
 
     if (firstRB) {
       updateTransformedVertices();
@@ -410,7 +413,7 @@ namespace Rigid2D
     }
 
     // SAT for edges of this RB
-    for (int i = 0; i < num_vertices_; i++) {
+    for (unsigned i = 0; i < num_vertices_; i++) {
       Vector2 normal = (transformed_vertices_[(i+1) % num_vertices_] - transformed_vertices_[i]).perp();
       normal.normalize();
 
@@ -421,8 +424,37 @@ namespace Rigid2D
           intervalRB1[0] > intervalRB2[1]) {
         return false;
       }
-      // store min intersection for MSV?
-      //
+      // store min intersection for MTV
+      // TODO: optimize with above if statement and fix ugliness
+      if (intervalRB1[1] < intervalRB2[1] &&
+          intervalRB1[0] < intervalRB2[0]) {
+        if (intervalRB1[1] - intervalRB2[0] < min_overlap) {
+          min_overlap = intervalRB1[1] - intervalRB2[0];
+          min_interval = normal;
+        }
+      }
+      else if ( intervalRB1[1] > intervalRB2[1] &&
+          intervalRB1[0] > intervalRB2[0]) 
+      {
+        if (intervalRB2[1] - intervalRB1[0] < min_overlap) {
+          min_overlap = intervalRB2[1] - intervalRB1[0];
+          min_interval = normal;
+        }
+      }
+      else if ( intervalRB1[1] > intervalRB2[1] &&
+          intervalRB1[0] < intervalRB2[0]) 
+      {
+        if (intervalRB2[1] - intervalRB2[0] < min_overlap) {
+          min_overlap = intervalRB2[1] - intervalRB2[0];
+          min_interval = normal;
+        }
+      }
+      else {
+        if (intervalRB1[1] - intervalRB1[0] < min_overlap) {
+          min_overlap = intervalRB2[1] - intervalRB1[0];
+          min_interval = normal;
+        }
+      }
     }
 
     if (firstRB) {
