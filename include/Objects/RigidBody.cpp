@@ -388,7 +388,6 @@ namespace Rigid2D
         interval[1] = position;
       } else {                  // update min/max interval values
         if (position < interval[0]) {
-          printf("%f\n", position);
           interval[0] = position;
         } else if (position > interval[1]) {
           interval[1] = position;
@@ -417,11 +416,9 @@ namespace Rigid2D
 
       intervalRB1 = findProjectionInterval(normal);
       intervalRB2 = rb->findProjectionInterval(normal);
-      printf("%f   %f\n", intervalRB1[0], intervalRB2[1]);
       // if no intersection, we are done
       if (intervalRB1[1] < intervalRB2[0] ||
           intervalRB1[0] > intervalRB2[1]) {
-        printf("FALSE\n");
         return false;
       }
       // store min intersection for MSV?
@@ -436,7 +433,6 @@ namespace Rigid2D
       return true;
     }
   }
-
 
   bool RigidBody::pointIsInterior(Real x, Real y)
   {
