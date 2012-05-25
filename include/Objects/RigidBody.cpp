@@ -8,6 +8,73 @@
 
 namespace Rigid2D
 {
+  void RBState::operator *= (Real scalar)
+  {
+      position *= scalar;
+      linearMomentum *= scalar;
+      orientation *= scalar;
+      angularMomentum *= scalar;
+  }
+
+  void RBState::operator /= (Real scalar)
+  {
+    position /= scalar;
+    linearMomentum /= scalar;
+    orientation /= scalar;
+    angularMomentum /= scalar;
+  }
+
+  RBState RBState::operator + (const RBState & s) const
+  {
+    return RBState(position + s.position,
+                   linearMomentum + s.linearMomentum,
+                   orientation + s.orientation,
+                   angularMomentum + s.angularMomentum);
+  }
+
+  RBState RBState::operator - (const RBState & s) const
+  {
+    return RBState(position - s.position,
+                   linearMomentum - s.linearMomentum,
+                   orientation - s.orientation,
+                   angularMomentum - s.angularMomentum);
+  }
+
+  RBState RBState::operator * (const Real scalar) const
+  {
+    return RBState(position * scalar,
+                   linearMomentum * scalar,
+                   orientation * scalar,
+                   angularMomentum * scalar);
+  }
+
+  RBState operator * (const Real scalar, const RBState &state)
+  {
+    return state * scalar;
+  }
+
+  RBState RBState::operator / (const Real scalar) const
+  {
+    assert(feq(scalar, 0.0) == false);
+    return RBState(position / scalar,
+                   linearMomentum / scalar,
+                   orientation / scalar,
+                   angularMomentum / scalar);
+  }
+
+  void RBState::operator = (const RBState & other)
+  {
+    position = other.position;
+    linearMomentum = other.linearMomentum;
+    angularMomentum = other.angularMomentum;
+    orientation = other.orientation;
+  }
+
+  void RBState::normalizeOrientAngle()
+  {
+    orientation = fmod(orientation, TAU);
+  }
+
 
   RigidBody::RigidBody(unsigned int num_vertices,
                        Real const *vertex_array,
@@ -56,6 +123,7 @@ namespace Rigid2D
           "vertices must be given in counter-clockwise order so that signed-area of vertices is positive.");
     }
 
+    transformed_vertices_ = new Vector2 [num_vertices];
     state_.position = position;
     state_.linearMomentum = velocity * mass;
     state_.orientation = orientation;
@@ -80,6 +148,7 @@ namespace Rigid2D
   void RigidBody::update()
   {
     bp_isIntersecting_ = false;
+    np_isIntersecting_ = false;
     RBState result;
     RBSolver::nextStep(*this, result);
     prevState_ = state_;
@@ -274,6 +343,28 @@ namespace Rigid2D
     return result;
   }
 
+  Vector2 RigidBody::localToWorldTransform(const Vector2 & point) const
+  {
+    // TODO: compare to worldtolocal
+    Vector2 result;
+    result = point;
+
+    Real cos_theta = cos(state_.orientation);
+    Real sin_theta = sin(state_.orientation);
+
+    result.x = cos_theta * point.x - sin_theta * point.y;
+    result.y = sin_theta * point.x + cos_theta * point.y;
+
+    result += state_.position;
+    return result;
+  }
+
+  void RigidBody::updateTransformedVertices() const {
+    for (unsigned i = 0; i < num_vertices_; i++) {
+      transformed_vertices_[i] = localToWorldTransform(vertices_[i]);
+    }
+  }
+
   bool RigidBody::broadPhase(RigidBody *rb)
   {
     if (worldBB_.isIntersecting(*(rb->getWorldBB()))) {
@@ -281,97 +372,98 @@ namespace Rigid2D
       rb->bp_isIntersecting_ = true;
       return true;
     }
-
     return false;
   }
 
-  bool RigidBody::narrowPhase(RigidBody *rb)
+  Vector2 RigidBody::findProjectionInterval(const Vector2 & normal) const
   {
-    /*
-    // Use the Separation Axis Theorem to find distance between
-    // two polygons. The steps are as follows:
-    // 1) For each edge of both polygons find perpendicular
-    // 2) Project all vertices into this perpendicular axis
-    // 3) If the projected interval of p1 and p2 don't overlap, 
-    // there is no collision, otherwise continue
-    // 4) If for every 'edge-axis' projected intervals overlap,
-    // there is a collision, otherwise there isn't
+    Vector2 interval;     // stores left and right most projected positions
+    Real position;
 
-    // extremum points for the intervals of each RB
-    Real min1, max1, min2, max2;
-
-    Real axis_slope, axis_length;
-    Real deltaX, deltaY, pos;
-
-    // SAT for edges of "this" RB
-    for (int i = 0; i < num_vertices_-1; i++) {
-      deltaX = vertex_array_[i*2 + 2] - vertex_array_[i*2];
-      deltaY = vertex_array_[i*2 + 1] - vertex_array_[i*2 + 3];
-
-      // find perpendicular slope of edge
-      if (deltaY == 0) {
-        if (deltaX == 0) {        // repeating vertex
-          continue;
-        } else {                  // horizontal line
-          axis_slope = std::numeric_limits<Real>::infinity();
-        }
-      } else if (deltaX == 0) {   // vertical line
-        axis_slope = 0;
-      } else {
-        axis_slope = -deltaX/deltaY;
-      }
-
-      axis_length = sqrt(1 + axis_slope * axis_slope);
-
-      // project each vertex of "this" RB
-      for (int j = 0; j < num_vertices_; j++) {
-        if (axis_slope == 0) {
-          pos = vertex_array_[j*2];
-        } else if (axis_slope == std::numeric_limits<Real>::infinity()) {
-          pos = vertex_array_[j*2 + 1];
-        } else {
-          pos = (vertex_array_[j*2] + vertex_array_[j*2 + 1] * axis_slope);
-          pos /= axis_length;
-        }
-
-       if (j == 0) {              // set inital values, can we eliminate this?
-          min1 = pos;
-          max1 = pos;
-        } else {                  // update min/max interval values
-          if (pos > max1) {
-            max1 = pos;
-          } else if (pos < min1) {
-            min1 = pos;
-          }
+    // project each vertex on given slope
+    for (unsigned j = 0; j < num_vertices_; j++) {
+      position = normal.dot(transformed_vertices_[j]);
+      if (j == 0) {              // set inital values, can we eliminate this?
+        interval[0] = position;
+        interval[1] = position;
+      } else {                  // update min/max interval values
+        if (position < interval[0]) {
+          interval[0] = position;
+        } else if (position > interval[1]) {
+          interval[1] = position;
         }
       }
-
-      // project each vertex of other RB
-      for (int j = 0; j < rb->num_vertices_; j++) {
-        if (axis_slope == 0) {
-          pos = rb->vertex_array_[j*2];
-        } else if (axis_slope == std::numeric_limits<Real>::infinity()) {
-          pos = rb->vertex_array_[j*2 + 1];
-        } else {
-          pos = (rb->vertex_array_[j*2] + rb->vertex_array_[j*2 + 1] * axis_slope);
-          pos /= axis_length;
-        }
-
-       if (j == 0) {              // set inital values, can we eliminate this?
-          min2 = pos;
-          max2 = pos;
-        } else {                  // update min/max interval values
-          if (pos > max2) {
-            max2 = pos;
-          } else if (pos < min2) {
-            min2 = pos;
-          }
-        }
-      }
-
     }
-    */
-    return false;
+    return interval;
+  }
+
+  bool RigidBody::narrowPhase(RigidBody *rb, bool firstRB)
+  {
+    // TODO: add explanation
+
+    // extrema points for the projected intervals of each RB
+    Vector2 intervalRB1, intervalRB2;
+    Vector2 min_interval;         // ends up being direction of MTV
+    Real min_overlap = 10000000;  // ends up being magnitude of MTV
+                                  // TODO: choose a sexier value
+
+    if (firstRB) {
+      updateTransformedVertices();
+      rb->updateTransformedVertices();
+    }
+
+    // SAT for edges of this RB
+    for (unsigned i = 0; i < num_vertices_; i++) {
+      Vector2 normal = (transformed_vertices_[(i+1) % num_vertices_] - transformed_vertices_[i]).perp();
+      normal.normalize();
+
+      intervalRB1 = findProjectionInterval(normal);
+      intervalRB2 = rb->findProjectionInterval(normal);
+      // if no intersection, we are done
+      if (intervalRB1[1] < intervalRB2[0] ||
+          intervalRB1[0] > intervalRB2[1]) {
+        return false;
+      }
+      // store min intersection for MTV
+      // TODO: optimize with above if statement and fix ugliness
+      if (intervalRB1[1] < intervalRB2[1] &&
+          intervalRB1[0] < intervalRB2[0]) {
+        if (intervalRB1[1] - intervalRB2[0] < min_overlap) {
+          min_overlap = intervalRB1[1] - intervalRB2[0];
+          min_interval = normal;
+        }
+      }
+      else if ( intervalRB1[1] > intervalRB2[1] &&
+          intervalRB1[0] > intervalRB2[0]) 
+      {
+        if (intervalRB2[1] - intervalRB1[0] < min_overlap) {
+          min_overlap = intervalRB2[1] - intervalRB1[0];
+          min_interval = normal;
+        }
+      }
+      else if ( intervalRB1[1] > intervalRB2[1] &&
+          intervalRB1[0] < intervalRB2[0]) 
+      {
+        if (intervalRB2[1] - intervalRB2[0] < min_overlap) {
+          min_overlap = intervalRB2[1] - intervalRB2[0];
+          min_interval = normal;
+        }
+      }
+      else {
+        if (intervalRB1[1] - intervalRB1[0] < min_overlap) {
+          min_overlap = intervalRB2[1] - intervalRB1[0];
+          min_interval = normal;
+        }
+      }
+    }
+
+    if (firstRB) {
+      return rb->narrowPhase(this, false);
+    } else {
+      np_isIntersecting_ = true;
+      rb->np_isIntersecting_ = true;
+      return true;
+    }
   }
 
   bool RigidBody::pointIsInterior(Real x, Real y)
