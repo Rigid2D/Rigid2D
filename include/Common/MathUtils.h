@@ -60,6 +60,8 @@ namespace Rigid2D
   // the point c.
   void ClosestPtPointSegment(Vector2 const &a, Vector2 const &b, Vector2 const &c, Vector2 &d);
 
+  // Returns the squared distance between the point c and the line segment
+  // whose end points are a and b.
   Real SqDistPointSegment(Vector2 const &a, Vector2 const &b, Vector2 const &c);
 }
 

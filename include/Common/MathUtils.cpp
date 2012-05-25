@@ -154,6 +154,7 @@ namespace Rigid2D
 
   // Parameterize the line segment ab with P(t) = a + t*(b - a).  The point d(t) = a + t * (b - a),
   // where t = (c - a) . n/|b - a|, with t in [0,1] and n = (b - a) / |b - a|.
+  // Algorithm by Christer Ericson.
   void ClosestPtPointSegment(Vector2 const &a, Vector2 const &b, Vector2 const &c, Vector2 &d) {
     Vector2 ab = b - a;
     // Project c onto ab, but defer dividing by ab.dot(ab).
@@ -176,6 +177,22 @@ namespace Rigid2D
         d = a + t * ab;
       }
     }
+  }
+
+  // Algorithm by Christer Ericson.
+  Real SqDistPointSegment(Vector2 const &a, Vector2 const &b, Vector2 const &c) {
+    Vector2 ab = b - a,
+            ac = c - a,
+            bc = c - b;
+    Real e = ac.dot(ab);
+
+    // Handle cases where c projects outside ab.
+    if (e <= 0.0f) return ac.dot(ac);
+    Real f = ab.dot(ab);
+    if (e >= f) return bc.dot(bc);
+
+    // Handle cases where c proejcts onto ab.
+    return ac.dot(ac) - (e * e / f);
   }
 
 } // end namespace Rigid2D

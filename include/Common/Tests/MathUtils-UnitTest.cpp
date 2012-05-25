@@ -350,3 +350,61 @@ TEST(ClosestPtPointSegment, within_interval_below){
   ClosestPtPointSegment(a, b, c, d);
   EXPECT_TRUE(d == Vector2(0.5,0));
 }
+
+//=============================================================================
+// SqDistPointSegment Tests
+//=============================================================================
+
+// Point c lies outside segment ab, is closest to point a, and is above ab.
+TEST(SqDistPointSegment, outside_interval_test1){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(-1,1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 2.0);
+}
+
+// Point c lies outside segment ab, is closest to point a, and is below ab.
+TEST(SqDistPointSegment, outside_interval_test2){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(-1, -1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 2.0);
+}
+
+// Point c lies outside segment ab, is closest to point b, and is above ab.
+TEST(SqDistPointSegment, outside_interval_test3){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(2, 1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 2.0);
+}
+
+// Point c lies outside segment ab, is closest to point b, and is below ab.
+TEST(SqDistPointSegment, outside_interval_test4){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(2, -1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 2.0);
+}
+
+// Point c lies within segment ab, and is above ab.
+TEST(SqDistPointSegment, inside_interval_test1){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(0.5, 1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 1.0);
+}
+
+// Point c lies within segment ab, and is below ab.
+TEST(SqDistPointSegment, inside_interval_test2){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(0.5, -1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 1.0);
+}
