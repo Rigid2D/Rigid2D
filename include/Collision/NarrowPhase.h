@@ -33,11 +33,10 @@ namespace Rigid2D {
   bool sat(RigidBody *rb1, RigidBody *rb2, Contact &contact);
 
   // Time of Impact
-  // Determines the contact time of the two bodies referenced by the given
-  // Contact argument and rolls back their RBStates to this moment so that they
-  // are non-overlapping and are within a squared distance epsilon > 0 from one
-  // another.
-  void toi(Contact const &contact);
+  // Returns a value in (0,1) marking the fraction of frame time since the
+  // previous frame where bodies a and b are non-intersecting and are within a
+  // squared distance 𝜀 > 0 from one another.
+  Real toi(Contact const &contact);
 
   // Adjusts the linear velocities of the two Rigid Bodys referenced by the
   // given Contact arugment in order to simulate an elastic collision.

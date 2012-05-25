@@ -1,22 +1,28 @@
 #include "NarrowPhase.h"
 #include "Objects/RBSolver.h"
+#include "float.h" // for FLT_MAX
 
 using namespace Rigid2D;
 
-// Perform root finding method until body a is no longer contained in b
-// and are within some 𝜀 > 0 of touching.
+// We let time t = 0 at previous frame and t = 1 at current frame.  Our root
+// finding method is used to determine a value of t in (0,1), which represents
+// the fractional frame time starting from the previous frame, where body a is
+// no longer contained in b and bodies are within squared distnace 𝜀 > 0 of
+// touching.
 //
 // secant root finding method: t_{n+1} = t_n - d(t_n)*[(t_n - t_{n-1})/(d(t_n) - d(t_{n-1}))]
-// t: simulation time
+// t: fractional simulation time since previous frame.
 // d(t): distance between bodies a and b at time t.
-Real toi(Contact const &contact, Real current_simulation_time) {
+Real toi(Contact const &contact) {
   RigidBody *a = contact.a,
             *b = contact.b;
 
-  RBState state_a      = a->getState(),
-          state_a_prev = a->getPrevState(),
-          state_b      = b->getState(),
-          state_b_prev = b->getPrevState();
+  RBState state_a = a->getState(),  // current state of a, to be modified
+          state_b = b->getState(),  // current state of b, to be modified
+          state_tmp;
+
+  RBState const state_a_prev_frame = a->getPrevState(),
+          const state_b_prev_frame = b->getPrevState();
 
   unsigned int va_index   = contact.va_index,   // index of contact vertex for body a
                vb1_index  = contact.vb1_index,  // index for first vertex of contact edge for body b
@@ -27,67 +33,64 @@ Real toi(Contact const &contact, Real current_simulation_time) {
           vb2 = b->getVertex(vb2_index),
           v;    // temp variable
 
-  Real t_prev,  // t_{n-1}
-       t,       // t_n
-       d_prev,  // d(t_{n-1})
-       d,       // d(t_n)
+  Real t_prev = 0.0f,  // t_{n-1}
+       t      = 1.0f,  // t_n
+       d_prev,         // d(t_{n-1})
+       d,              // d(t_n)
        t_tmp,
        epsilon = 0.001f;
 
-  t = current_simulation_time;
-
-  // distance between a and b during current simulation time.
-  d = distance(state_a, state_b);
+  // Compute d, the distance between contact vertex and contact edge
+  // during the current frame.
 
   // transform vertex va from a's body space to world space.
-  v = a->getVertex(va_index);
-  v = a->toWorldSpace(v);
-  va.x = v.x;
-  va.y = v.y;
+  v = state_a->getVertex(va_index);
+  va = state_a->localToWorldTransform(v);
 
-  d_prev = distance(state_a_prev, state_b_prev);
-  t_prev = state_a_prev.getTime();
+  // transform vertex vb1 from b's body space to world space.
+  v = state_b->getVertex(vb1_index);
+  vb1 = state_b->localToWorldTransform(v);
 
+  // transform vertex vb2 from b's body space to world space.
+  v = state_b->getVertex(vb2_index);
+  vb2 = state_b->localToWorldTransform(v);
+
+  // compute squared distance from vertex va to edge (vb1, vb2).
+  d = SqDistPointSegment(va, vb1, vb2);
+
+
+  // Compute d_prev, the distance between contact vertex and contact edge
+  // during the previous frame.
+
+  // transform vertex va from a's body space to world space.
+  v = state_a_prev->getVertex(va_index);
+  va = state_a_prev->localToWorldTransform(v);
+
+  // transform vertex vb1 from b's body space to world space.
+  v = state_b_prev->getVertex(vb1_index);
+  vb1 = state_b_prev->localToWorldTransform(v);
+
+  // transform vertex vb2 from b's body space to world space.
+  v = state_b_prev->getVertex(vb2_index);
+  vb2 = state_b_prev->localToWorldTransform(v);
+
+  // compute squared distance from vertex va to edge (vb1, vb2).
+  d_prev = SqDistPointSegment(va, vb1, vb2);
+
+  // Only need to compute one distance d per loop
   while (d > epsilon || b->pointIsInterior(va.x, va.y)) {
     t_tmp = t;
 
-    // Compute t_{n+1}
+    // Compute next t value using secant method.
     t = t - d*((t - t_prev)/(d - d_prev));
 
     t_prev = t_tmp;
-
-    // Determine RigidBody states at time t.
-    state_a_prev = state_a;
-    state_b_prev = state_b;
-
-    RBSolver::nextStep(&a,         // rigid body
-                       state_a,    // outState
-                       t,          // start time, tIn
-                       t-t_prev,   // time step, dt
-                       NULL);      // tOut
-
-
-    RBSolver::nextStep(&b,         // rigid body
-                       state_b,    // outState
-                       t,          // start time, tIn
-                       t-t_prev,   // time step, dt
-                       NULL);      // tOut
-
-    a->setState(state_a);
-    b->setState(state_b);
-
-    // Update previous values
     d_prev = d;
-    t_prev = state_a_prev.getTime();
 
-    // Compute distance between a and b at new time.
-    d = distance(state_a, state_b);
+    // Update Rigid Body a by starting from the state state_a_prev_frame and advancing
+    // the ODESolver by the step size RBSolver::step_size * t.
 
-    // transform vertex va from a's body space to world space.
-    v = a->getVertex(va_index);
-    v = a->toWorldSpace(v);
-    va.x = v.x;
-    va.y = v.y;
+
   }
 
   return t;
