@@ -19,7 +19,7 @@ namespace Rigid2D
   {
     Vector2 position;
     Vector2 linearMomentum;
-    Angle orientation;         // radians.
+    Angle orientation;         // radians
     Real angularMomentum;
 
     RBState() {}
@@ -31,72 +31,15 @@ namespace Rigid2D
       orientation(orientation),
       angularMomentum(angularMomentum) { }
 
-    void operator *= (Real scalar)
-    {
-      position *= scalar;
-      linearMomentum *= scalar;
-      orientation *= scalar;
-      angularMomentum *= scalar;
-    }
-
-    void operator /= (Real scalar)
-    {
-      position /= scalar;
-      linearMomentum /= scalar;
-      orientation /= scalar;
-      angularMomentum /= scalar;
-    }
-
-    RBState operator + (const RBState & s) const
-    {
-      return RBState(position + s.position,
-                     linearMomentum + s.linearMomentum,
-                     orientation + s.orientation,
-                     angularMomentum + s.angularMomentum);
-    }
-
-    RBState operator - (const RBState & s) const
-    {
-      return RBState(position - s.position,
-                     linearMomentum - s.linearMomentum,
-                     orientation - s.orientation,
-                     angularMomentum - s.angularMomentum);
-    }
-
-    RBState operator * (const Real scalar) const
-    {
-      return RBState(position * scalar,
-                     linearMomentum * scalar,
-                     orientation * scalar,
-                     angularMomentum * scalar);
-    }
-
-    friend RBState operator * (const Real scalar, const RBState &state)
-    {
-      return state * scalar;
-    }
-
-    RBState operator / (const Real scalar) const
-    {
-      assert(feq(scalar, 0.0) == false);
-      return RBState(position / scalar,
-                     linearMomentum / scalar,
-                     orientation / scalar,
-                     angularMomentum / scalar);
-    }
-
-    void operator = (const RBState & other)
-    {
-      position = other.position;
-      linearMomentum = other.linearMomentum;
-      angularMomentum = other.angularMomentum;
-      orientation = other.orientation;
-    }
-
-    void normalizeOrientAngle()
-    {
-      orientation = fmod(orientation, TAU);
-    }
+    void operator *= (Real scalar);
+    void operator /= (Real scalar);
+    RBState operator + (const RBState & s) const;
+    RBState operator - (const RBState & s) const;
+    RBState operator * (const Real scalar) const;
+    friend RBState operator * (const Real scalar, const RBState &state);
+    RBState operator / (const Real scalar) const;
+    void operator = (const RBState & other);
+    void normalizeOrientAngle();
   };
 
 
@@ -214,6 +157,10 @@ namespace Rigid2D
       /* Transform point in previous frame world space to current frame local space. */
       Vector2 worldToLocalTransform(const Vector2 & point) const;
 
+      Vector2 localToWorldTransform(const Vector2 & point) const;
+  
+      void updateTransformedVertices() const;
+
       unsigned int getNumVertices() const;
 
       Vector2 const * getVertices() const;
@@ -227,7 +174,7 @@ namespace Rigid2D
       bool broadPhase(RigidBody *rb);
 
       /** Check for exact intersection. Called after broadPhase returns true. */
-      bool narrowPhase(RigidBody *rb);
+      bool narrowPhase(RigidBody *rb, bool firstRB = true);
 
     private:
       void initialize(unsigned int num_vertices,
@@ -236,6 +183,8 @@ namespace Rigid2D
                       Real mass,
                       Vector2 const &velocity,
                       Angle orientation);
+
+    Vector2 findProjectionInterval(const Vector2 & slope) const;
 
     protected:
       RBState state_;
@@ -253,6 +202,7 @@ namespace Rigid2D
       // Geometry
       unsigned int num_vertices_;             // Number of vertices that make up the perimeter of RigidBody.
 			Vector2 *vertices_;	                    // Collection of Vector2 objects representing the vertices that compose the RigidBody.
+      Vector2 *transformed_vertices_;         // All the vertices in world space; updated on request
       AABB staticBB_;                         // local space, does not change
       AABB worldBB_;                          // world space, changes, used for broadPhase
       bool bp_isIntersecting_;                // is the body colliding in broadPhase

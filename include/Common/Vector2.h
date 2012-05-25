@@ -119,6 +119,10 @@ namespace Rigid2D {
         x /= length;
         y /= length;
       }
+
+      Vector2 perp() const {
+        return Vector2(-y, x);
+      }
   };
 }
 #endif
