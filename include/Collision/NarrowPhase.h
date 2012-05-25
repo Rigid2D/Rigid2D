@@ -35,7 +35,7 @@ namespace Rigid2D {
   // Time of Impact
   // Determines the contact time of the two bodies referenced by the given
   // Contact argument and rolls back their RBStates to this moment so that they
-  // are non-overlapping and are within a distance epsilon > 0 from one
+  // are non-overlapping and are within a squared distance epsilon > 0 from one
   // another.
   void toi(Contact const &contact);
 

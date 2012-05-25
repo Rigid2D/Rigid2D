@@ -10,25 +10,29 @@ using namespace Rigid2D;
 // t: simulation time
 // d(t): distance between bodies a and b at time t.
 Real toi(Contact const &contact, Real current_simulation_time) {
-  epsilon = 0.001f;
-  RigidBody *a = contact.a;
-  RigidBody *b = contact.b;
-  RBState state_a = a->getState();
-  RBState state_a_prev = a->getPrevState();
-  RBState state_b = b->getState();
-  RBState state_b_prev = b->getPrevState();
-  unsigned int va_index   = contact.va_index;   // index of contact vertex for body a
-  unsigned int vb1_index  = contact.vb1_index;  // index for first vertex of contact edge for body b
-  unsigned int vb2_index  = contact.vb2_index;  // index for second vertex of contact edge for body b
-  Vector2 va = a->getVertex(va_index);
-  Vector2 vb1 = b->getVertex(vb1_index);
-  Vector2 vb2 = b->getVertex(vb2_index);
-  Vector2 v;    // temp variable
-  Real t_prev;  // t_{n-1}
-  Real t;       // t_n
-  Real d_prev;  // d(t_{n-1})
-  Real d;       // d(t_n)
-  Real t_tmp;
+  RigidBody *a = contact.a,
+            *b = contact.b;
+
+  RBState state_a      = a->getState(),
+          state_a_prev = a->getPrevState(),
+          state_b      = b->getState(),
+          state_b_prev = b->getPrevState();
+
+  unsigned int va_index   = contact.va_index,   // index of contact vertex for body a
+               vb1_index  = contact.vb1_index,  // index for first vertex of contact edge for body b
+               vb2_index  = contact.vb2_index;  // index for second vertex of contact edge for body b
+
+  Vector2 va  = a->getVertex(va_index),
+          vb1 = b->getVertex(vb1_index),
+          vb2 = b->getVertex(vb2_index),
+          v;    // temp variable
+
+  Real t_prev,  // t_{n-1}
+       t,       // t_n
+       d_prev,  // d(t_{n-1})
+       d,       // d(t_n)
+       t_tmp,
+       epsilon = 0.001f;
 
   t = current_simulation_time;
 
