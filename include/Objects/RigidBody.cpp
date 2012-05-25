@@ -1,6 +1,7 @@
 #include "RigidBody.h"
 #include "RBSolver.h"
 #include "Common/MathUtils.h"
+#include "Common/RigidException.h"
 #include <cassert>
 #include <cstring>
 #include <iostream>
@@ -169,7 +170,7 @@ namespace Rigid2D
     Vector2 forceResult;
     Real torqueResult;
 
-    for (it = forces_.begin(); it != forces_.end(); ++it) 
+    for (it = forces_.begin(); it != forces_.end(); ++it)
     {
       forceResult.x = 0.0;
       forceResult.y = 0.0;
@@ -200,12 +201,12 @@ namespace Rigid2D
     }
   }
 
-  void RigidBody::addForce(Force *force) 
+  void RigidBody::addForce(Force *force)
   {
     forces_.insert(force);
   }
 
-  void RigidBody::addForces(Force **forces, unsigned int numForces) 
+  void RigidBody::addForces(Force **forces, unsigned int numForces)
   {
     for (unsigned i = 0; i < numForces; ++i) {
       forces_.insert(forces[i]);
@@ -216,7 +217,7 @@ namespace Rigid2D
     forces_.erase(force);
   }
 
-  void RigidBody::removeForces(Force **forces, unsigned int numForces) 
+  void RigidBody::removeForces(Force **forces, unsigned int numForces)
   {
     for (unsigned int i = 0; i < numForces; ++i) {
       forces_.erase(forces[i]);
@@ -309,12 +310,18 @@ namespace Rigid2D
     return vertices_;
   }
 
-  AABB* RigidBody::getStaticBB() 
+  Vector2 RigidBody::getVertex(unsigned int index) const
+  {
+    assert(index < num_vertices_);
+    return vertices_[index];
+  }
+
+  AABB* RigidBody::getStaticBB()
   {
     return &staticBB_;
   }
 
-  AABB* RigidBody::getWorldBB() 
+  AABB* RigidBody::getWorldBB()
   {
     return &worldBB_;
   }
@@ -343,19 +350,25 @@ namespace Rigid2D
     return result;
   }
 
-  Vector2 RigidBody::localToWorldTransform(const Vector2 & point) const
+  Vector2 RigidBody::localToWorldTransform(Vector2 const & point, RBState::StateSpecifier frame) const
   {
     // TODO: compare to worldtolocal
+    RBState state;
+    if (frame == RBState::CURRENT)
+      state = state_;
+    else
+      state = prevState_;
+
     Vector2 result;
     result = point;
 
-    Real cos_theta = cos(state_.orientation);
-    Real sin_theta = sin(state_.orientation);
+    Real cos_theta = cos(state.orientation);
+    Real sin_theta = sin(state.orientation);
 
     result.x = cos_theta * point.x - sin_theta * point.y;
     result.y = sin_theta * point.x + cos_theta * point.y;
 
-    result += state_.position;
+    result += state.position;
     return result;
   }
 
@@ -434,7 +447,7 @@ namespace Rigid2D
         }
       }
       else if ( intervalRB1[1] > intervalRB2[1] &&
-          intervalRB1[0] > intervalRB2[0]) 
+          intervalRB1[0] > intervalRB2[0])
       {
         if (intervalRB2[1] - intervalRB1[0] < min_overlap) {
           min_overlap = intervalRB2[1] - intervalRB1[0];
@@ -442,7 +455,7 @@ namespace Rigid2D
         }
       }
       else if ( intervalRB1[1] > intervalRB2[1] &&
-          intervalRB1[0] < intervalRB2[0]) 
+          intervalRB1[0] < intervalRB2[0])
       {
         if (intervalRB2[1] - intervalRB2[0] < min_overlap) {
           min_overlap = intervalRB2[1] - intervalRB2[0];

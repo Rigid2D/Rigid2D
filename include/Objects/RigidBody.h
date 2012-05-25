@@ -17,6 +17,8 @@ namespace Rigid2D
   // Stores the state needed for force calculations.
   struct RBState
   {
+    enum StateSpecifier { CURRENT, PREVIOUS };
+
     Vector2 position;
     Vector2 linearMomentum;
     Angle orientation;         // radians
@@ -155,13 +157,21 @@ namespace Rigid2D
       /* Transform point in previous frame world space to current frame local space. */
       Vector2 worldToLocalTransform(const Vector2 & point) const;
 
-      Vector2 localToWorldTransform(const Vector2 & point) const;
-  
+      // Transform point from local body space to world space using specified
+      // state transform.  By default, StateSpecifier is set to CURRENT so that
+      // the current frame transform is used.  The StateSpecifier can also be
+      // assigned PREVIOUS in order to perfrom the coordinate transformation
+      // using the transformation of the previous frame.
+      Vector2 localToWorldTransform(Vector2 const & point, RBState::StateSpecifier frame = RBState::CURRENT) const;
+
       void updateTransformedVertices() const;
 
       unsigned int getNumVertices() const;
-
       Vector2 const * getVertices() const;
+
+      // Returns a copy of the Vector2 object representing vertex at given
+      // index of Rigid Body's vertex array.
+      Vector2 getVertex(unsigned int index) const;
 
       /* Given a point in **world coordinate space**, this function returns true if
        * the point lies within the convex polygon defined by vertex_array_.*/
