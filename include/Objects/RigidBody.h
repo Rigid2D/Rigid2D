@@ -140,6 +140,7 @@ namespace Rigid2D
       Real getMomentOfInertia() const;
 
       void getState(RBState & state) const;
+      void getPrevState(RBState & state) const;
 
 			void setState(RBState & state);
       void setPosition (const Vector2 & position);

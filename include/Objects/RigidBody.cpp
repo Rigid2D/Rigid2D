@@ -263,6 +263,11 @@ namespace Rigid2D
     dest = state_;
   }
 
+  void RigidBody::getPrevState(RBState & dest) const
+  {
+    dest = prevState_;
+  }
+
   void RigidBody::setState(RBState & state)
   {
     state_ = state;
