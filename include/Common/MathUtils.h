@@ -55,6 +55,10 @@ namespace Rigid2D
   // Assumes num_vertices > 0.  If num_vertices = 0, method will throw an
   // InvalidParameterException error.
   Vector2 * realArrayToVector2Array (unsigned int num_vertices, Real const *vertex_array) throw (Rigid2D::Exception, std::bad_alloc);
+
+  // Computes the point d on the line segment from a to b that is closest to
+  // the point c.
+  void ClosestPtPointSegment(Vector2 const &c, Vector2 const &a, Vector2 const &b, Vector2 &d);
 }
 
 #endif

@@ -307,3 +307,46 @@ TEST(momentOfInertiaTest, Rectangle_2x6_heavy){
 
   delete [] vertices;
 }
+
+//=============================================================================
+// ClosestPtPointSegment Tests
+//=============================================================================
+TEST(ClosestPtPointSegment, outside_interval_closest_to_a){
+  Vector2 a = Vector2(0,0);
+  Vector2 b = Vector2(1,0);
+  Vector2 c = Vector2(-1,1);
+  Vector2 d;
+
+  ClosestPtPointSegment(c, a, b, d);
+  EXPECT_TRUE(d == a);
+}
+
+TEST(ClosestPtPointSegment, outside_interval_closest_to_b){
+  Vector2 a = Vector2(0,0);
+  Vector2 b = Vector2(1,0);
+  Vector2 c = Vector2(2,1);
+  Vector2 d;
+
+  ClosestPtPointSegment(c, a, b, d);
+  EXPECT_TRUE(d == b);
+}
+
+TEST(ClosestPtPointSegment, within_interval_above){
+  Vector2 a = Vector2(0,0);
+  Vector2 b = Vector2(1,0);
+  Vector2 c = Vector2(0.5,3);
+  Vector2 d;
+
+  ClosestPtPointSegment(c, a, b, d);
+  EXPECT_TRUE(d == Vector2(0.5,0));
+}
+
+TEST(ClosestPtPointSegment, within_interval_below){
+  Vector2 a = Vector2(0,0);
+  Vector2 b = Vector2(1,0);
+  Vector2 c = Vector2(0.5, -3);
+  Vector2 d;
+
+  ClosestPtPointSegment(c, a, b, d);
+  EXPECT_TRUE(d == Vector2(0.5,0));
+}

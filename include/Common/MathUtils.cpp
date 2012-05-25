@@ -152,4 +152,30 @@ namespace Rigid2D
     return result;
   }
 
-}
+  // Parameterize the line segment ab with P(t) = a + t*(b - a).  The point d(t) = a + t * (b - a),
+  // where t = (c - a) . n/|b - a|, with t in [0,1] and n = (b - a) / |b - a|.
+  void ClosestPtPointSegment(Vector2 const &c, Vector2 const &a, Vector2 const &b, Vector2 &d) {
+    Vector2 ab = b - a;
+    // Project c onto ab, but defer dividing by ab.dot(ab).
+    Real t = (c - a).dot(ab);
+    if (t <= 0.0f) {
+      // c projects outside the interval [a,b] and is closest to the point a.
+      t = 0.0f;
+      d = a;
+    }
+    else {
+      Real denom = ab.dot(ab);
+      if (t >= denom) {
+        // c projects outside the interval [a,b] and is closest to the point b.
+        t = 1.0f;
+        d = b;
+      }
+      else {
+        // c projects onto the interval [a,b]; must do deferred division now.
+        t = t / denom;
+        d = a + t * ab;
+      }
+    }
+  }
+
+} // end namespace Rigid2D
