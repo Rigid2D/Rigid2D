@@ -317,7 +317,7 @@ TEST(ClosestPtPointSegment, outside_interval_closest_to_a){
   Vector2 c = Vector2(-1,1);
   Vector2 d;
 
-  ClosestPtPointSegment(c, a, b, d);
+  ClosestPtPointSegment(a, b, c, d);
   EXPECT_TRUE(d == a);
 }
 
@@ -327,7 +327,7 @@ TEST(ClosestPtPointSegment, outside_interval_closest_to_b){
   Vector2 c = Vector2(2,1);
   Vector2 d;
 
-  ClosestPtPointSegment(c, a, b, d);
+  ClosestPtPointSegment(a, b, c, d);
   EXPECT_TRUE(d == b);
 }
 
@@ -337,7 +337,7 @@ TEST(ClosestPtPointSegment, within_interval_above){
   Vector2 c = Vector2(0.5,3);
   Vector2 d;
 
-  ClosestPtPointSegment(c, a, b, d);
+  ClosestPtPointSegment(a, b, c, d);
   EXPECT_TRUE(d == Vector2(0.5,0));
 }
 
@@ -347,6 +347,6 @@ TEST(ClosestPtPointSegment, within_interval_below){
   Vector2 c = Vector2(0.5, -3);
   Vector2 d;
 
-  ClosestPtPointSegment(c, a, b, d);
+  ClosestPtPointSegment(a, b, c, d);
   EXPECT_TRUE(d == Vector2(0.5,0));
 }

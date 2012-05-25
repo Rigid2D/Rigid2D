@@ -58,7 +58,9 @@ namespace Rigid2D
 
   // Computes the point d on the line segment from a to b that is closest to
   // the point c.
-  void ClosestPtPointSegment(Vector2 const &c, Vector2 const &a, Vector2 const &b, Vector2 &d);
+  void ClosestPtPointSegment(Vector2 const &a, Vector2 const &b, Vector2 const &c, Vector2 &d);
+
+  Real SqDistPointSegment(Vector2 const &a, Vector2 const &b, Vector2 const &c);
 }
 
 #endif

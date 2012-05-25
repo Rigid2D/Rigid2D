@@ -154,7 +154,7 @@ namespace Rigid2D
 
   // Parameterize the line segment ab with P(t) = a + t*(b - a).  The point d(t) = a + t * (b - a),
   // where t = (c - a) . n/|b - a|, with t in [0,1] and n = (b - a) / |b - a|.
-  void ClosestPtPointSegment(Vector2 const &c, Vector2 const &a, Vector2 const &b, Vector2 &d) {
+  void ClosestPtPointSegment(Vector2 const &a, Vector2 const &b, Vector2 const &c, Vector2 &d) {
     Vector2 ab = b - a;
     // Project c onto ab, but defer dividing by ab.dot(ab).
     Real t = (c - a).dot(ab);
