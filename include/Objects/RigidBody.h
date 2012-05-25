@@ -147,8 +147,6 @@ namespace Rigid2D
       void setOrientation (const Real orientation);
       void setMass (const Real mass);
 
-      int getVertexCount() const;
-      Real* getVertexArray() const;
       AABB* getStaticBB();
       AABB* getWorldBB();
       bool bp_isIntersecting() const;
