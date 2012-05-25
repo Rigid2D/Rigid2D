@@ -24,7 +24,7 @@ SOURCES = examples.cpp \
           ../include/Objects/RigidBody.cpp \
           ../include/Objects/RigidBodySystem.cpp \
           ../include/Objects/Force.cpp \
-          ../include/Collision/BroadPhase/AABB.cpp \
+          ../include/Collision/AABB.cpp \
           ../include/Common/RigidException.cpp \
           ../include/Common/MathUtils.cpp \
           ../include/Common/feq.cpp \
