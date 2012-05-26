@@ -29,7 +29,8 @@ SOURCES = examples.cpp \
           ../include/Common/MathUtils.cpp \
           ../include/Common/feq.cpp \
           ../include/Collision/AABB.cpp \
-          ../include/Collision/NarrowPhase.cpp
+          ../include/Collision/NarrowPhase.cpp \
+          ../include/Dynamics/CollisionResponse.cpp
 
 QMAKE_CXXFLAGS += -std=c++0x -ggdb
 QMAKE_CLEAN += examples *.o
