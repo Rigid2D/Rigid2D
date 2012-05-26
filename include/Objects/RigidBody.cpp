@@ -531,8 +531,19 @@ namespace Rigid2D
     return true;
   }
 
-  Vector2 pointVelocity(Vector2 point) {
-    //Vector2 v = state_.linearMomentum * invMass_;  // linear velocity
-    ////body->v + (body->omega ˆ (p - body->x));
+  // Velocity of a point on Rigid Body is given by
+  // v + ω ^ (p - x)
+  //
+  // v = linear velocity of Rigid Body
+  // ω = angular velocity of Rigid Body
+  // p = point on Rigid Body
+  // x = center of mass of Rigid Body
+  // ^ = cross product
+  Vector2 RigidBody::pointVelocity(Vector2 point) {
+    Vector2 v = state_.linearMomentum * invMass_;  // linear velocity
+    Vector2 r = point - state_.position;           // (p - x)
+    Real omega = state_.angularMomentum * invMoi_; // angular velcity
+
+    return v + omega * r.perp();
   }
 }
