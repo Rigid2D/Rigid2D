@@ -17,7 +17,7 @@ namespace Rigid2D
   // Stores the state needed for force calculations.
   struct RBState
   {
-    enum StateSpecifier { CURRENT, PREVIOUS };
+    enum FrameSpecifier { CURRENT, PREVIOUS };
 
     Vector2 position;
     Vector2 linearMomentum;
@@ -32,6 +32,12 @@ namespace Rigid2D
       linearMomentum(linearMomentum),
       orientation(orientation),
       angularMomentum(angularMomentum) { }
+
+    RBState(const RBState &other) :
+        position(other.position),
+        linearMomentum(other.linearMomentum),
+        orientation(other.orientation),
+        angularMomentum(other.angularMomentum) { }
 
     void operator *= (Real scalar);
     void operator /= (Real scalar);
@@ -163,7 +169,7 @@ namespace Rigid2D
       // the current frame transform is used.  The StateSpecifier can also be
       // assigned PREVIOUS in order to perfrom the coordinate transformation
       // using the transformation of the previous frame.
-      Vector2 localToWorldTransform(Vector2 const & point, RBState::StateSpecifier frame = RBState::CURRENT) const;
+      Vector2 localToWorldTransform(Vector2 const & point, RBState::FrameSpecifier frame = RBState::CURRENT) const;
 
       void updateTransformedVertices() const;
 

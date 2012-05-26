@@ -9,6 +9,7 @@
 
 namespace Rigid2D
 {
+
   void RBState::operator *= (Real scalar)
   {
       position *= scalar;
@@ -355,7 +356,7 @@ namespace Rigid2D
     return result;
   }
 
-  Vector2 RigidBody::localToWorldTransform(Vector2 const & point, RBState::StateSpecifier frame) const
+  Vector2 RigidBody::localToWorldTransform(Vector2 const & point, RBState::FrameSpecifier frame) const
   {
     // TODO: compare to worldtolocal
     RBState state;
