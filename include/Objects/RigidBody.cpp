@@ -274,6 +274,11 @@ namespace Rigid2D
     state_ = state;
   }
 
+  void RigidBody::setPrevState(RBState & prev_state)
+  {
+    prevState_ = prev_state;
+  }
+
   void RigidBody::setPosition(const Vector2 & position)
   {
     state_.position = position;

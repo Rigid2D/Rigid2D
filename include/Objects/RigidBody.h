@@ -149,6 +149,7 @@ namespace Rigid2D
       void getPrevState(RBState & state) const;
 
 			void setState(RBState & state);
+			void setPrevState(RBState & state);
       void setPosition (const Vector2 & position);
       void setPosition (Real xPos, Real yPos);
       void setVelocity (const Vector2 & velocity);
