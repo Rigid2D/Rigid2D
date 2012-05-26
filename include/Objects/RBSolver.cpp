@@ -2,7 +2,7 @@
 
 using namespace Rigid2D;
 
-const Real RBSolver::step_size = 0.01;
+const Real RBSolver::STEP_SIZE = 0.01;
 
 void RBSolver::nextStep(class RigidBody &rb, struct RBState &outState, Real stepSize) {
   struct RBState initialState, tempState, k1, k2, k3, k4;

@@ -10,11 +10,11 @@ namespace Rigid2D
   class RBSolver
   {
     public:
-			static const Real step_size;
+			static const Real STEP_SIZE;
 
       //// NOTE: time is not being passed currently, but it's trivial
       //// to add if needed.
-      static void nextStep(class RigidBody &rb, struct RBState &outState, Real stepSize = step_size);
+      static void nextStep(class RigidBody &rb, struct RBState &outState, Real stepSize = STEP_SIZE);
   };
 
 }
