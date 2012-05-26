@@ -2,6 +2,7 @@
 #define RIGID2D_NARROW_PHASE_H
 
 #include "Common/RigidSettings.h"
+#include "Objects/RigidBody.h"
 
 namespace Rigid2D {
 
@@ -38,8 +39,6 @@ namespace Rigid2D {
   // squared distance 𝜀 > 0 from one another.
   Real toi(Contact const &contact);
 
-  // Adjusts the linear velocities of the two Rigid Bodys referenced by the
-  // given Contact arugment in order to simulate an elastic collision.
   void resolveCollision(Contact const &contact);
 }
 

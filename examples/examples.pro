@@ -15,6 +15,7 @@ HEADERS = DemoBase.h \
           DemosFramework.h \
           ../include/Rigid2D.h \
 
+
 SOURCES = examples.cpp \
           DemosFramework.cpp \
           DemoBase.cpp \
@@ -24,10 +25,11 @@ SOURCES = examples.cpp \
           ../include/Objects/RigidBody.cpp \
           ../include/Objects/RigidBodySystem.cpp \
           ../include/Objects/Force.cpp \
-          ../include/Collision/AABB.cpp \
           ../include/Common/RigidException.cpp \
           ../include/Common/MathUtils.cpp \
           ../include/Common/feq.cpp \
+          ../include/Collision/AABB.cpp \
+          ../include/Collision/NarrowPhase.cpp
 
 QMAKE_CXXFLAGS += -std=c++0x -ggdb
 QMAKE_CLEAN += examples *.o
