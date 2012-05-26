@@ -12,11 +12,6 @@ namespace Rigid2D {
       RigidBody *a;	            // Reference body.  The msv is computed with respect to this body.
       RigidBody *b;	            // Incident body that body a is colliding with.
 
-      Vector2 msv_dir;          // Direction of minimum separation vector (msv).
-                                // Needed by resolveCollision().  This direction
-                                // should be outward pointing from body B and
-                                // orthongal to B's contact edge.
-
       // Each Rigid Body contains a vertex list, and the following indices
       // allow us to keep track of specific vertices involved in the contact
       // at various moments in time.
@@ -32,12 +27,6 @@ namespace Rigid2D {
   // rb2.  Otherwise, false is returned. If inter-penetration is detected the
   // contact structure will be filled out, otherwise it will not be modified.
   bool sat(RigidBody *rb1, RigidBody *rb2, Contact &contact);
-
-  // Time of Impact
-  // Returns a value in (0,1) marking the fraction of frame time since the
-  // previous frame where bodies a and b are non-intersecting and are within a
-  // squared distance 𝜀 > 0 from one another.
-  Real toi(Contact const &contact);
 
   void resolveCollision(Contact const &contact);
 }
