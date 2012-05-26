@@ -16,4 +16,6 @@
 #include "Collision/AABB.h"
 #include "Collision/NarrowPhase.h"
 
+#include "Dynamics/CollisionResponse.h"
+
 #endif
