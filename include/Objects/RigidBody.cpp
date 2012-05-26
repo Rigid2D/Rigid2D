@@ -114,6 +114,8 @@ namespace Rigid2D
                              Vector2 const &velocity,
                              Angle orientation)
   {
+    assert(mass != 0); // Needed by invMass_ to prevent divide by zero.
+
     // Need at least 3 vertices to make a convex polygon.
     if (num_vertices < 3) {
       throw InvalidParameterException(__LINE__, __FUNCTION__, __FILE__,
@@ -133,9 +135,11 @@ namespace Rigid2D
     prevState_ = state_;
 
     mass_ = mass;
+    invMass_ = 1/mass;
     num_vertices_ = num_vertices;
     forceAccumulator_ = Vector2(0, 0);
     moi_ = momentOfInertia(num_vertices, vertices, mass);
+    invMoi_ = 1/moi_;
 
     // compute staticBB
     staticBB_ = AABB(vertices_, num_vertices);
@@ -525,5 +529,10 @@ namespace Rigid2D
     if (orient2d(pt1, pt2, pt3) != 1)
       return false;
     return true;
+  }
+
+  Vector2 pointVelocity(Vector2 point) {
+    //Vector2 v = state_.linearMomentum * invMass_;  // linear velocity
+    ////body->v + (body->omega ˆ (p - body->x));
   }
 }

@@ -185,6 +185,11 @@ namespace Rigid2D
        * the point lies within the convex polygon defined by vertex_array_.*/
       bool pointIsInterior(Real x, Real y);
 
+      // Returns the velocity of given point on Rigid Body.  Takes into account
+      // both linear and angular velocities of the Rigid Body during the
+      // current frame.
+      Vector2 pointVelocity(Vector2 point);
+
     protected:
       /** Check for BB intersection. Call narrowPhase if true. */
       bool broadPhase(RigidBody *rb);
@@ -206,9 +211,11 @@ namespace Rigid2D
       RBState state_;
       RBState prevState_;                     // The state last frame
       Vector2 velocity_;                      // Velocity of center of mass (implicitly calculated)
-      Real mass_;                             // Object mass
+      Real mass_;                             // Mass of the Rigid Body
+      Real invMass_;                          // 1/mass
       Real moi_;                              // Moment of inertia about axis perpendicular to plane of
                                               // body and through its center.
+      Real invMoi_;                           // 1/moi
 
       Vector2 forceAccumulator_;              // Sum of forces acting on the center of mass of RigidBody
       Real torqueAccumulator_;                // Sum of torques on body, about center of mass.
