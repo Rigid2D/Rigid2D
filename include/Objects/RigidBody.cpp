@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstring>
 #include <iostream>
-#include <limits>       // for infinity
+#include "float.h"
 
 namespace Rigid2D
 {
@@ -476,8 +476,8 @@ namespace Rigid2D
     // extrema points for the projected intervals of each RB
     Vector2 intervalRB1, intervalRB2;
     Vector2 min_interval;         // ends up being direction of MTV
-    Real min_overlap = 10000000;  // ends up being magnitude of MTV
-                                  // TODO: choose a sexier value
+    Real min_overlap = FLT_MAX;  // ends up being magnitude of MTV
+
 
     if (firstRB) {
       updateTransformedVertices();
