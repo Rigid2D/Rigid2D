@@ -66,7 +66,9 @@ namespace Rigid2D {
       it2 = it1;
       it2++;
       for ( ; it2 != rigidBodies_.end(); ++it2) {
-        (*it1)->checkCollision(*it2);
+        if ( (*it1)->checkCollision(*it2) ) {
+          // Collision Detected
+        }
       }
     }
   }

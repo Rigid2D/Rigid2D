@@ -5,7 +5,8 @@
 #include "Common/MathUtils.h"
 #include "Common/Vector2.h"
 #include "Objects/Force.h"
-#include "Collision/BroadPhase/AABB.h"
+#include "Collision/AABB.h"
+#include "Collision/NarrowPhase.h"
 #include <unordered_set>
 #include <cmath>
 
@@ -17,6 +18,8 @@ namespace Rigid2D
   // Stores the state needed for force calculations.
   struct RBState
   {
+    enum FrameSpecifier { CURRENT, PREVIOUS };
+
     Vector2 position;
     Vector2 linearMomentum;
     Angle orientation;         // radians
@@ -30,6 +33,12 @@ namespace Rigid2D
       linearMomentum(linearMomentum),
       orientation(orientation),
       angularMomentum(angularMomentum) { }
+
+    RBState(const RBState &other) :
+        position(other.position),
+        linearMomentum(other.linearMomentum),
+        orientation(other.orientation),
+        angularMomentum(other.angularMomentum) { }
 
     void operator *= (Real scalar);
     void operator /= (Real scalar);
@@ -60,7 +69,8 @@ namespace Rigid2D
                 Vector2 const &position,
                 Real mass,
                 Vector2 const &velocity = Vector2(0,0),
-                Angle orientation = 0.0);
+                Angle orientation = 0.0,
+                Real restitution = 1.0);
 
       // Same as above, but takes in a Vector2 array
       RigidBody(unsigned int num_vertices,
@@ -68,7 +78,8 @@ namespace Rigid2D
                 Vector2 const &position,
                 Real mass,
                 Vector2 const &velocity = Vector2(0,0),
-                Angle orientation = 0.0);
+                Angle orientation = 0.0,
+                Real restitution = 1.0);
 
 			RigidBody() {}
 
@@ -131,15 +142,20 @@ namespace Rigid2D
       Vector2 getLinearMomentum() const;
       Real getAngularMomentum() const;
       Real getMass() const;
+      Real getInvMass() const;
+      Real getInvMoi() const;
       Angle getOrientation() const;
+      Real getRestitution() const;
 
       /// Returns moment of inertia about axis through centroid and
       /// perpendicular to the plane of the RigidBody.
       Real getMomentOfInertia() const;
 
       void getState(RBState & state) const;
+      void getPrevState(RBState & state) const;
 
 			void setState(RBState & state);
+			void setPrevState(RBState & state);
       void setPosition (const Vector2 & position);
       void setPosition (Real xPos, Real yPos);
       void setVelocity (const Vector2 & velocity);
@@ -147,34 +163,61 @@ namespace Rigid2D
       void setOrientation (const Real orientation);
       void setMass (const Real mass);
 
-      int getVertexCount() const;
-      Real* getVertexArray() const;
       AABB* getStaticBB();
       AABB* getWorldBB();
       bool bp_isIntersecting() const;
       bool np_isIntersecting() const;
 
       /* Transform point in previous frame world space to current frame local space. */
-      Vector2 worldToLocalTransform(const Vector2 & point) const;
+      Vector2 prevWorldToCurrentLocalTransform(const Vector2 & point) const;
 
-      Vector2 localToWorldTransform(const Vector2 & point) const;
-  
+      // Transform point from world space to local body space using specified
+      // state transform.  By default, FrameSpecifier is set to CURRENT so that
+      // the current frame transform is used.  The FrameSpecifier can also be
+      // assigned PREVIOUS in order to perfrom the coordinate transformation
+      // using the transformation of the previous frame.
+      Vector2 worldToLocalTransform(const Vector2 & point,
+          RBState::FrameSpecifier frame = RBState::CURRENT) const;
+
+      // Transform point from local body space to world space using specified
+      // state transform.  By default, FrameSpecifier is set to CURRENT so that
+      // the current frame transform is used.  The FrameSpecifier can also be
+      // assigned PREVIOUS in order to perfrom the coordinate transformation
+      // using the transformation of the previous frame.
+      Vector2 localToWorldTransform(Vector2 const & point,
+          RBState::FrameSpecifier frame = RBState::CURRENT) const;
+
       void updateTransformedVertices() const;
 
       unsigned int getNumVertices() const;
-
+      Vector2 const * getTransformedVertices() const;
       Vector2 const * getVertices() const;
+
+
+      // Returns a copy of the Vector2 object representing vertex at given
+      // index of Rigid Body's vertex array.
+      Vector2 getTransformedVertex(unsigned int index) const;
+
+      // Returns a copy of the Vector2 object representing a tranformed (world space) 
+      // vertex at given index of Rigid Body's vertex array.
+      Vector2 getVertex(unsigned int index) const;
 
       /* Given a point in **world coordinate space**, this function returns true if
        * the point lies within the convex polygon defined by vertex_array_.*/
       bool pointIsInterior(Real x, Real y);
+
+      // Returns the velocity of given point as if it were affixed to the Rigid
+      // Body.  Takes into account both linear and angular velocities of the
+      // Rigid Body during the current frame.  Assumes point is in local body
+      // coordinates.
+      Vector2 pointVelocity(Vector2 point);
 
     protected:
       /** Check for BB intersection. Call narrowPhase if true. */
       bool broadPhase(RigidBody *rb);
 
       /** Check for exact intersection. Called after broadPhase returns true. */
-      bool narrowPhase(RigidBody *rb, bool firstRB = true);
+      bool narrowPhase(RigidBody *rb, struct Contact *contact);
 
     private:
       void initialize(unsigned int num_vertices,
@@ -182,7 +225,8 @@ namespace Rigid2D
                       Vector2 const &position,
                       Real mass,
                       Vector2 const &velocity,
-                      Angle orientation);
+                      Angle orientation,
+                      Real restitution);
 
     Vector2 findProjectionInterval(const Vector2 & slope) const;
 
@@ -190,14 +234,17 @@ namespace Rigid2D
       RBState state_;
       RBState prevState_;                     // The state last frame
       Vector2 velocity_;                      // Velocity of center of mass (implicitly calculated)
-      Real mass_;                             // Object mass
+      Real mass_;                             // Mass of the Rigid Body
+      Real invMass_;                          // 1/mass
       Real moi_;                              // Moment of inertia about axis perpendicular to plane of
                                               // body and through its center.
+      Real invMoi_;                           // 1/moi
+      Real restitution_;                      // Coefficient of restitution for collisions, in the interval [0,1].
 
       Vector2 forceAccumulator_;              // Sum of forces acting on the center of mass of RigidBody
       Real torqueAccumulator_;                // Sum of torques on body, about center of mass.
 
-      std::unordered_set<Force*> forces_;     // all forces being applied to this RB
+      std::unordered_set<Force*> forces_;     // All forces being applied to this RB
 
       // Geometry
       unsigned int num_vertices_;             // Number of vertices that make up the perimeter of RigidBody.

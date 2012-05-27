@@ -307,3 +307,137 @@ TEST(momentOfInertiaTest, Rectangle_2x6_heavy){
 
   delete [] vertices;
 }
+
+//=============================================================================
+// ClosestPtPointSegment Tests
+//=============================================================================
+TEST(ClosestPtPointSegment, outside_interval_closest_to_a){
+  Vector2 a = Vector2(0,0);
+  Vector2 b = Vector2(1,0);
+  Vector2 c = Vector2(-1,1);
+  Vector2 d;
+
+  ClosestPtPointSegment(a, b, c, d);
+  EXPECT_TRUE(d == a);
+}
+
+TEST(ClosestPtPointSegment, outside_interval_closest_to_b){
+  Vector2 a = Vector2(0,0);
+  Vector2 b = Vector2(1,0);
+  Vector2 c = Vector2(2,1);
+  Vector2 d;
+
+  ClosestPtPointSegment(a, b, c, d);
+  EXPECT_TRUE(d == b);
+}
+
+TEST(ClosestPtPointSegment, within_interval_above){
+  Vector2 a = Vector2(0,0);
+  Vector2 b = Vector2(1,0);
+  Vector2 c = Vector2(0.5,3);
+  Vector2 d;
+
+  ClosestPtPointSegment(a, b, c, d);
+  EXPECT_TRUE(d == Vector2(0.5,0));
+}
+
+TEST(ClosestPtPointSegment, within_interval_below){
+  Vector2 a = Vector2(0,0);
+  Vector2 b = Vector2(1,0);
+  Vector2 c = Vector2(0.5, -3);
+  Vector2 d;
+
+  ClosestPtPointSegment(a, b, c, d);
+  EXPECT_TRUE(d == Vector2(0.5,0));
+}
+
+//=============================================================================
+// SqDistPointSegment Tests
+//=============================================================================
+
+// Point c lies outside segment ab, is closest to point a, and is above ab.
+TEST(SqDistPointSegment, outside_interval_test1){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(-1,1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 2.0);
+}
+
+// Point c lies outside segment ab, is closest to point a, and is below ab.
+TEST(SqDistPointSegment, outside_interval_test2){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(-1, -1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 2.0);
+}
+
+// Point c lies outside segment ab, is closest to point b, and is above ab.
+TEST(SqDistPointSegment, outside_interval_test3){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(2, 1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 2.0);
+}
+
+// Point c lies outside segment ab, is closest to point b, and is below ab.
+TEST(SqDistPointSegment, outside_interval_test4){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(2, -1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 2.0);
+}
+
+// Point c lies within segment ab, and is above ab.
+TEST(SqDistPointSegment, inside_interval_test1){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(0.5, 1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 1.0);
+}
+
+// Point c lies within segment ab, and is below ab.
+TEST(SqDistPointSegment, inside_interval_test2){
+  Vector2 a = Vector2(0,0),
+          b = Vector2(1,0),
+          c = Vector2(0.5, -1);
+  Real result = SqDistPointSegment(a,b,c);
+  EXPECT_FLOAT_EQ(result, 1.0);
+}
+
+//=============================================================================
+// tripleCrossProduct Tests
+//=============================================================================
+TEST(tripleCrossProduct, test1){
+  Vector2 i(1,0),
+          j(0,1);
+
+  EXPECT_TRUE(tripleCrossProduct(i,j,i) == j);
+}
+
+TEST(tripleCrossProduct, test2){
+  Vector2 i(1,0),
+          j(0,1);
+
+  EXPECT_TRUE(tripleCrossProduct(i,i,j) == -1*j);
+}
+
+TEST(tripleCrossProduct, test3){
+  Vector2 a(1,0),
+          b(0,1),
+          c(0.5,0.5);
+
+  EXPECT_TRUE(tripleCrossProduct(a,b,c) == Vector2(0, 0.5));
+}
+
+TEST(tripleCrossProduct, test4){
+  Vector2 a(1,0),
+          b(0,1),
+          c(0.0,0.0);
+
+  EXPECT_TRUE(tripleCrossProduct(a,b,c) == Vector2(0.0, 0.0));
+}

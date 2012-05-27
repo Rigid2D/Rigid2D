@@ -1,12 +1,14 @@
 #include "RigidBody.h"
 #include "RBSolver.h"
 #include "Common/MathUtils.h"
+#include "Common/RigidException.h"
 #include <cassert>
 #include <cstring>
 #include <iostream>
 
 namespace Rigid2D
 {
+
   void RBState::operator *= (Real scalar)
   {
       position *= scalar;
@@ -80,11 +82,12 @@ namespace Rigid2D
                        Vector2 const &position,
                        Real mass,
                        Vector2 const &velocity,
-                       Angle orientation)
+                       Angle orientation,
+                       Real restitution)
   {
     assert(vertex_array != NULL);
 		vertices_ = realArrayToVector2Array(num_vertices, vertex_array);
-    initialize(num_vertices, vertices_, position, mass, velocity, orientation);
+    initialize(num_vertices, vertices_, position, mass, velocity, orientation, restitution);
   }
 
   RigidBody::RigidBody(unsigned int num_vertices,
@@ -92,7 +95,8 @@ namespace Rigid2D
                        Vector2 const &position,
                        Real mass,
                        Vector2 const &velocity,
-                       Angle orientation)
+                       Angle orientation,
+                       Real restitution)
   {
     assert(vertices != NULL);
     vertices_ = new Vector2 [num_vertices];
@@ -101,7 +105,7 @@ namespace Rigid2D
       vertices_[i] = Vector2(vertices[i].x, vertices[i].y);
     }
 
-    initialize(num_vertices, vertices, position, mass, velocity, orientation);
+    initialize(num_vertices, vertices, position, mass, velocity, orientation, restitution);
   }
 
   void RigidBody::initialize(unsigned int num_vertices,
@@ -109,8 +113,11 @@ namespace Rigid2D
                              Vector2 const &position,
                              Real mass,
                              Vector2 const &velocity,
-                             Angle orientation)
+                             Angle orientation,
+                             Real restitution)
   {
+    assert(mass != 0); // Needed by invMass_ to prevent divide by zero.
+
     // Need at least 3 vertices to make a convex polygon.
     if (num_vertices < 3) {
       throw InvalidParameterException(__LINE__, __FUNCTION__, __FILE__,
@@ -130,9 +137,12 @@ namespace Rigid2D
     prevState_ = state_;
 
     mass_ = mass;
+    invMass_ = 1/mass;
+    restitution_ = restitution;
     num_vertices_ = num_vertices;
     forceAccumulator_ = Vector2(0, 0);
     moi_ = momentOfInertia(num_vertices, vertices, mass);
+    invMoi_ = 1/moi_;
 
     // compute staticBB
     staticBB_ = AABB(vertices_, num_vertices);
@@ -168,7 +178,7 @@ namespace Rigid2D
     Vector2 forceResult;
     Real torqueResult;
 
-    for (it = forces_.begin(); it != forces_.end(); ++it) 
+    for (it = forces_.begin(); it != forces_.end(); ++it)
     {
       forceResult.x = 0.0;
       forceResult.y = 0.0;
@@ -192,19 +202,20 @@ namespace Rigid2D
 
   bool RigidBody::checkCollision(RigidBody *rb)
   {
+    Contact *contact = new Contact;
     if (broadPhase(rb)) {
-       return narrowPhase(rb);
+       return narrowPhase(rb, contact);
     } else {
       return false;
     }
   }
 
-  void RigidBody::addForce(Force *force) 
+  void RigidBody::addForce(Force *force)
   {
     forces_.insert(force);
   }
 
-  void RigidBody::addForces(Force **forces, unsigned int numForces) 
+  void RigidBody::addForces(Force **forces, unsigned int numForces)
   {
     for (unsigned i = 0; i < numForces; ++i) {
       forces_.insert(forces[i]);
@@ -215,7 +226,7 @@ namespace Rigid2D
     forces_.erase(force);
   }
 
-  void RigidBody::removeForces(Force **forces, unsigned int numForces) 
+  void RigidBody::removeForces(Force **forces, unsigned int numForces)
   {
     for (unsigned int i = 0; i < numForces; ++i) {
       forces_.erase(forces[i]);
@@ -247,9 +258,24 @@ namespace Rigid2D
     return mass_;
   }
 
+  Real RigidBody::getInvMass() const
+  {
+    return invMass_;
+  }
+
+  Real RigidBody::getInvMoi() const
+  {
+    return invMoi_;
+  }
+
   Angle RigidBody::getOrientation() const
   {
     return state_.orientation;
+  }
+
+  Real RigidBody::getRestitution() const
+  {
+    return restitution_;
   }
 
   Real RigidBody::getMomentOfInertia() const
@@ -261,9 +287,19 @@ namespace Rigid2D
     dest = state_;
   }
 
+  void RigidBody::getPrevState(RBState & dest) const
+  {
+    dest = prevState_;
+  }
+
   void RigidBody::setState(RBState & state)
   {
     state_ = state;
+  }
+
+  void RigidBody::setPrevState(RBState & prev_state)
+  {
+    prevState_ = prev_state;
   }
 
   void RigidBody::setPosition(const Vector2 & position)
@@ -303,17 +339,34 @@ namespace Rigid2D
     return num_vertices_;
   }
 
+  Vector2 const * RigidBody::getTransformedVertices() const
+  {
+    return transformed_vertices_;
+  }
+
   Vector2 const * RigidBody::getVertices() const
   {
     return vertices_;
   }
 
-  AABB* RigidBody::getStaticBB() 
+  Vector2 RigidBody::getVertex(unsigned int index) const
+  {
+    assert(index < num_vertices_);
+    return vertices_[index];
+  }
+
+  Vector2 RigidBody::getTransformedVertex(unsigned int index) const
+  {
+    assert(index < num_vertices_);
+    return transformed_vertices_[index];
+  }
+
+  AABB* RigidBody::getStaticBB()
   {
     return &staticBB_;
   }
 
-  AABB* RigidBody::getWorldBB() 
+  AABB* RigidBody::getWorldBB()
   {
     return &worldBB_;
   }
@@ -328,7 +381,7 @@ namespace Rigid2D
     return np_isIntersecting_;
   }
 
-  Vector2 RigidBody::worldToLocalTransform(const Vector2 & point) const
+  Vector2 RigidBody::prevWorldToCurrentLocalTransform(const Vector2 & point) const
   {
     Vector2 temp, result;
     temp = point - prevState_.position;
@@ -342,19 +395,49 @@ namespace Rigid2D
     return result;
   }
 
-  Vector2 RigidBody::localToWorldTransform(const Vector2 & point) const
+  // Apply reverse transform T(-x) * R(-theta) to the point, where x is translation from world coordinate origin
+  // to center of mass of Rigid Body, and theta is world space orientation angle of Rigid Body.
+  Vector2 RigidBody::worldToLocalTransform(const Vector2 & point, RBState::FrameSpecifier frame) const
   {
-    // TODO: compare to worldtolocal
+    RBState state;
+    if (frame == RBState::CURRENT)
+      state = state_;
+    else
+      state = prevState_;
+
     Vector2 result;
     result = point;
 
-    Real cos_theta = cos(state_.orientation);
-    Real sin_theta = sin(state_.orientation);
+    Real cos_theta = cos(-state.orientation);
+    Real sin_theta = sin(-state.orientation);
 
     result.x = cos_theta * point.x - sin_theta * point.y;
     result.y = sin_theta * point.x + cos_theta * point.y;
 
-    result += state_.position;
+    result -= state.position;
+    return result;
+  }
+
+  // Apply transform T(x) * R(theta) to the point, where x is translation from world coordinate origin
+  // to center of mass of Rigid Body, and theta is world space orientation angle of Rigid Body.
+  Vector2 RigidBody::localToWorldTransform(Vector2 const & point, RBState::FrameSpecifier frame) const
+  {
+    RBState state;
+    if (frame == RBState::CURRENT)
+      state = state_;
+    else
+      state = prevState_;
+
+    Vector2 result;
+    result = point;
+
+    Real cos_theta = cos(state.orientation);
+    Real sin_theta = sin(state.orientation);
+
+    result.x = cos_theta * point.x - sin_theta * point.y;
+    result.y = sin_theta * point.x + cos_theta * point.y;
+
+    result += state.position;
     return result;
   }
 
@@ -374,94 +457,16 @@ namespace Rigid2D
     return false;
   }
 
-  Vector2 RigidBody::findProjectionInterval(const Vector2 & normal) const
+
+  bool RigidBody::narrowPhase(RigidBody *rb, Contact *contact)
   {
-    Vector2 interval;     // stores left and right most projected positions
-    Real position;
 
-    // project each vertex on given slope
-    for (unsigned j = 0; j < num_vertices_; j++) {
-      position = normal.dot(transformed_vertices_[j]);
-      if (j == 0) {              // set inital values, can we eliminate this?
-        interval[0] = position;
-        interval[1] = position;
-      } else {                  // update min/max interval values
-        if (position < interval[0]) {
-          interval[0] = position;
-        } else if (position > interval[1]) {
-          interval[1] = position;
-        }
-      }
-    }
-    return interval;
-  }
-
-  bool RigidBody::narrowPhase(RigidBody *rb, bool firstRB)
-  {
-    // TODO: add explanation
-
-    // extrema points for the projected intervals of each RB
-    Vector2 intervalRB1, intervalRB2;
-    Vector2 min_interval;         // ends up being direction of MTV
-    Real min_overlap = 10000000;  // ends up being magnitude of MTV
-                                  // TODO: choose a sexier value
-
-    if (firstRB) {
-      updateTransformedVertices();
-      rb->updateTransformedVertices();
-    }
-
-    // SAT for edges of this RB
-    for (unsigned i = 0; i < num_vertices_; i++) {
-      Vector2 normal = (transformed_vertices_[(i+1) % num_vertices_] - transformed_vertices_[i]).perp();
-      normal.normalize();
-
-      intervalRB1 = findProjectionInterval(normal);
-      intervalRB2 = rb->findProjectionInterval(normal);
-      // if no intersection, we are done
-      if (intervalRB1[1] < intervalRB2[0] ||
-          intervalRB1[0] > intervalRB2[1]) {
-        return false;
-      }
-      // store min intersection for MTV
-      // TODO: optimize with above if statement and fix ugliness
-      if (intervalRB1[1] < intervalRB2[1] &&
-          intervalRB1[0] < intervalRB2[0]) {
-        if (intervalRB1[1] - intervalRB2[0] < min_overlap) {
-          min_overlap = intervalRB1[1] - intervalRB2[0];
-          min_interval = normal;
-        }
-      }
-      else if ( intervalRB1[1] > intervalRB2[1] &&
-          intervalRB1[0] > intervalRB2[0]) 
-      {
-        if (intervalRB2[1] - intervalRB1[0] < min_overlap) {
-          min_overlap = intervalRB2[1] - intervalRB1[0];
-          min_interval = normal;
-        }
-      }
-      else if ( intervalRB1[1] > intervalRB2[1] &&
-          intervalRB1[0] < intervalRB2[0]) 
-      {
-        if (intervalRB2[1] - intervalRB2[0] < min_overlap) {
-          min_overlap = intervalRB2[1] - intervalRB2[0];
-          min_interval = normal;
-        }
-      }
-      else {
-        if (intervalRB1[1] - intervalRB1[0] < min_overlap) {
-          min_overlap = intervalRB2[1] - intervalRB1[0];
-          min_interval = normal;
-        }
-      }
-    }
-
-    if (firstRB) {
-      return rb->narrowPhase(this, false);
-    } else {
+    if ( sat(this, rb, contact) ) {
       np_isIntersecting_ = true;
       rb->np_isIntersecting_ = true;
       return true;
+    } else {
+      return false;
     }
   }
 
@@ -500,5 +505,21 @@ namespace Rigid2D
     if (orient2d(pt1, pt2, pt3) != 1)
       return false;
     return true;
+  }
+
+  // Velocity of a point on Rigid Body is given by
+  // v + ω ^ (p - x)
+  //
+  // v = linear velocity of Rigid Body
+  // ω = angular velocity of Rigid Body
+  // p = point on Rigid Body
+  // x = center of mass of Rigid Body
+  // ^ = cross product
+  Vector2 RigidBody::pointVelocity(Vector2 point) {
+    Vector2 v = state_.linearMomentum * invMass_;  // linear velocity
+    Vector2 r = point - state_.position;           // (p - x)
+    Real omega = state_.angularMomentum * invMoi_; // angular velcity
+
+    return v + omega * r.perp();
   }
 }
