@@ -351,7 +351,7 @@ namespace Rigid2D
     return np_isIntersecting_;
   }
 
-  Vector2 RigidBody::worldToLocalTransform(const Vector2 & point) const
+  Vector2 RigidBody::prevWorldToCurrentLocalTransform(const Vector2 & point) const
   {
     Vector2 temp, result;
     temp = point - prevState_.position;
@@ -365,6 +365,31 @@ namespace Rigid2D
     return result;
   }
 
+  // Apply reverse transform T(-x) * R(-theta) to the point, where x is translation from world coordinate origin
+  // to center of mass of Rigid Body, and theta is world space orientation angle of Rigid Body.
+  Vector2 RigidBody::worldToLocalTransform(const Vector2 & point, RBState::FrameSpecifier frame) const
+  {
+    RBState state;
+    if (frame == RBState::CURRENT)
+      state = state_;
+    else
+      state = prevState_;
+
+    Vector2 result;
+    result = point;
+
+    Real cos_theta = cos(-state.orientation);
+    Real sin_theta = sin(-state.orientation);
+
+    result.x = cos_theta * point.x - sin_theta * point.y;
+    result.y = sin_theta * point.x + cos_theta * point.y;
+
+    result -= state.position;
+    return result;
+  }
+
+  // Apply transform T(x) * R(theta) to the point, where x is translation from world coordinate origin
+  // to center of mass of Rigid Body, and theta is world space orientation angle of Rigid Body.
   Vector2 RigidBody::localToWorldTransform(Vector2 const & point, RBState::FrameSpecifier frame) const
   {
     // TODO: compare to worldtolocal

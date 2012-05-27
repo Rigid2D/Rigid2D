@@ -163,14 +163,23 @@ namespace Rigid2D
       bool np_isIntersecting() const;
 
       /* Transform point in previous frame world space to current frame local space. */
-      Vector2 worldToLocalTransform(const Vector2 & point) const;
+      Vector2 prevWorldToCurrentLocalTransform(const Vector2 & point) const;
 
-      // Transform point from local body space to world space using specified
-      // state transform.  By default, StateSpecifier is set to CURRENT so that
-      // the current frame transform is used.  The StateSpecifier can also be
+      // Transform point from world space to local body space using specified
+      // state transform.  By default, FrameSpecifier is set to CURRENT so that
+      // the current frame transform is used.  The FrameSpecifier can also be
       // assigned PREVIOUS in order to perfrom the coordinate transformation
       // using the transformation of the previous frame.
-      Vector2 localToWorldTransform(Vector2 const & point, RBState::FrameSpecifier frame = RBState::CURRENT) const;
+      Vector2 worldToLocalTransform(const Vector2 & point,
+          RBState::FrameSpecifier frame = RBState::CURRENT) const;
+
+      // Transform point from local body space to world space using specified
+      // state transform.  By default, FrameSpecifier is set to CURRENT so that
+      // the current frame transform is used.  The FrameSpecifier can also be
+      // assigned PREVIOUS in order to perfrom the coordinate transformation
+      // using the transformation of the previous frame.
+      Vector2 localToWorldTransform(Vector2 const & point,
+          RBState::FrameSpecifier frame = RBState::CURRENT) const;
 
       void updateTransformedVertices() const;
 

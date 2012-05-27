@@ -134,7 +134,7 @@ void Demo1::paintGL()
 	if (!paused) {
     // update mouseClicked position
     if (rbActedOn != NULL) {
-      Vector2 pt = rbActedOn->worldToLocalTransform(Vector2(userData_mouseForce[2], userData_mouseForce[3]));
+      Vector2 pt = rbActedOn->prevWorldToCurrentLocalTransform(Vector2(userData_mouseForce[2], userData_mouseForce[3]));
       pt += rbActedOn->getPosition();
       userData_mouseForce[2] = pt.x;
       userData_mouseForce[3] = pt.y;
@@ -173,7 +173,7 @@ void Demo1::mousePressEvent(QMouseEvent *event)
   {
     rbActedOn = body1;
     body1->addForce(mouseForce);
-    Vector2 transformedPoint = body1->worldToLocalTransform(Vector2(posX, posY));
+    Vector2 transformedPoint = body1->prevWorldToCurrentLocalTransform(Vector2(posX, posY));
   }
   else if (body2->pointIsInterior(posX, posY))
   {
