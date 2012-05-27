@@ -4,7 +4,6 @@
 #include <cassert>
 #include <cstring>
 #include <iostream>
-#include <limits>       // for infinity
 
 namespace Rigid2D
 {
