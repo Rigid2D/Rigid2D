@@ -408,3 +408,36 @@ TEST(SqDistPointSegment, inside_interval_test2){
   Real result = SqDistPointSegment(a,b,c);
   EXPECT_FLOAT_EQ(result, 1.0);
 }
+
+//=============================================================================
+// tripleCrossProduct Tests
+//=============================================================================
+TEST(tripleCrossProduct, test1){
+  Vector2 i(1,0),
+          j(0,1);
+
+  EXPECT_TRUE(tripleCrossProduct(i,j,i) == j);
+}
+
+TEST(tripleCrossProduct, test2){
+  Vector2 i(1,0),
+          j(0,1);
+
+  EXPECT_TRUE(tripleCrossProduct(i,i,j) == -1*j);
+}
+
+TEST(tripleCrossProduct, test3){
+  Vector2 a(1,0),
+          b(0,1),
+          c(0.5,0.5);
+
+  EXPECT_TRUE(tripleCrossProduct(a,b,c) == Vector2(0, 0.5));
+}
+
+TEST(tripleCrossProduct, test4){
+  Vector2 a(1,0),
+          b(0,1),
+          c(0.0,0.0);
+
+  EXPECT_TRUE(tripleCrossProduct(a,b,c) == Vector2(0.0, 0.0));
+}

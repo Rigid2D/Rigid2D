@@ -195,4 +195,8 @@ namespace Rigid2D
     return ac.dot(ac) - (e * e / f);
   }
 
+  // Use rule a x (b x c) = b(a*c) - c(a*b)
+  Vector2 tripleCrossProduct(Vector2 a, Vector2 b, Vector2 c) {
+    return b * (a.dot(c)) - c * (a.dot(b));
+  }
 } // end namespace Rigid2D

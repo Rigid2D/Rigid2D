@@ -63,6 +63,11 @@ namespace Rigid2D
   // Returns the squared distance between the point c and the line segment
   // whose end points are a and b.
   Real SqDistPointSegment(Vector2 const &a, Vector2 const &b, Vector2 const &c);
+
+  // Returns a x (b x c), which is a vector that lies in the 2D plane
+  // containing a, b, and c.
+  // Note that (b x c) x a = -tripleCrossProdcut(a, b, c)
+  Vector2 tripleCrossProduct(Vector2 a, Vector2 b, Vector2 c);
 }
 
 #endif
