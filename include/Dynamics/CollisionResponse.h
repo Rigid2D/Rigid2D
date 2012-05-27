@@ -7,7 +7,6 @@
 
 namespace Rigid2D{
 
-  enum ContactType { Resting, Colliding, Separating };
 
   // Given the contact argument representing an overlapping collision between
   // bodies a and b, resetStatesToTOI resets the current RBStates of the bodies
@@ -17,6 +16,9 @@ namespace Rigid2D{
   // from one another.
   Real resetStatesToTOI(Contact const &contact);
 
+  // Determines type of contact and resolves collision accordingly.  If contact
+  // is of type Contact::Colliding then impulses are generated and applied to
+  // the two contacting bodies in order to simulate a collision.
   void resolveCollision(Contact const &contact);
 }
 
