@@ -83,11 +83,12 @@ namespace Rigid2D
                        Vector2 const &position,
                        Real mass,
                        Vector2 const &velocity,
-                       Angle orientation)
+                       Angle orientation,
+                       Real restitution)
   {
     assert(vertex_array != NULL);
 		vertices_ = realArrayToVector2Array(num_vertices, vertex_array);
-    initialize(num_vertices, vertices_, position, mass, velocity, orientation);
+    initialize(num_vertices, vertices_, position, mass, velocity, orientation, restitution);
   }
 
   RigidBody::RigidBody(unsigned int num_vertices,
@@ -95,7 +96,8 @@ namespace Rigid2D
                        Vector2 const &position,
                        Real mass,
                        Vector2 const &velocity,
-                       Angle orientation)
+                       Angle orientation,
+                       Real restitution)
   {
     assert(vertices != NULL);
     vertices_ = new Vector2 [num_vertices];
@@ -104,7 +106,7 @@ namespace Rigid2D
       vertices_[i] = Vector2(vertices[i].x, vertices[i].y);
     }
 
-    initialize(num_vertices, vertices, position, mass, velocity, orientation);
+    initialize(num_vertices, vertices, position, mass, velocity, orientation, restitution);
   }
 
   void RigidBody::initialize(unsigned int num_vertices,
@@ -112,7 +114,8 @@ namespace Rigid2D
                              Vector2 const &position,
                              Real mass,
                              Vector2 const &velocity,
-                             Angle orientation)
+                             Angle orientation,
+                             Real restitution)
   {
     assert(mass != 0); // Needed by invMass_ to prevent divide by zero.
 
@@ -136,6 +139,7 @@ namespace Rigid2D
 
     mass_ = mass;
     invMass_ = 1/mass;
+    restitution_ = restitution;
     num_vertices_ = num_vertices;
     forceAccumulator_ = Vector2(0, 0);
     moi_ = momentOfInertia(num_vertices, vertices, mass);

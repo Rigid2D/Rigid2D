@@ -68,7 +68,8 @@ namespace Rigid2D
                 Vector2 const &position,
                 Real mass,
                 Vector2 const &velocity = Vector2(0,0),
-                Angle orientation = 0.0);
+                Angle orientation = 0.0,
+                Real restitution = 1.0);
 
       // Same as above, but takes in a Vector2 array
       RigidBody(unsigned int num_vertices,
@@ -76,7 +77,8 @@ namespace Rigid2D
                 Vector2 const &position,
                 Real mass,
                 Vector2 const &velocity = Vector2(0,0),
-                Angle orientation = 0.0);
+                Angle orientation = 0.0,
+                Real restitution = 1.0);
 
 			RigidBody() {}
 
@@ -194,9 +196,10 @@ namespace Rigid2D
        * the point lies within the convex polygon defined by vertex_array_.*/
       bool pointIsInterior(Real x, Real y);
 
-      // Returns the velocity of given point on Rigid Body.  Takes into account
-      // both linear and angular velocities of the Rigid Body during the
-      // current frame.
+      // Returns the velocity of given point as if it were affixed to the Rigid
+      // Body.  Takes into account both linear and angular velocities of the
+      // Rigid Body during the current frame.  Assumes point is in local body
+      // coordinates.
       Vector2 pointVelocity(Vector2 point);
 
     protected:
@@ -212,7 +215,8 @@ namespace Rigid2D
                       Vector2 const &position,
                       Real mass,
                       Vector2 const &velocity,
-                      Angle orientation);
+                      Angle orientation,
+                      Real restitution);
 
     Vector2 findProjectionInterval(const Vector2 & slope) const;
 
@@ -225,6 +229,7 @@ namespace Rigid2D
       Real moi_;                              // Moment of inertia about axis perpendicular to plane of
                                               // body and through its center.
       Real invMoi_;                           // 1/moi
+      Real restitution_;                      // Coefficient of restitution for collisions, in the interval [0,1].
 
       Vector2 forceAccumulator_;              // Sum of forces acting on the center of mass of RigidBody
       Real torqueAccumulator_;                // Sum of torques on body, about center of mass.
