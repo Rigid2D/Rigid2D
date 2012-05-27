@@ -22,7 +22,9 @@ namespace Rigid2D {
       Vector2 pb;                // Contact point on body b, given in local body coordinates.
       Vector2 n;                 // Outward pointing normal to contact edge of b.
 
-      enum ContactType { Resting, Colliding, Separating };
+      Real v_rel;                // Relative velocity between a's contact vertex and b's contact point.
+
+      enum Type { Resting, Colliding, Separating };
   };
 
   // Separating axis test

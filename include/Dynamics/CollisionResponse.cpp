@@ -111,7 +111,7 @@ void resetStatesToTOI(Contact const &contact) {
   // and are a squared distance 𝜀 > 0 apart.
 }
 
-Contact::ContactType getContactType(Contact &contact) {
+Contact::Type getContactType(Contact &contact) {
   RigidBody *a = contact.a;
   RigidBody *b = contact.b;
 
@@ -153,6 +153,8 @@ Contact::ContactType getContactType(Contact &contact) {
   Real v_rel = n.dot(va_velocity - pb_velocity);
   Real threshold = 0.0001f;
 
+  contact.v_rel = v_rel;
+
   if (v_rel > threshold)
     // bodies are moving away from one another
     return Contact::Separating;
@@ -166,9 +168,48 @@ Contact::ContactType getContactType(Contact &contact) {
 
 void resolveCollision(Contact &contact) {
   // Determine type of contact.
-  Contact::ContactType type = getContactType(contact);
+  Contact::Type type = getContactType(contact);
   if (type == Contact::Colliding){
-    // Update linear and angular momentum for bodies a and b.
+    RigidBody *a = contact.a;
+    RigidBody *b = contact.b;
+
+    // Do steps to compute impulse j
+
+    // Vector from a's center of mass to a's contact vertex.
+    Vector2 ra = a->getVertex(contact.va_index) - a->getPosition();
+
+    // Vector from b's center of mass to b's contact point.
+    Vector2 rb = contact.pb - b->getPosition();
+
+    Vector2 n = contact.n;
+
+    Real epsilon = (a->getRestitution() + b->getRestitution()) / 2;
+
+    Real numerator = -(1 + epsilon) * contact.v_rel;
+
+    Real term1 = a->getInvMass(),
+         term2 = b->getInvMass(),
+         term3 = n.dot(a->getInvMoi() * tripleCrossProduct(ra, n, ra)),
+         term4 = n.dot(b->getInvMoi() * tripleCrossProduct(rb, n, rb));
+
+    // Now compute impulse
+    Real j = numerator / (term1 + term2 + term3 + term4);
+
+    Vector2 force = j * n;
+
+    RBState state;
+
+    // Apply impulse to body a.
+    a->getState(state);
+    state.linearMomentum += force;
+    state.angularMomentum += ra.cross(force);
+    a->setState(state);
+
+    // Apply impulse to body b.
+    b->getState(state);
+    state.linearMomentum -= force;
+    state.angularMomentum -= rb.cross(force);
+    b->setState(state);
   }
 }
 
