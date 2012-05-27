@@ -143,6 +143,7 @@ namespace Rigid2D
       Real getMass() const;
       Real getInvMass() const;
       Angle getOrientation() const;
+      Real getRestitution() const;
 
       /// Returns moment of inertia about axis through centroid and
       /// perpendicular to the plane of the RigidBody.

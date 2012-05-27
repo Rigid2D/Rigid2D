@@ -268,6 +268,11 @@ namespace Rigid2D
     return state_.orientation;
   }
 
+  Real RigidBody::getRestitution() const
+  {
+    return restitution_;
+  }
+
   Real RigidBody::getMomentOfInertia() const
   {
     return moi_;
