@@ -142,6 +142,7 @@ namespace Rigid2D
       Real getAngularMomentum() const;
       Real getMass() const;
       Real getInvMass() const;
+      Real getInvMoi() const;
       Angle getOrientation() const;
       Real getRestitution() const;
 
@@ -236,7 +237,7 @@ namespace Rigid2D
       Vector2 forceAccumulator_;              // Sum of forces acting on the center of mass of RigidBody
       Real torqueAccumulator_;                // Sum of torques on body, about center of mass.
 
-      std::unordered_set<Force*> forces_;     // all forces being applied to this RB
+      std::unordered_set<Force*> forces_;     // All forces being applied to this RB
 
       // Geometry
       unsigned int num_vertices_;             // Number of vertices that make up the perimeter of RigidBody.
