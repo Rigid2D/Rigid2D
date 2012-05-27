@@ -7,10 +7,15 @@
 
 namespace Rigid2D{
 
-  // Returns a value in (0,1) marking the fraction of frame time since the
-  // previous frame where bodies a and b are non-intersecting and are within a
-  // squared distance 𝜀 > 0 from one another.
-  Real timeOfImpact(Contact const &contact);
+  enum ContactType { Resting, Colliding, Separating };
+
+  // Given the contact argument representing an overlapping collision between
+  // bodies a and b, resetStatesToTOI resets the current RBStates of the bodies
+  // back in time to the momment of impact.  The momment of impact is some time
+  // between the previous time frame and the current time frame such that
+  // bodies a and b are non-intersecting and are within a squared distance 𝜀 > 0
+  // from one another.
+  Real resetStatesToTOI(Contact const &contact);
 
   void resolveCollision(Contact const &contact);
 }
