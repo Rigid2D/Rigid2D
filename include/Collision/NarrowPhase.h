@@ -19,7 +19,10 @@ namespace Rigid2D {
       unsigned int vb1_index;    // Index of first vertex that composes contact edge of b.
       unsigned int vb2_index;    // Index for second vertex that composes contact edge of b.
 
-      // TODO: implement constructor, and accessors
+      Vector2 pb;                // Contact point on body b, given in local body coordinates.
+      Vector2 n;                 // Outward pointing normal to contact edge of b.
+
+      enum ContactType { Resting, Colliding, Separating };
   };
 
   // Separating axis test
@@ -28,7 +31,6 @@ namespace Rigid2D {
   // contact structure will be filled out, otherwise it will not be modified.
   bool sat(RigidBody *rb1, RigidBody *rb2, Contact &contact);
 
-  void resolveCollision(Contact const &contact);
 }
 
 #endif
