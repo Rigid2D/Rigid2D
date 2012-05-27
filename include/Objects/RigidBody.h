@@ -141,6 +141,7 @@ namespace Rigid2D
       Vector2 getLinearMomentum() const;
       Real getAngularMomentum() const;
       Real getMass() const;
+      Real getInvMass() const;
       Angle getOrientation() const;
 
       /// Returns moment of inertia about axis through centroid and

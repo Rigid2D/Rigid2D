@@ -258,6 +258,11 @@ namespace Rigid2D
     return mass_;
   }
 
+  Real RigidBody::getInvMass() const
+  {
+    return invMass_;
+  }
+
   Angle RigidBody::getOrientation() const
   {
     return state_.orientation;
