@@ -20,6 +20,7 @@ namespace Rigid2D {
       unsigned int vb1_index;    // Index of first vertex that composes contact edge of b.
       unsigned int vb2_index;    // Index for second vertex that composes contact edge of b.
 
+      Vector2 mtv;               // The minimum translation vector in regards to body b.
       Vector2 pb;                // Contact point on body b, given in local body coordinates.
       Vector2 n;                 // Outward pointing normal to contact edge of b.
 
@@ -31,11 +32,15 @@ namespace Rigid2D {
   // Returns the interval bounds of the projection of all the vertices onto a normal for a given body.
   Vector2 findProjectionInterval(const RigidBody *rb, const Vector2 & normal);
 
+  // Fills out the information in contact struct. Colliding bodies in contact should already be filled out.
+  // Requires mtv to be passed in.
+  void findContactInformation(Contact *contact);
+
   // Separating axis test
   // Returns true if inter-penetration is detected between Rigid Bodys rb1 and
   // rb2.  Otherwise, false is returned. If inter-penetration is detected the
   // contact structure will be filled out, otherwise it will not be modified.
-  bool sat(const RigidBody *rb1, const RigidBody *rb2, Contact *contact, bool firstRB = true);
+  bool sat(RigidBody *rb1, RigidBody *rb2, Contact *contact, bool firstRB = true);
 
 }
 

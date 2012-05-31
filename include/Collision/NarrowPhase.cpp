@@ -24,7 +24,11 @@ namespace Rigid2D {
     return interval;
   }
 
-  bool sat(const RigidBody *rb1, const RigidBody *rb2, Contact *contact, bool firstRB)
+  /*void findContactInformation(Contact *contact)
+  {
+  }*/
+
+  bool sat(RigidBody *rb1, RigidBody *rb2, Contact *contact, bool firstRB)
   {
     // TODO: add explanation
 
@@ -90,6 +94,10 @@ namespace Rigid2D {
     if (firstRB) {
       return sat(rb1, rb2, contact, false);
     } else {
+      // fill out contact
+      contact->a = rb1;
+      contact->b = rb2;
+      contact->mtv = min_interval;
       return true;
     }
   }
