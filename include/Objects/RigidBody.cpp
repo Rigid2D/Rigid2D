@@ -200,9 +200,8 @@ namespace Rigid2D
     dState.angularMomentum = torqueAccumulator_;
   }
 
-  bool RigidBody::checkCollision(RigidBody *rb)
+  bool RigidBody::checkCollision(RigidBody *rb, Contact *contact)
   {
-    Contact *contact = new Contact;
     if (broadPhase(rb)) {
        return narrowPhase(rb, contact);
     } else {
@@ -370,6 +369,11 @@ namespace Rigid2D
   {
     return &worldBB_;
   }
+
+  /*Contact * RigidBody::getContact()
+  {
+    return contact_;
+  } */
 
   bool RigidBody::bp_isIntersecting() const
   {

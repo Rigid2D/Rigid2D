@@ -95,9 +95,11 @@ namespace Rigid2D {
       return sat(rb1, rb2, contact, false);
     } else {
       // fill out contact
+      // NOTE: currently the passed in contact is rb1's contact_.
       contact->a = rb1;
       contact->b = rb2;
-      contact->mtv = min_interval;
+      contact->mtv = min_overlap * min_interval;
+
       return true;
     }
   }

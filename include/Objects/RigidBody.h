@@ -94,7 +94,7 @@ namespace Rigid2D
       void computeForces(RBState &state);
       void computeStateDeriv(const RBState &state, RBState &dState) const;
 
-      bool checkCollision(RigidBody *rb);
+      bool checkCollision(RigidBody *rb, struct Contact *contact);
 
       /** Tells RigidBodySystem to apply the given force from here on out.
 			 * If the force was already previously given, it does not apply it a
@@ -146,6 +146,7 @@ namespace Rigid2D
       Real getInvMoi() const;
       Angle getOrientation() const;
       Real getRestitution() const;
+      //Contact * getContact();
 
       /// Returns moment of inertia about axis through centroid and
       /// perpendicular to the plane of the RigidBody.

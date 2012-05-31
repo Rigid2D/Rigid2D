@@ -2,8 +2,10 @@
 #define RIGID2D_RIGID_BODY_SYSTEM_H
 
 #include "Common/RigidSettings.h"
+#include "Collision/NarrowPhase.h"
 #include "Objects/RigidBody.h"
 #include <unordered_set>
+#include <vector>
 
 namespace Rigid2D
 {
@@ -62,11 +64,13 @@ namespace Rigid2D
        */
       void removeRigidBodies (RigidBody **rigidBodyArray, unsigned int numBodies);
 
+      std::vector<Contact*> * getContacts();
 			/// Perform collision detection between all pairs of rigid bodies.
       void checkCollision();
 
     private:
       std::unordered_set<RigidBody*> rigidBodies_;   // Collection of all tracked rigid bodies
+      std::vector<Contact*> contacts_;               // All contacts after checkCollision runs
       Real time_;                                    // Simulation clock
 	};
 

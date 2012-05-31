@@ -130,6 +130,19 @@ void Demo1::paintGL()
     glEnd();
   }
 
+  // Draw all MTVs
+  std::vector<Contact*> * contacts = rigidBodySystem->getContacts();
+  std::vector<Contact*>::iterator it;
+  for (it = contacts->begin(); it < contacts->end(); it++) {
+    Vector2 mtv = (*it)->mtv;
+    Vector2 pos = (*it)->a->getPosition();
+    glBegin(GL_LINE);
+      glColor3ub(100, 100, 230);
+      glVertex2f(pos.x, pos.y);
+      glVertex2f(pos.x + mtv.x, pos.y + mtv.y);
+    glEnd();
+  }
+
   // Update ALL THE THINGS!! (unless paused)
 	if (!paused) {
     // update mouseClicked position
