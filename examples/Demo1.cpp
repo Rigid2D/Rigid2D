@@ -136,10 +136,11 @@ void Demo1::paintGL()
   for (it = contacts->begin(); it < contacts->end(); it++) {
     Vector2 mtv = (*it)->mtv;
     Vector2 pos = (*it)->a->getPosition();
+    body1->setPosition(body1->getPosition() + mtv);
     glBegin(GL_LINE);
       glColor3ub(100, 100, 230);
-      glVertex2f(pos.x, pos.y);
-      glVertex2f(pos.x + mtv.x, pos.y + mtv.y);
+      glVertex2f(0, 0);
+      glVertex2f(mtv.x, mtv.y);
     glEnd();
   }
 
