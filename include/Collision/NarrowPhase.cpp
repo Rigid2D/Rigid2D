@@ -1,4 +1,6 @@
 #include "NarrowPhase.h"
+#include <limits>
+#include <iostream>
 
 namespace Rigid2D {
 
@@ -24,9 +26,52 @@ namespace Rigid2D {
     return interval;
   }
 
-  /*void findContactInformation(Contact *contact)
+  void findContactInformation(Contact *contact)
   {
-  }*/
+    RigidBody * a = contact->a;
+    RigidBody * b = contact->b;
+    Vector2 mtv = contact->mtv;
+    //mtv.normalize();
+
+    // find vertex of a furthest in b
+    Real max = std::numeric_limits<Real>::min();
+    unsigned index = 0;
+    Real projection;
+    for (unsigned i = 0; i < a->getNumVertices(); i++) {
+      projection = a->getTransformedVertex(i).dot(1*mtv);
+      if (projection > max) {
+        max = projection;
+        index = i;
+      }
+    }
+    contact->va_index = index;
+
+    // find edge of b being intersected (we are interested in the one most
+    // perpendicular to the mtv)
+    max = std::numeric_limits<Real>::min();
+    for (unsigned i = 0; i < b->getNumVertices(); i++) {
+      projection = b->getTransformedVertex(i).dot(-1*mtv);
+      if (projection > max) {
+        max = projection;
+        index = i;
+      }
+    }
+    Vector2 v = b->getVertex(index);
+    unsigned l_index = (index + b->getNumVertices() - 1 ) % b->getNumVertices();
+    unsigned r_index = (index + 1 ) % b->getNumVertices();
+    Vector2 v0 = b->getTransformedVertex(l_index);
+    Vector2 v1 = b->getTransformedVertex(r_index);
+    Vector2 l = v - v0;
+    Vector2 r = v - v1;
+    if (r.dot(mtv) < l.dot(mtv)) {
+      contact->vb1_index = l_index;
+      contact->vb2_index = index;
+    } else {
+      contact->vb1_index = index;
+      contact->vb2_index = r_index;
+    }
+
+  }
 
   bool sat(RigidBody *rb1, RigidBody *rb2, Contact *contact, bool firstRB)
   {
@@ -34,8 +79,8 @@ namespace Rigid2D {
 
     // extrema points for the projected intervals of each RB
     Vector2 intervalRB1, intervalRB2;
-    Vector2 min_interval;         // ends up being direction of MTV
-    Real min_overlap = FLT_MAX;   // ends up being magnitude of MTV
+    Vector2 min_interval;                // ends up being direction of MTV
+    Real min_overlap = std::numeric_limits<Real>::max();   // ends up being magnitude of MTV
     RigidBody const * rb;                // the body which has it's vertices projected
 
     if (firstRB) {
@@ -99,6 +144,7 @@ namespace Rigid2D {
       contact->a = rb1;
       contact->b = rb2;
       contact->mtv = min_overlap * min_interval;
+      findContactInformation(contact);
 
       return true;
     }

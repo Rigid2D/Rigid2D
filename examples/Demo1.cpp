@@ -130,17 +130,30 @@ void Demo1::paintGL()
     glEnd();
   }
 
-  // Draw all MTVs
+  // Draw all MTVs and contact edges/vertices
   std::vector<Contact*> * contacts = rigidBodySystem->getContacts();
   std::vector<Contact*>::iterator it;
   for (it = contacts->begin(); it < contacts->end(); it++) {
     Vector2 mtv = (*it)->mtv;
     Vector2 pos = (*it)->a->getPosition();
-    body1->setPosition(body1->getPosition() + mtv);
+    std::cout << (*it)->va_index;
+    Vector2 v = (*it)->a->localToWorldTransform((*it)->a->getVertex((*it)->va_index));
+    Vector2 edge_v0 = (*it)->b->localToWorldTransform((*it)->b->getVertex((*it)->vb1_index));
+    Vector2 edge_v1 = (*it)->b->localToWorldTransform((*it)->b->getVertex((*it)->vb2_index));
+    //body1->setPosition(body1->getPosition() + mtv);
+    glTranslatef(0,0,1);
     glBegin(GL_LINE);
       glColor3ub(100, 100, 230);
       glVertex2f(0, 0);
       glVertex2f(mtv.x, mtv.y);
+      // contact edge
+      glColor3ub(250,50, 250);
+      glVertex2f(edge_v0.x, edge_v0.y);
+      glVertex2f(edge_v1.x, edge_v1.y);
+    glEnd();
+    glPointSize(4);
+    glBegin(GL_POINT);
+      glVertex2f(v.x, v.y);
     glEnd();
   }
 
