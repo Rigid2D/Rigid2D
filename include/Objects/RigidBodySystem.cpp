@@ -1,5 +1,6 @@
 #include "RigidBodySystem.h"
 #include "Common/RigidException.h"
+#include "Dynamics/CollisionResponse.h"
 
 using namespace std;
 
@@ -27,6 +28,11 @@ namespace Rigid2D {
       (*it)->update();
     }
     checkCollision();
+
+    std::vector<Contact*>::iterator contact_it;
+    for (contact_it = contacts_.begin(); contact_it < contacts_.end(); contact_it++) {
+      resolveCollision(**contact_it);
+    }
   }
 
 

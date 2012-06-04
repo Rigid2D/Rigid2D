@@ -14,12 +14,12 @@ namespace Rigid2D {
   // between the previous time frame and the current time frame such that
   // bodies a and b are non-intersecting and are within a squared distance 𝜀 > 0
   // from one another.
-  Real resetStatesToTOI(Contact const &contact);
+  void resetStatesToTOI(Contact const &contact);
 
   // Determines type of contact and resolves collision accordingly.  If contact
   // is of type Contact::Colliding then impulses are generated and applied to
   // the two contacting bodies in order to simulate a collision.
-  void resolveCollision(Contact const &contact);
+  void resolveCollision(Contact &contact);
 }
 
 #endif
