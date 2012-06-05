@@ -20,15 +20,17 @@ namespace Rigid2D {
 
   void RigidBodySystem::update()
   {
-    // clear contacts from previous frame (this should later be done by collision response code)
+    // clear old collisions (this should later be done by collision response code)
     contacts_.clear();
 
+    // find collisions
     unordered_set<RigidBody*>::iterator it;
     for (it = rigidBodies_.begin(); it != rigidBodies_.end(); ++it) {
       (*it)->update();
     }
     checkCollision();
 
+    // resolve collisions
     std::vector<Contact*>::iterator contact_it;
     for (contact_it = contacts_.begin(); contact_it < contacts_.end(); contact_it++) {
       resolveCollision(**contact_it);

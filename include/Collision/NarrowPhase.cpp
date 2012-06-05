@@ -34,21 +34,26 @@ namespace Rigid2D {
     //mtv.normalize();
 
     // find vertex of a furthest in b
-    Real max = std::numeric_limits<Real>::min();
-    unsigned index = 0;
+    Real max = -1 * std::numeric_limits<Real>::max();
+    unsigned index;
     Real projection;
     for (unsigned i = 0; i < a->getNumVertices(); i++) {
+
+      std::cout << "curindex " << index << std::endl;
       projection = a->getTransformedVertex(i).dot(1*mtv);
+      std::cout << "proj: " << projection << std::endl;
+      std::cout << "max: " << max << std::endl;
       if (projection > max) {
         max = projection;
         index = i;
       }
     }
+    std::cout << index << std::endl;
     contact->va_index = index;
 
     // find edge of b being intersected (we are interested in the one most
     // perpendicular to the mtv)
-    max = std::numeric_limits<Real>::min();
+    max = -1 * std::numeric_limits<Real>::min();
     for (unsigned i = 0; i < b->getNumVertices(); i++) {
       projection = b->getTransformedVertex(i).dot(-1*mtv);
       if (projection > max) {

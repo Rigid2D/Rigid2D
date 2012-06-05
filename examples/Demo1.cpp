@@ -136,7 +136,6 @@ void Demo1::paintGL()
   for (it = contacts->begin(); it < contacts->end(); it++) {
     Vector2 mtv = (*it)->mtv;
     Vector2 pos = (*it)->a->getPosition();
-    //std::cout << (*it)->va_index;
     Vector2 v = (*it)->a->localToWorldTransform((*it)->a->getVertex((*it)->va_index));
     Vector2 edge_v0 = (*it)->b->localToWorldTransform((*it)->b->getVertex((*it)->vb1_index));
     Vector2 edge_v1 = (*it)->b->localToWorldTransform((*it)->b->getVertex((*it)->vb2_index));
