@@ -118,14 +118,11 @@ namespace Rigid2D {
     Vector2 pb;  // contact point on body b, lies somwhere on the edge (vb1, vb2).
     Vector2 va;  // contact point on body a, which is a's contact vertex.
 
-    va = a->getVertex(contact.va_index);
-    va = a->localToWorldTransform(va);
+    va = a->getTransformedVertex(contact.va_index);
 
-    Vector2 vb1 = b->getVertex(contact.vb1_index);
-    vb1 = b->localToWorldTransform(vb1);
+    Vector2 vb1 = b->getTransformedVertex(contact.vb1_index);
 
-    Vector2 vb2 = b->getVertex(contact.vb2_index);
-    vb2 = b->localToWorldTransform(vb2);
+    Vector2 vb2 = b->getTransormedVertex(contact.vb2_index);
 
     // Determine contact point on body b in world coordinates.
     ClosestPtPointSegment(vb1, vb2, va, pb);
@@ -176,7 +173,7 @@ namespace Rigid2D {
       // Do steps to compute impulse j
 
       // Vector from a's center of mass to a's contact vertex.
-      Vector2 ra = a->getVertex(contact.va_index) - a->getPosition();
+      Vector2 ra = a->getTransformedVertex(contact.va_index) - a->getPosition();
 
       // Vector from b's center of mass to b's contact point.
       Vector2 rb = contact.pb - b->getPosition();
