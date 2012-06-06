@@ -40,32 +40,24 @@ namespace Rigid2D {
     unsigned index;
     Real projection;
     for (unsigned i = 0; i < a->getNumVertices(); i++) {
-      std::cout << "i0: " << i << "   curindex " << index << std::endl;
       projection = a->getTransformedVertex(i).dot(1*mtv);
-      std::cout << "proj: " << projection << std::endl;
-      std::cout << "max: " << max << std::endl;
       if (projection > max) {
         max = projection;
         index = i;
       }
     }
-    std::cout << index << std::endl;
     contact->va_index = index;
 
     // find edge of b being intersected (we are interested in the one most
     // perpendicular to the mtv)
     max = -1 * std::numeric_limits<Real>::max();
     for (unsigned i = 0; i < b->getNumVertices(); i++) {
-      std::cout << "i: " << i << "   curindex " << index << std::endl;
       projection = b->getTransformedVertex(i).dot(-1*mtv);
-      std::cout << "proj: " << projection << std::endl;
-      std::cout << "max: " << max << std::endl;
       if (projection > max) {
         max = projection;
         index = i;
       }
     }
-      std::cout << "IIndex " << index << std::endl;
     Vector2 v = b->getTransformedVertex(index);
     unsigned l_index = (index + b->getNumVertices() - 1 ) % b->getNumVertices();
     unsigned r_index = (index + 1 ) % b->getNumVertices();
@@ -207,9 +199,6 @@ namespace Rigid2D {
       }
       contact->mtv = mtv;
       contact->mtv_magnitude = mtv_magnitude;
-      
-      // 
-      std::cout << "MAGNITUDE " << contact->mtv_magnitude << std::endl;
 
       findContactInformation(contact);
 

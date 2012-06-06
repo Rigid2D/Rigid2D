@@ -122,7 +122,7 @@ namespace Rigid2D {
 
     Vector2 vb1 = b->getTransformedVertex(contact.vb1_index);
 
-    Vector2 vb2 = b->getTransormedVertex(contact.vb2_index);
+    Vector2 vb2 = b->getTransformedVertex(contact.vb2_index);
 
     // Determine contact point on body b in world coordinates.
     ClosestPtPointSegment(vb1, vb2, va, pb);
