@@ -156,6 +156,8 @@ namespace Rigid2D {
 
     // Compute relative velocity
     Real v_rel = n.dot(va_velocity - pb_velocity);
+    std::cout << "va_velocity -- " << va_velocity.x << "    "  << va_velocity.y << "      \n";
+    std::cout << "pb_velocity -- " << pb_velocity.x << "    "  << pb_velocity.y << "      \n";
     Real threshold = 0.0001f;
 
     contact.v_rel = v_rel;
@@ -174,7 +176,7 @@ namespace Rigid2D {
   void resolveCollision(Contact &contact) {
     // Determine type of contact.
     Contact::Type type = getContactType(contact);
-    if (true) {///(type == Contact::Colliding){
+    if (true) { ///(type == Contact::Colliding){
       RigidBody *a = contact.a;
       RigidBody *b = contact.b;
 
@@ -207,6 +209,12 @@ namespace Rigid2D {
       std::cout << "term3 " << term3 << "\n";
       std::cout << "term4 " << term4 << "\n";
       std::cout << "force.x " << force[0] << "\n";
+
+      // temp hack for video
+      if (fabs(force.getLength()) > 100.0) {
+        force.normalize();
+        force = force * 50.0;
+      }
 
       RBState state;
 

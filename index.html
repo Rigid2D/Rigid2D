@@ -1,0 +1,95 @@
+<html>
+
+<head>
+	<title>Rigid2D</title>
+	<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+	<div id="page-container">
+
+		<div id="logo">
+			<h1> Rigid2D</h1>
+			<h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Library for 2D physics and collision</h3>
+		</div>
+
+		<div id="main-nav">
+			<a href="#"> About </a><br>
+			<a href="#"> Code </a><br>
+			<a href="#"> Documentation </a><br>
+			<a href="#"> References </a><br>
+		</div>
+
+		<div id="content">
+			<div id="content-inner">
+<p>
+	Rigid2D is an open-source library for 2D physics and collision detection written in C++.
+	It is functional but still in early development.
+</p>
+<p>
+	Rigid2D is intended to be used with convex polygons.
+</p>
+
+<br>
+<iframe width="420" height="315" src="http://www.youtube.com/embed/YDSGmYMrcEE" frameborder="0" allowfullscreen></iframe>
+			</div>
+			<div id="content-inner">
+Code Design:
+<p>
+	The library is made up of several core classes. They are RigidBodySystem, RigidBody,
+	and Force. RigidBodySystem is the class responsible for all RigidBody objects.
+	Once a RigidBody is created, it is registered with RigidBodySystem.
+</p>
+<p>
+	The force class is intended to be the way the user (of the library) will make the objects
+	move. To add a force to an object, all that is necessary is to create a force object and
+	give it a ForceFunctionPtr which is an arbitrary function that manipulates the RigidBody
+	in some way. Then the force is registered with the proper RigidBody object.
+</p>
+<p>
+	Additionally there is an ODE solver implementing a RungeKutta4 method used to compute
+	how the functions change the rigib bodies' states.  
+</p>
+<p>
+	There is also a collection of methods for collision detection. Collision detection
+	is broken into two part - broad phase and narrow phase. Broad phase collision detection
+	(used for fast culling of possible collisions) is done by encapsulating the rigid bodies in
+	Axis-Aligned Bounding Boxes (AABB). Because the AABBs are simple and axis-aligned,
+	collision checks between them can be done very quickly.
+</p>
+<p>
+	Broad phase returning a positive collision does not guarantee an actual collision
+	and so we do a second check in narrow phase. Rigid2D uses the Separating
+	Axis Theorem inside narrow phase to provide an exact check between convex-convex
+	polygon collisions. Conveniently, SAT also return the Minimum Translation Vector which is
+	the minimum vector by which we need to move one of the two intersecting bodies so
+	there no longer is a collision.
+</p>
+<p>
+	Using the MTV we can compute the edge-vertex pair during collision. Finally,
+	using this information we can resolve the collision in a physically realistic
+	manner.
+</p>
+<p>
+	Once the RigidBody objects and Forces are registered, all of the above is done
+	simple with the update() command of RigidBodySystem in the main program loop.
+</p>
+
+			</div> 
+		</div> <!--content-->
+		
+		<div id="alt-nav">
+			<a href="#"> About </a> | 
+			<a href="#"> Code </a> | 
+			<a href="#"> Documentation </a> | 
+			<a href="#"> References </a>
+		</div>
+		
+		<div id="footer">
+			Code by <b>Dustin Biser</b> and <b>Michail Denchev</b>
+		</div> <!-- footer -->
+
+	</div> <!-- page-container -->
+</body>
+</html>
+
