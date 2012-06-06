@@ -20,7 +20,8 @@ namespace Rigid2D {
       unsigned int vb1_index;    // Index of first vertex that composes contact edge of b.
       unsigned int vb2_index;    // Index for second vertex that composes contact edge of b.
 
-      Vector2 mtv;               // The minimum translation vector in regards to body b.
+      Vector2 mtv;               // The minimum translation vector (normalized).
+      Real mtv_magnitude;        // The length of the mtv vector.
       Vector2 pb;                // Contact point on body b, given in local body coordinates.
       Vector2 n;                 // Outward pointing normal to contact edge of b.
 
@@ -30,7 +31,7 @@ namespace Rigid2D {
   };
 
   // Returns the interval bounds of the projection of all the vertices onto a normal for a given body.
-  Vector2 findProjectionInterval(const RigidBody *rb, const Vector2 & normal);
+  Vector2 findProjectionInterval(const RigidBody *rb, const Vector2 & normal, unsigned &leftIndex, unsigned &rightIndex);
 
   // Fills out the information in contact struct. Colliding bodies in contact should already be filled out.
   // Requires mtv to be passed in.
