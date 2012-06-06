@@ -69,7 +69,7 @@ void Demo1::paintGL()
   glPushMatrix();
   AABB *bb = body1->getWorldBB();
   AABB *bb2 = body1->getStaticBB();
-  if (body1->np_isIntersecting()) {
+  /*if (body1->np_isIntersecting()) {
     glColor3ub(180,50,50);
   } else {
     glColor3ub(50,50,180);
@@ -79,7 +79,7 @@ void Demo1::paintGL()
     glVertex2f(bb->minVertex_.x-0.2, bb->maxVertex_.y+0.2);
     glVertex2f(bb->maxVertex_.x+0.2, bb->maxVertex_.y+0.2);
     glVertex2f(bb->maxVertex_.x+0.2, bb->minVertex_.y-0.2);
-  glEnd();
+  glEnd();*/
   glTranslatef(body1->getPosition()[0], body1->getPosition()[1], 0);
   glRotatef(180/PI * body1->getOrientation(), 0, 0, 1);
   glColor3ub (255, 255, 255);
@@ -97,7 +97,7 @@ void Demo1::paintGL()
   glPushMatrix();
   bb = body2->getWorldBB();
   bb2 = body2->getStaticBB();
-  if (body2->np_isIntersecting()) {
+  /*if (body2->np_isIntersecting()) {
     glColor3ub(180,50,50);
   } else {
     glColor3ub(50,50,180);
@@ -107,7 +107,7 @@ void Demo1::paintGL()
     glVertex2f(bb->minVertex_.x-0.2, bb->maxVertex_.y+0.2);
     glVertex2f(bb->maxVertex_.x+0.2, bb->maxVertex_.y+0.2);
     glVertex2f(bb->maxVertex_.x+0.2, bb->minVertex_.y-0.2);
-  glEnd();
+  glEnd();*/
   glTranslatef(body2->getPosition()[0], body2->getPosition()[1], 0);
   glRotatef(180/PI * body2->getOrientation(), 0, 0, 1);
   glColor3ub (255, 255, 255);
@@ -142,9 +142,9 @@ void Demo1::paintGL()
     //body1->setPosition(body1->getPosition() + mtv);
     glTranslatef(0,0,1);
     glBegin(GL_LINE);
-      glColor3ub(100, 100, 230);
-      glVertex2f(0, 0);
-      glVertex2f(mtv.x, mtv.y);
+      //glColor3ub(100, 100, 230);
+      //glVertex2f(0, 0);
+      //glVertex2f(mtv.x, mtv.y);
       // contact edge
       glColor3ub(250,50, 250);
       glVertex2f(edge_v0.x, edge_v0.y);
