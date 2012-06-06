@@ -33,6 +33,7 @@ namespace Rigid2D {
     // resolve collisions
     std::vector<Contact*>::iterator contact_it;
     for (contact_it = contacts_.begin(); contact_it < contacts_.end(); contact_it++) {
+      //resetStatesToTOI(**contact_it);
       resolveCollision(**contact_it);
     }
   }

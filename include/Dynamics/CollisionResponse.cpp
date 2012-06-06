@@ -1,6 +1,8 @@
 #include "CollisionResponse.h"
 #include "Objects/RBSolver.h"
 
+#include <iostream>
+
 namespace Rigid2D {
 
   // Returns squared distance from contact vertex va of RigidBody a to contact
@@ -79,14 +81,20 @@ namespace Rigid2D {
   // during the previous time frame.
   d_prev = vertexEdgeDist(a, b, va_index, vb1_index, vb2_index, va, RBState::PREVIOUS);
 
+  std::cout << "d_prev: " << d_prev << "\n";
+
   // Compute d, the distance between contact vertex and contact edge
   // during the current time frame.
   d = vertexEdgeDist(a, b, va_index, vb1_index, vb2_index, va);
 
   while (d > epsilon || b->pointIsInterior(va.x, va.y)) {
     t_tmp = t;
+    std::cout << "d: " << d << "\n";
+    std::cout << "t: " << t << "\n";
+    std::cout << "a.x: " << a->getPosition().x << "\n";
 
     // Compute next t value using secant method.
+    std::cout << "v: " << (t - t_prev)/(d - d_prev) << "\n";
     t = t - d * ((t - t_prev)/(d - d_prev));
 
     t_prev = t_tmp;
@@ -126,7 +134,7 @@ namespace Rigid2D {
 
     // Determine contact point on body b in world coordinates.
     ClosestPtPointSegment(vb1, vb2, va, pb);
-
+    std::cout << "closestpt -- " << pb.x << "    "  << pb.y << "      \n";
     pb = b->worldToLocalTransform(pb);  // Change to local coordinates.
     contact.pb = pb;  // Save contact point for easy look up later.
 
@@ -166,7 +174,7 @@ namespace Rigid2D {
   void resolveCollision(Contact &contact) {
     // Determine type of contact.
     Contact::Type type = getContactType(contact);
-    if (type == Contact::Colliding){
+    if (true) {///(type == Contact::Colliding){
       RigidBody *a = contact.a;
       RigidBody *b = contact.b;
 
@@ -193,19 +201,25 @@ namespace Rigid2D {
       Real j = numerator / (term1 + term2 + term3 + term4);
 
       Vector2 force = j * n;
+      std::cout << "numerator  " << numerator << "\n";
+      std::cout << "term1 " << term1 << "\n";
+      std::cout << "term2 " << term2 << "\n";
+      std::cout << "term3 " << term3 << "\n";
+      std::cout << "term4 " << term4 << "\n";
+      std::cout << "force.x " << force[0] << "\n";
 
       RBState state;
 
       // Apply impulse to body a.
-      a->getState(state);
-      state.linearMomentum += force;
-      state.angularMomentum += ra.cross(force);
+      a->getPrevState(state);
+      state.linearMomentum -= force;
+      state.angularMomentum -= ra.cross(force);
       a->setState(state);
 
       // Apply impulse to body b.
-      b->getState(state);
-      state.linearMomentum -= force;
-      state.angularMomentum -= rb.cross(force);
+      b->getPrevState(state);
+      state.linearMomentum += force;
+      state.angularMomentum += rb.cross(force);
       b->setState(state);
     }
   }
