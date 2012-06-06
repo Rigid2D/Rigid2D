@@ -1,0 +1,133 @@
+html, body {
+	margin: 0em;
+	margin-top: 0.1em;
+	margin-bottom: 0.2em;
+	padding: 0em;
+}
+
+html {
+	background-color: #19516B;
+}
+
+#page-container {
+	border-style: solid;
+	border-width: 0em;
+	border-color: black;
+	width: 60em;
+	min-height: 30em;
+	margin: auto;
+}
+
+#logo {
+	background-color: rgb(232, 242, 236);
+	border-style: solid;
+	border-width: 0.3em;
+	border-color: rgb(115, 142, 109);
+	font-variant: small-caps;
+	padding: 1.0em;
+	margin-right: 9.0em;
+}
+
+#logo h1, h2, h3 {
+	margin: 0 0 0 0;
+	font-weight: 100;
+}
+
+#main-nav {
+	background-color: rgb(232, 242, 236);
+	box-sizing: border-box;
+	ms-box-sizing: border-box;
+	webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	float: right;
+	
+	border-style: solid;
+	border-width: 0.3em;
+	border-color: rgb(115, 142, 109);
+	
+	width: 9.0em;
+	min-height: inherit;
+	padding: 0.5em;
+	padding-top: 0.3em;
+	margin-top: 0.0em;
+}
+
+#main-nav a {
+	color: blue;
+	text-decoration: none;
+	font-size: 1.1em;
+}
+
+#content {
+	background-color: rgb(232, 242, 236);
+	box-sizing: border-box;
+	ms-box-sizing: border-box;
+	webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	
+	border-style: solid;
+	border-width: 0;
+	border-color: black;
+	
+	margin-right: 9.0em;
+	width: auto;
+	padding: 0.1em;
+	min-height: inherit;
+}
+
+#content-inner {
+	background-color: rgb(168, 255, 207);
+	box-sizing: border-box;
+	ms-box-sizing: border-box;
+	webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	
+	border-style: solid;
+	border-width: 0;
+	border-color: black;
+	margin: 1.0em;
+	padding: 1.0em;
+}
+
+#alt-nav {
+	background-color: rgb(172, 232, 160);
+	box-sizing: border-box;
+	ms-box-sizing: border-box;
+	webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+
+	border-style: solid;
+	border-width: 0;
+	border-color: black;
+	
+	text-align: center;
+	padding: 0.2em;
+	margin-top: 0.0em;
+	margin-right: 9em;
+}
+
+#alt-nav a {
+	color: blue;
+	text-decoration: none;
+}
+
+#footer {
+	background-color: rgb(172, 232, 160);
+	color: rgb(120,20,20);
+	box-sizing: border-box;
+	ms-box-sizing: border-box;
+	webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	font-variant: small-caps;
+	clear: both;
+	
+	border-style: solid;
+	border-width: 0;
+	border-color: black;
+	
+	padding: 0.1em;
+	min-height: 1em;
+	text-align: center;
+	margin-top: 0.0em;
+	margin-right: 9em;
+}

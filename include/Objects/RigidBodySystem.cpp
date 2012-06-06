@@ -1,5 +1,6 @@
 #include "RigidBodySystem.h"
 #include "Common/RigidException.h"
+#include "Dynamics/CollisionResponse.h"
 
 using namespace std;
 
@@ -19,11 +20,22 @@ namespace Rigid2D {
 
   void RigidBodySystem::update()
   {
+    // clear old collisions (this should later be done by collision response code)
+    contacts_.clear();
+
+    // find collisions
     unordered_set<RigidBody*>::iterator it;
     for (it = rigidBodies_.begin(); it != rigidBodies_.end(); ++it) {
       (*it)->update();
     }
     checkCollision();
+
+    // resolve collisions
+    std::vector<Contact*>::iterator contact_it;
+    for (contact_it = contacts_.begin(); contact_it < contacts_.end(); contact_it++) {
+      //resetStatesToTOI(**contact_it);
+      resolveCollision(**contact_it);
+    }
   }
 
 
@@ -55,17 +67,32 @@ namespace Rigid2D {
     }
   }
 
+  std::vector<Contact*> * RigidBodySystem::getContacts()
+  {
+    return &contacts_;
+  }
+
+	// Perform collision detection between all pairs of rigid bodies without
+	// duplicating work.  Given n Rigid Bodies, we call RigidBody::checkCollision()
+	// "n choose 2" times.
+  // This function generates all the Contact structure needed to handle collision response.
   void RigidBodySystem::checkCollision()
   {
+    Contact *contact = new Contact;
     unordered_set<RigidBody*>::iterator it1;
     unordered_set<RigidBody*>::iterator it2;
     for (it1 = rigidBodies_.begin(); it1 != rigidBodies_.end(); ++it1) {
       it2 = it1;
       it2++;
       for ( ; it2 != rigidBodies_.end(); ++it2) {
-        (*it1)->checkCollision(*it2);
+        if ( (*it1)->checkCollision(*it2, contact) ) {
+          // Collision Detected
+          contacts_.push_back(contact);
+          contact = new Contact;
+        }
       }
     }
+    delete contact;
   }
 
 }

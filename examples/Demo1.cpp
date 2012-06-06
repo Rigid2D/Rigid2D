@@ -33,8 +33,8 @@ Demo1::Demo1(QWidget *parent)
                         mass);
 
   gravityForce = new Force(gravity);
-  body1->addForce(gravityForce);
-  body2->addForce(gravityForce);
+  //body1->addForce(gravityForce);
+  //body2->addForce(gravityForce);
 
 	// Add bodies to rigidBodySystem
 	rigidBodySystem->addRigidBody(body1);
@@ -42,7 +42,7 @@ Demo1::Demo1(QWidget *parent)
 
   userData_mouseForce[0] = 0;
   userData_mouseForce[1] = 0;
-  userData_mouseForce[4] = 100;  // Spring constant ks
+  userData_mouseForce[4] = 10;  // Spring constant ks
   userData_mouseForce[5] = 5;   // Damping constant kd
   rbActedOn = NULL;
 }
@@ -69,25 +69,18 @@ void Demo1::paintGL()
   glPushMatrix();
   AABB *bb = body1->getWorldBB();
   AABB *bb2 = body1->getStaticBB();
-  if (body1->bp_isIntersecting()) {
+  /*if (body1->np_isIntersecting()) {
     glColor3ub(180,50,50);
   } else {
     glColor3ub(50,50,180);
   }
-  //body1->setOrientation(body1->getOrientation() + 0.01);
   glBegin(GL_QUADS);
     glVertex2f(bb->minVertex_.x-0.2, bb->minVertex_.y-0.2);
     glVertex2f(bb->minVertex_.x-0.2, bb->maxVertex_.y+0.2);
     glVertex2f(bb->maxVertex_.x+0.2, bb->maxVertex_.y+0.2);
     glVertex2f(bb->maxVertex_.x+0.2, bb->minVertex_.y-0.2);
-  glEnd();
-  glTranslatef(body1->getPosition()[0], body1->getPosition()[1], 0);
-  /*glBegin(GL_QUADS);
-    glVertex2f(bb2->minVertex_.x-0.2, bb2->minVertex_.y-0.2);
-    glVertex2f(bb2->minVertex_.x-0.2, bb2->maxVertex_.y+0.2);
-    glVertex2f(bb2->maxVertex_.x+0.2, bb2->maxVertex_.y+0.2);
-    glVertex2f(bb2->maxVertex_.x+0.2, bb2->minVertex_.y-0.2);
   glEnd();*/
+  glTranslatef(body1->getPosition()[0], body1->getPosition()[1], 0);
   glRotatef(180/PI * body1->getOrientation(), 0, 0, 1);
   glColor3ub (255, 255, 255);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -104,7 +97,7 @@ void Demo1::paintGL()
   glPushMatrix();
   bb = body2->getWorldBB();
   bb2 = body2->getStaticBB();
-  if (body2->bp_isIntersecting()) {
+  /*if (body2->np_isIntersecting()) {
     glColor3ub(180,50,50);
   } else {
     glColor3ub(50,50,180);
@@ -114,15 +107,8 @@ void Demo1::paintGL()
     glVertex2f(bb->minVertex_.x-0.2, bb->maxVertex_.y+0.2);
     glVertex2f(bb->maxVertex_.x+0.2, bb->maxVertex_.y+0.2);
     glVertex2f(bb->maxVertex_.x+0.2, bb->minVertex_.y-0.2);
-  glEnd();
-  glTranslatef(body2->getPosition()[0], body2->getPosition()[1], 0);
-  /*glBegin(GL_QUADS);
-    glVertex2f(bb2->minVertex_.x-0.2, bb2->minVertex_.y-0.2);
-    glVertex2f(bb2->minVertex_.x-0.2, bb2->maxVertex_.y+0.2);
-    glVertex2f(bb2->maxVertex_.x+0.2, bb2->maxVertex_.y+0.2);
-    glVertex2f(bb2->maxVertex_.x+0.2, bb2->minVertex_.y-0.2);
   glEnd();*/
-//  body2->setOrientation(body2->getOrientation() + 0.01);
+  glTranslatef(body2->getPosition()[0], body2->getPosition()[1], 0);
   glRotatef(180/PI * body2->getOrientation(), 0, 0, 1);
   glColor3ub (255, 255, 255);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -144,11 +130,37 @@ void Demo1::paintGL()
     glEnd();
   }
 
+  // Draw all MTVs and contact edges/vertices
+  std::vector<Contact*> * contacts = rigidBodySystem->getContacts();
+  std::vector<Contact*>::iterator it;
+  for (it = contacts->begin(); it < contacts->end(); it++) {
+    Vector2 mtv = (*it)->mtv;
+    Vector2 pos = (*it)->a->getPosition();
+    Vector2 v = (*it)->a->localToWorldTransform((*it)->a->getVertex((*it)->va_index));
+    Vector2 edge_v0 = (*it)->b->localToWorldTransform((*it)->b->getVertex((*it)->vb1_index));
+    Vector2 edge_v1 = (*it)->b->localToWorldTransform((*it)->b->getVertex((*it)->vb2_index));
+    //body1->setPosition(body1->getPosition() + mtv);
+    glTranslatef(0,0,1);
+    glBegin(GL_LINE);
+      //glColor3ub(100, 100, 230);
+      //glVertex2f(0, 0);
+      //glVertex2f(mtv.x, mtv.y);
+      // contact edge
+      glColor3ub(250,50, 250);
+      glVertex2f(edge_v0.x, edge_v0.y);
+      glVertex2f(edge_v1.x, edge_v1.y);
+    glEnd();
+    glPointSize(4);
+    glBegin(GL_POINT);
+      glVertex2f(v.x, v.y);
+    glEnd();
+  }
+
   // Update ALL THE THINGS!! (unless paused)
 	if (!paused) {
     // update mouseClicked position
     if (rbActedOn != NULL) {
-      Vector2 pt = rbActedOn->worldToLocalTransform(Vector2(userData_mouseForce[2], userData_mouseForce[3]));
+      Vector2 pt = rbActedOn->prevWorldToCurrentLocalTransform(Vector2(userData_mouseForce[2], userData_mouseForce[3]));
       pt += rbActedOn->getPosition();
       userData_mouseForce[2] = pt.x;
       userData_mouseForce[3] = pt.y;
@@ -187,7 +199,7 @@ void Demo1::mousePressEvent(QMouseEvent *event)
   {
     rbActedOn = body1;
     body1->addForce(mouseForce);
-    Vector2 transformedPoint = body1->worldToLocalTransform(Vector2(posX, posY));
+    Vector2 transformedPoint = body1->prevWorldToCurrentLocalTransform(Vector2(posX, posY));
   }
   else if (body2->pointIsInterior(posX, posY))
   {

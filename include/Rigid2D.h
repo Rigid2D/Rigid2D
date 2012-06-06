@@ -12,6 +12,10 @@
 #include "Objects/RigidBodySystem.h"
 #include "Objects/Force.h"
 #include "Objects/RBSolver.h"
-#include "Objects/AABB.h"
+
+#include "Collision/AABB.h"
+#include "Collision/NarrowPhase.h"
+
+#include "Dynamics/CollisionResponse.h"
 
 #endif
