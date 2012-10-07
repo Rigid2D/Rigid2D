@@ -124,3 +124,4 @@ Force.o : $(SRC_DIR)Force.h $(SRC_DIR)Force.cpp
 RigidBodySystem.o : $(SRC_DIR)RigidBodySystem.h $(SRC_DIR)RigidBodySystem.cpp  \
 										$(SRC_DIR)RigidBody.h $(COMMON_DIR)RigidException.h
 	$(COMPILE) $(SRC_DIR)RigidBodySystem.cpp
+
